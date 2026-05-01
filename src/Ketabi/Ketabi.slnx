@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Ketabi.Application/Ketabi.Application.csproj" />
+  <Project Path="Ketabi.Core/Ketabi.Core.csproj" />
+  <Project Path="Ketabi.Infrastructure/Ketabi.Infrastructure.csproj" />
+  <Project Path="Ketabi.Web/Ketabi.Web.csproj" />
+</Solution>
