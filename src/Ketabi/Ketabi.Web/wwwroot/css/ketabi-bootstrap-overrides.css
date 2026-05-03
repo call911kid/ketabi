@@ -1,0 +1,193 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   KETABI — BOOTSTRAP 5 OVERRIDES
+   Maps --bs-* to Ketabi tokens. Load after bootstrap.min.css & tokens.css.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Typography */
+  --bs-font-sans-serif:           var(--font-primary);
+  --bs-body-font-family:          var(--font-primary);
+  --bs-body-font-size:            var(--text-base);
+  --bs-body-color:                var(--color-text);
+  --bs-body-bg:                   var(--color-bg);
+
+  /* Brand */
+  --bs-primary:                   var(--color-indigo);
+  --bs-primary-rgb:               91, 91, 214;
+  --bs-primary-text-emphasis:     var(--color-indigo-dark);
+  --bs-link-color:                var(--color-indigo);
+  --bs-link-hover-color:          var(--color-indigo-dark);
+  --bs-link-color-rgb:            91, 91, 214;
+
+  /* Semantic */
+  --bs-success:                   var(--color-success);
+  --bs-success-rgb:               22, 163, 74;
+  --bs-warning:                   var(--color-warning);
+  --bs-warning-rgb:               217, 119, 6;
+  --bs-danger:                    var(--color-error-strong);
+  --bs-danger-rgb:                225, 29, 72;
+  --bs-info:                      var(--color-info);
+  --bs-info-rgb:                  37, 99, 235;
+  --bs-secondary-color:           var(--color-text-muted);
+
+  /* Borders */
+  --bs-border-color:              rgba(0, 0, 0, 0.08);
+  --bs-border-radius:             var(--radius-base);
+  --bs-border-radius-sm:          var(--radius-sm);
+  --bs-border-radius-lg:          var(--radius-lg);
+  --bs-border-radius-xl:          var(--radius-xl);
+  --bs-border-radius-2xl:         var(--radius-2xl);
+  --bs-border-radius-pill:        var(--radius-full);
+
+  /* Shadows */
+  --bs-box-shadow:                var(--shadow-card);
+  --bs-box-shadow-sm:             var(--shadow-navbar);
+  --bs-box-shadow-lg:             var(--shadow-float);
+
+  /* Cards */
+  --bs-card-bg:                   var(--color-surface);
+  --bs-card-border-color:         rgba(0, 0, 0, 0.08);
+  --bs-card-border-radius:        var(--radius-2xl);
+  --bs-card-box-shadow:           var(--shadow-card);
+  --bs-card-spacer-x:             1.25rem;
+  --bs-card-spacer-y:             1.25rem;
+
+  /* Navbar */
+  --bs-navbar-bg:                 rgba(255, 255, 255, 0.85);
+
+  /* Forms */
+  --bs-input-bg:                  var(--color-surface-muted);
+  --bs-input-border-color:        transparent;
+  --bs-input-border-radius:       var(--radius-lg);
+  --bs-input-focus-border-color:  var(--color-indigo);
+  --bs-input-focus-box-shadow:    var(--shadow-input-focus);
+
+  /* Badges */
+  --bs-badge-border-radius:       var(--radius-full);
+  --bs-badge-font-size:           0.70rem;
+  --bs-badge-font-weight:         600;
+  --bs-badge-padding-x:           0.5rem;
+  --bs-badge-padding-y:           0.25rem;
+
+  /* Buttons */
+  --bs-btn-border-radius:         var(--radius-lg);
+  --bs-btn-border-radius-sm:      var(--radius-sm);
+  --bs-btn-border-radius-lg:      var(--radius-xl);
+  --bs-btn-font-weight:           600;
+
+  /* Modals */
+  --bs-modal-border-radius:       var(--radius-3xl);
+  --bs-modal-inner-border-radius: var(--radius-3xl);
+  --bs-modal-box-shadow:          var(--shadow-float);
+  --bs-modal-backdrop-bg:         rgba(0, 0, 0, 0.45);
+
+  /* Dropdown */
+  --bs-dropdown-border-radius:    var(--radius-3xl);
+  --bs-dropdown-box-shadow:       var(--shadow-float);
+  --bs-dropdown-border-color:     rgba(0, 0, 0, 0.08);
+  --bs-dropdown-min-width:        16rem;
+  --bs-dropdown-item-padding-x:   1rem;
+  --bs-dropdown-item-padding-y:   0.625rem;
+}
+
+/* ── .btn-primary — indigo gradient + hover lift ── */
+.btn-primary {
+  background:   linear-gradient(135deg, var(--color-indigo) 0%, var(--color-indigo-dark) 100%);
+  border-color: var(--color-indigo);
+  color:        #ffffff;
+  box-shadow:   var(--shadow-btn-primary);
+  font-weight:  var(--weight-semibold);
+  transition:   background    var(--duration-base) var(--ease-default),
+                border-color  var(--duration-base) var(--ease-default),
+                box-shadow    var(--duration-base) var(--ease-default),
+                transform     var(--duration-fast) var(--ease-default);
+}
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  background:   var(--color-indigo-dark);
+  border-color: var(--color-indigo-dark);
+  color:        #ffffff;
+  box-shadow:   var(--shadow-btn-hover);
+  transform:    translateY(-1px);
+}
+.btn-primary:active { transform: translateY(0); box-shadow: var(--shadow-btn-primary); }
+
+/* ── .btn-outline-primary ── */
+.btn-outline-primary {
+  color: var(--color-indigo); border-color: var(--color-indigo);
+  font-weight: var(--weight-semibold);
+  transition: background var(--duration-base), color var(--duration-base), transform var(--duration-fast);
+}
+.btn-outline-primary:hover { background: var(--color-indigo); border-color: var(--color-indigo); transform: translateY(-1px); }
+.btn-outline-primary:active { transform: translateY(0); }
+
+/* ── .card ── */
+.card {
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--duration-normal) var(--ease-default), transform var(--duration-normal) var(--ease-default);
+}
+.card:hover { box-shadow: var(--shadow-hover); }
+
+/* ── Form controls ── */
+.form-control, .form-select {
+  background-color: var(--color-surface-muted);
+  border:           1.5px solid transparent;
+  font-family:      var(--font-primary);
+  transition: border-color var(--duration-base) var(--ease-default),
+              box-shadow   var(--duration-base) var(--ease-default),
+              background   var(--duration-base) var(--ease-default);
+}
+.form-control:focus, .form-select:focus {
+  background-color: var(--color-surface);
+  border-color:     var(--color-indigo);
+  box-shadow:       var(--shadow-input-focus);
+}
+
+/* ── Navbar glass ── */
+.navbar {
+  backdrop-filter:         var(--blur-lg);
+  -webkit-backdrop-filter: var(--blur-lg);
+  box-shadow:              var(--shadow-navbar);
+}
+
+/* ── Dropdown ── */
+.dropdown-menu {
+  box-shadow:    var(--shadow-float);
+  border-color:  rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-3xl);
+  min-width:     var(--dropdown-width);
+}
+.dropdown-item {
+  font-size:   var(--text-sm-menu);
+  font-weight: var(--weight-medium);
+  transition:  background var(--duration-base) var(--ease-default), color var(--duration-base) var(--ease-default);
+}
+.dropdown-item:hover, .dropdown-item:focus {
+  background-color: var(--color-surface-soft);
+  color:            var(--color-text);
+}
+
+/* ── Pill buttons (filter chips) ── */
+.btn-pill {
+  border-radius: var(--radius-full);
+  padding:       0.25rem 0.875rem;
+  font-size:     var(--text-sm);
+  font-weight:   var(--weight-semibold);
+  transition: background var(--duration-base) var(--ease-default),
+              color      var(--duration-base) var(--ease-default),
+              box-shadow var(--duration-base) var(--ease-default),
+              transform  var(--duration-fast) var(--ease-default);
+}
+.btn-pill:hover  { transform: translateY(-1px); }
+.btn-pill:active { transform: translateY(0); }
+
+/* ── Modal ── */
+.modal-content {
+  border-radius: var(--radius-3xl);
+  box-shadow:    var(--shadow-float);
+  border:        1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* ── Overrides ── */
+.text-muted { color: var(--color-text-muted) !important; }
+.badge      { font-family: var(--font-primary); letter-spacing: 0.01em; }

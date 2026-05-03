@@ -1,0 +1,48 @@
+@* Views/Shared/_Navbar.cshtml (Placeholder for now) *@
+<header>
+    <nav class="navbar navbar-expand-md fixed-top ketabi-glass border-bottom mb-3" style="box-shadow: var(--shadow-navbar); backdrop-filter: var(--blur-lg); -webkit-backdrop-filter: var(--blur-lg);">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" asp-area="" asp-controller="Home" asp-action="Index" style="background: linear-gradient(135deg, var(--color-indigo), var(--color-indigo-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Ketabi
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-md-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1 mx-md-4 gap-2">
+                    <li class="nav-item">
+                        <a class="nav-link fw-medium" asp-area="" asp-controller="Home" asp-action="Index">Explorer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-medium" href="#">Requests</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <a href="#" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm d-none d-md-block" style="box-shadow: var(--shadow-btn-nav) !important;">
+                        + Add Book
+                    </a>
+                    
+                    <button class="btn btn-link position-relative text-muted p-2">
+                        <i class="bi bi-bell fs-5"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle p-1 rounded-circle border border-2 border-white" style="background-color: var(--color-error);">
+                            <span class="visually-hidden">New alerts</span>
+                        </span>
+                    </button>
+
+                    <div class="dropdown">
+                        <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle" style="box-shadow: var(--shadow-avatar-focus); border: 2px solid white;">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="dropdownUser">
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#">Sign out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>

@@ -20,3 +20,5 @@ node_modules/
 
 dist/
 wwwroot/dist/
+
+docs/web-docs

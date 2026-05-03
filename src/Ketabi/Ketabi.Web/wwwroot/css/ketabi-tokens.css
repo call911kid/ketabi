@@ -1,0 +1,203 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap');
+
+:root {
+
+  /* ── Brand · Primary Indigo ── */
+  --color-indigo:         #5B5BD6;   /* Electric Indigo — primary CTA, active states       */
+  --color-indigo-dark:    #4747C2;   /* Hover state, gradient mid-stop                     */
+  --color-indigo-deeper:  #3B3BA8;   /* Gradient end-stop, deep accent                     */
+  --color-indigo-light:   #EEEEFF;   /* Tinted surface — active chips, icon backgrounds    */
+  --color-indigo-surface: #EEF2FF;   /* Badge / status pill background (borrow)            */
+  --color-indigo-border:  #C7D2FE;   /* Badge / status pill border (borrow)                */
+  --color-indigo-4F:      #4F46E5;   /* Badge text — borrow label                          */
+  --color-indigo-7C:      #7C3AED;   /* Decorative accent (floating elements)              */
+  --color-indigo-6D:      #6D28D9;   /* Decorative accent                                  */
+  --color-indigo-8B:      #8B5CF6;   /* Decorative accent                                  */
+
+  /* ── Neutrals / Surface ── */
+  --color-bg:             #FAFAFA;   /* Alabaster — page / layout background               */
+  --color-surface:        #FFFFFF;   /* Card, panel, modal background                      */
+  --color-surface-soft:   #F9F9FC;   /* Hover state for list items / dropdown rows         */
+  --color-surface-muted:  #F5F5F8;   /* Stats bar, input background                        */
+  --color-surface-subtle: #F5F5FF;   /* Dropdown header gradient end                       */
+
+  /* ── Text ── */
+  --color-text:           #0C0C14;   /* Primary text — near black                          */
+  --color-text-muted:     #6B7080;   /* Secondary / hint / caption text                    */
+  --color-text-faint:     #717182;   /* Tertiary / disabled text                           */
+
+  /* ── Semantic · Success / Green ── */
+  --color-success:        #16A34A;   /* Text & icon — "New" condition, "Both", completed   */
+  --color-success-dot:    #22C55E;   /* Online indicator dot, completed status dot         */
+  --color-success-bg:     #F0FDF4;   /* Success surface background                         */
+  --color-success-border: #BBF7D0;   /* Success badge / pill border                        */
+
+  /* ── Semantic · Warning / Amber ── */
+  --color-warning:        #D97706;   /* Text & icon — "Fair" condition, exchange badge     */
+  --color-warning-star:   #F59E0B;   /* Star / rating colour, meetup status dot            */
+  --color-warning-bg:     #FFF7ED;   /* Warning surface background                         */
+  --color-warning-border: #FDE68A;   /* Warning badge / pill border                        */
+
+  /* ── Semantic · Info / Blue ── */
+  --color-info:           #2563EB;   /* Text & icon — "Good" condition, handoff confirmed  */
+  --color-info-dot:       #3B82F6;   /* Info status dot                                    */
+  --color-info-bg:        #EFF6FF;   /* Info surface background                            */
+
+  /* ── Semantic · Error / Red ── */
+  --color-error:          #EF4444;   /* Notification dot, badge count (non-active nav)     */
+  --color-error-strong:   #E11D48;   /* "Worn" condition, rejected status text             */
+  --color-error-deep:     #D4183D;   /* Destructive action                                 */
+  --color-error-bg:       #FFF1F2;   /* Error surface background                           */
+  --color-error-border:   #FECDD3;   /* Rejected status badge border                       */
+  --color-error-soft:     #FCA5A5;   /* Sign-out sublabel, error caption text              */
+
+  /* ── System Theme Tokens (shadcn/ui compatible) ── */
+  --background:           #ffffff;
+  --foreground:           oklch(0.145 0 0);
+  --card:                 #ffffff;
+  --card-foreground:      oklch(0.145 0 0);
+  --popover:              oklch(1 0 0);
+  --popover-foreground:   oklch(0.145 0 0);
+  --primary:              #030213;
+  --primary-foreground:   oklch(1 0 0);
+  --secondary:            oklch(0.95 0.0058 264.53);
+  --secondary-foreground: #030213;
+  --muted:                #ececf0;
+  --muted-foreground:     #717182;
+  --accent:               #e9ebef;
+  --accent-foreground:    #030213;
+  --destructive:          #d4183d;
+  --destructive-foreground: #ffffff;
+  --border:               rgba(0, 0, 0, 0.1);
+  --input:                transparent;
+  --input-background:     #f3f3f5;
+  --switch-background:    #cbced4;
+  --ring:                 oklch(0.708 0 0);
+
+  /* ── Border Radius ── */
+  --radius:               0.625rem;  /* 10px — base radius token                           */
+  --radius-xs:            4px;
+  --radius-sm:            6px;       /* calc(var(--radius) - 4px)                          */
+  --radius-md:            8px;       /* calc(var(--radius) - 2px)                          */
+  --radius-base:          10px;      /* var(--radius)                                      */
+  --radius-lg:            12px;      /* buttons, inputs                                    */
+  --radius-xl:            14px;      /* calc(var(--radius) + 4px)                          */
+  --radius-2xl:           16px;      /* cards (.ketabi-card)                               */
+  --radius-3xl:           24px;      /* dropdown, large modals                             */
+  --radius-full:          9999px;    /* pills / chips                                      */
+
+  /* ── Box Shadows ── */
+  --shadow-card:          0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-hover:         0 8px 32px rgba(0,0,0,0.12);
+  --shadow-float:         0 12px 48px rgba(0,0,0,0.14);
+  --shadow-navbar:        0 1px 0 rgba(0,0,0,0.06);
+  --shadow-mobile-menu:   0 8px 32px rgba(0,0,0,0.08);
+  --shadow-search-bar:    0 8px 32px rgba(0,0,0,0.2);
+  --shadow-btn-primary:   0 2px 8px rgba(91,91,214,0.3);
+  --shadow-btn-hover:     0 4px 16px rgba(91,91,214,0.4);
+  --shadow-btn-nav:       0 2px 12px rgba(91,91,214,0.3);
+  --shadow-cta-banner:    0 8px 32px rgba(91,91,214,0.3);
+  --shadow-filter-chip:   0 2px 8px rgba(91,91,214,0.25);
+  --shadow-avatar-ring:   0 2px 8px rgba(91,91,214,0.2);
+  --shadow-input-focus:   0 0 0 3px rgba(91,91,214,0.12);
+  --shadow-avatar-focus:  0 0 0 2px var(--color-indigo);
+
+  /* ── Typography — Font Families ── */
+  --font-primary:         'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-secondary:       'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-size-base:       16px;
+
+  /* ── Typography — Font Size Scale ── */
+  --text-2xs:             0.60rem;   /* 9.6px  — badge counts, tiny labels                */
+  --text-xs-tight:        0.62rem;   /* 9.9px  — stat labels in dropdowns                 */
+  --text-xs-badge:        0.63rem;   /* 10.1px — condition badge text                     */
+  --text-xs:              0.65rem;   /* 10.4px — reserved tags, small captions            */
+  --text-xs-sub:          0.68rem;   /* 10.9px — sublabels, review counts                 */
+  --text-xs-label:        0.70rem;   /* 11.2px — book card author, badge labels           */
+  --text-xs-loc:          0.72rem;   /* 11.5px — location text, owner name in cards       */
+  --text-sm-pill:         0.75rem;   /* 12px   — category filter pills                   */
+  --text-sm-filter:       0.78rem;   /* 12.5px — search tag, expanded filter buttons      */
+  --text-sm:              0.80rem;   /* 12.8px — type filters, eyebrow/label text         */
+  --text-sm-menu:         0.82rem;   /* 13.1px — dropdown menu item labels                */
+  --text-sm-cta:          0.84rem;   /* 13.4px — nav add-book CTA                         */
+  --text-sm-nav:          0.85rem;   /* 13.6px — nav links, book title in card            */
+  --text-base:            0.875rem;  /* 14px   — body, action buttons, standard UI        */
+  --text-md:              0.90rem;   /* 14.4px — small headings, dropdown header          */
+  --text-body:            0.95rem;   /* 15.2px — hero body copy                           */
+  --text-1:               1.00rem;   /* 16px   — base / root                              */
+  --text-lg-section:      1.10rem;   /* 17.6px — section heading in content               */
+  --text-xl-cta:          1.30rem;   /* 20.8px — CTA banner heading                       */
+  /* Responsive hero H1: clamp(1.8rem, 4vw, 2.8rem) — 28.8–44.8px                       */
+
+  /* ── Typography — Font Weights ── */
+  --weight-normal:        400;
+  --weight-medium:        500;
+  --weight-semibold:      600;
+  --weight-bold:          700;
+  --weight-extrabold:     800;
+
+  /* ── Typography — Line Heights ── */
+  --leading-tight:        1.5;       /* Headings, labels                                  */
+  --leading-body:         1.6;       /* Hero paragraph copy                               */
+
+  /* ── Typography — Letter Spacing ── */
+  --tracking-tight:       -0.02em;   /* Hero H1, logo wordmark                            */
+  --tracking-snug:        -0.01em;   /* CTA heading                                       */
+  --tracking-wide:        0.10em;    /* Eyebrow/label uppercase                           */
+  --tracking-widest:      0.30em;    /* Reserved tag UPPERCASE                            */
+
+  /* ── Transitions ── */
+  --duration-fast:        0.1s;      /* active/press transform                            */
+  --duration-base:        0.15s;     /* button bg, dropdown motion                        */
+  --duration-normal:      0.2s;      /* card shadow, link hover, image hover              */
+  --duration-medium:      0.3s;      /* motion item entrance animation                    */
+  --duration-slow:        0.5s;      /* hero section animation, book cover hover scale    */
+  --ease-default:         ease;
+
+  /* ── Backdrop Blur ── */
+  --blur-sm:              blur(8px);   /* image badge backdrop                            */
+  --blur-md:              blur(16px);  /* sticky filter bar                               */
+  --blur-lg:              blur(20px);  /* glass navbar, search bar, mobile menu           */
+
+  /* ── Z-index ── */
+  --z-filter-bar:         40;
+  --z-navbar:             50;
+  --z-modal:              60;
+  --z-toast:              70;
+
+  /* ── Layout ── */
+  --navbar-height:        64px;      /* 4rem — fixed top navbar                           */
+  --container-max:        1280px;    /* max-w-7xl                                         */
+  --container-px:         16px;      /* px-4 — mobile container padding                  */
+  --container-px-sm:      24px;      /* sm:px-6 — tablet+ container padding              */
+  --hero-height:          340px;
+  --dropdown-width:       256px;     /* 16rem — profile dropdown                         */
+
+  /* ── Component · Avatar ── */
+  --avatar-xs:            20px;      /* tiny (book card owner ring)                       */
+  --avatar-sm:            28px;      /* navbar avatar button                              */
+  --avatar-md:            44px;      /* dropdown header                                   */
+
+  /* ── Component · Icon ── */
+  --icon-xs:              10px;      /* w-2.5 — star, map pin in card                     */
+  --icon-sm:              14px;      /* w-3.5 — nav icons, button icons                  */
+  --icon-md:              16px;      /* w-4   — standard action icons                    */
+  --icon-lg:              20px;      /* w-5   — search bar icon                          */
+  --icon-xl:              32px;      /* w-8   — empty state illustration                 */
+
+  /* ── Component · Badge/Dot ── */
+  --dot-xs:               8px;       /* notification dot                                  */
+  --dot-sm:               10px;      /* online indicator (nav)                            */
+  --dot-md:               12px;      /* online indicator (dropdown)                       */
+  --badge-chip:           16px;      /* unread count chip (w-4 h-4)                       */
+
+  /* ── Aspect Ratios ── */
+  --ratio-book-cover:     3 / 4;     /* Portrait book cover image                         */
+
+  /* ── Scrollbar ── */
+  --scrollbar-width:      6px;
+  --scrollbar-height:     6px;
+  --scrollbar-radius:     3px;
+  --scrollbar-thumb:      rgba(0,0,0,0.15);
+  --scrollbar-thumb-hover: rgba(0,0,0,0.25);
+}
