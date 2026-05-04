@@ -27,7 +27,7 @@ namespace Ketabi.Infrastructure.Repositories
         public async Task<User?> GetUserWithListingsAsync(Guid userId)
         {
             return await _dbSet
-                .Include(u => u.Books)
+                .Include(u => u.Listings)
                 .FirstOrDefaultAsync(u => u.Id == userId);
         }
 

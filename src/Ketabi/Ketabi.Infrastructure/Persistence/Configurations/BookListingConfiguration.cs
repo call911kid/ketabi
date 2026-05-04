@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Ketabi.Infrastructure.Persistence.Configurations;
 
-public class UserBookConfiguration : IEntityTypeConfiguration<BookListing>
+public class BookListingConfiguration : IEntityTypeConfiguration<BookListing>
 {
     public void Configure(EntityTypeBuilder<BookListing> builder)
     {
@@ -49,7 +49,7 @@ public class UserBookConfiguration : IEntityTypeConfiguration<BookListing>
         builder.Property(u => u.DeletedAt);
 
         builder.HasMany(b => b.Requests)
-            .WithOne(r => r.Book)
+            .WithOne(r => r.Listing)
             .HasForeignKey(r => r.ListingId)
             .OnDelete(DeleteBehavior.Restrict);
     }

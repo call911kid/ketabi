@@ -28,7 +28,7 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
 
         builder.Property(u => u.DeletedAt);
 
-        builder.HasMany(c => c.Books)
+        builder.HasMany(c => c.BookListings)
             .WithOne(b => b.Category)
             .HasForeignKey(b => b.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);

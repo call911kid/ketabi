@@ -13,6 +13,6 @@ internal class CategoryRepository : GenericRepository<Category>, ICategoryReposi
 
     public async Task<IEnumerable<Category>> GetCategoriesWithBooksAsync()
     {
-        return await _dbSet.Include(c => c.Books).ToListAsync();
+        return await _dbSet.Include(c => c.BookListings).ToListAsync();
     }
 }
