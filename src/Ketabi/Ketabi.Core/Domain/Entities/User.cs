@@ -15,7 +15,7 @@ public sealed class User : BaseEntity
     public string? ProfilePictureUrl { get; set; }
 
     // Navigation
-    public ICollection<UserBook> Books { get; set; } = new List<UserBook>();
+    public ICollection<BookListing> Listings { get; set; } = new List<BookListing>();
     public ICollection<Request> SentRequests { get; set; } = new List<Request>();
     public ICollection<Request> ReceivedRequests { get; set; } = new List<Request>();
     public ICollection<Review> ReviewsWritten { get; set; } = new List<Review>();

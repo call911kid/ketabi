@@ -6,6 +6,6 @@ public sealed class ExchangeRequest : Request
 
     public Guid OfferedBookId { get; set; }
 
-    public UserBook? OfferedBook { get; set; }
+    public BookListing? OfferedBook { get; set; }
 }
 

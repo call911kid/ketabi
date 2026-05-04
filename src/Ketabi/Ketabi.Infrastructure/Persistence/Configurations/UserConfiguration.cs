@@ -73,7 +73,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasForeignKey(n => n.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<ApplicationUser>()
+        builder.HasOne<KetabiUser>()
                .WithOne()
                .HasForeignKey<User>(u => u.Id)
                .OnDelete(DeleteBehavior.Cascade);

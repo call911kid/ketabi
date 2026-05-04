@@ -17,7 +17,7 @@ namespace Ketabi.Infrastructure
         private IDbContextTransaction? _transaction;
         private IUserRepository? _users;
         private ICategoryRepository? _categories;
-        private IUserBookRepository? _listings;
+        private IBookListingRepository? _listings;
         private IRequestRepository? _requests;
         private IReviewRepository? _reviews;
 
@@ -27,7 +27,7 @@ namespace Ketabi.Infrastructure
         }
         public IUserRepository Users => _users ??= new UserRepository(_context);
         public ICategoryRepository Categories => _categories ??= new CategoryRepository(_context);
-        public IUserBookRepository Listings => _listings ??= new UserBookRepository(_context);
+        public IBookListingRepository Listings => _listings ??= new UserBookRepository(_context);
         public IRequestRepository Requests => _requests ??= new RequestRepository(_context);
         public IReviewRepository Reviews => _reviews ??= new ReviewRepository(_context);
         public async Task<int> SaveChangesAsync()

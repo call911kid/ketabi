@@ -6,7 +6,7 @@ public interface IUnitOfWork : IDisposable
 {
     IUserRepository Users { get; }
     ICategoryRepository Categories { get; }
-    IUserBookRepository Listings { get; }
+    IBookListingRepository Listings { get; }
     IRequestRepository Requests { get; }
     IReviewRepository Reviews { get; }
 

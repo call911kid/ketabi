@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 
 namespace Ketabi.Infrastructure.Repositories
 {
-    internal class UserBookRepository : GenericRepository<UserBook>, IUserBookRepository
+    internal class UserBookRepository : GenericRepository<BookListing>, IBookListingRepository
     {
         public UserBookRepository(KetabiDbContext context) : base(context)
         {
         }
 
-        public async Task<PagedResult<UserBook>> GetListingsByLocationAndModeAsync(string governorate, SharingMode mode, int pageNumber, int pageSize)
+        public async Task<PagedResult<BookListing>> GetListingsByLocationAndModeAsync(string governorate, SharingMode mode, int pageNumber, int pageSize)
         {
             var query =  _dbSet
                 .Where(ub => ub.IsAvailable && ub.LocationNote.Contains(governorate) && (mode == SharingMode.Both || ub.SharingMode == mode));
@@ -30,7 +30,7 @@ namespace Ketabi.Infrastructure.Repositories
                 .Take(pageSize)
                 .ToListAsync();
 
-            return new PagedResult<UserBook>(items, totalCount, pageNumber, pageSize);
+            return new PagedResult<BookListing>(items, totalCount, pageNumber, pageSize);
         }
     }
 }

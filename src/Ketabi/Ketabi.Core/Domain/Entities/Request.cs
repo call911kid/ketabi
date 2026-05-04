@@ -17,7 +17,7 @@ public abstract class Request : BaseEntity
     // Navigation
     public User? Sender { get; set; }
     public User? Receiver { get; set; }
-    public UserBook? Book { get; set; }
+    public BookListing? Listing { get; set; }
 
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
 }

@@ -2,9 +2,9 @@ namespace Ketabi.Core.Domain.Entities;
 
 using Ketabi.Core.Domain.Enums;
 
-public sealed class UserBook : BaseEntity
+public sealed class BookListing : BaseEntity
 {
-    public UserBook(Guid id) : base(id) { }
+    public BookListing(Guid id) : base(id) { }
 
     public string Title { get; set; }
     public string Author { get; set; }

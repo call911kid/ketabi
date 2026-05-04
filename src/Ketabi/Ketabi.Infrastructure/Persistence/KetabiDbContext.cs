@@ -6,12 +6,12 @@ using Ketabi.Infrastructure.Persistence.Identity;
 
 namespace Ketabi.Infrastructure.Persistence
 { 
-    public class KetabiDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+    public class KetabiDbContext : IdentityDbContext<KetabiUser, IdentityRole<Guid>, Guid>
     {
         public KetabiDbContext(DbContextOptions<KetabiDbContext> options) : base(options) { }
 
         public DbSet<User> DomainUsers { get; set; }
-        public DbSet<UserBook> UserBooks { get; set; }
+        public DbSet<BookListing> BookListings { get; set; }
         public DbSet<Request> Requests { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Notification> Notifications { get; set; }

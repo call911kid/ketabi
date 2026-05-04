@@ -4,10 +4,10 @@ using Ketabi.Core.Domain.Entities;
 using Ketabi.Core.Domain.Enums;
 using Ketabi.Core.Domain.Models;
 
-public interface IUserBookRepository : IGenericRepository<UserBook>
+public interface IBookListingRepository : IGenericRepository<BookListing>
 {
 
-    Task<PagedResult<UserBook>> GetListingsByLocationAndModeAsync(
+    Task<PagedResult<BookListing>> GetListingsByLocationAndModeAsync(
         string governorate,
         SharingMode mode,
         int pageNumber,

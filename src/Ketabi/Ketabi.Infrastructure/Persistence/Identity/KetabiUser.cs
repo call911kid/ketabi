@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Ketabi.Infrastructure.Persistence.Identity
 {
-    public class ApplicationUser : IdentityUser<Guid>
+    public class KetabiUser : IdentityUser<Guid>
     {
         
     }

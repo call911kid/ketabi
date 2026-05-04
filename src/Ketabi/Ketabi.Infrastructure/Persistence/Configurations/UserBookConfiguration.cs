@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Ketabi.Infrastructure.Persistence.Configurations;
 
-public class UserBookConfiguration : IEntityTypeConfiguration<UserBook>
+public class UserBookConfiguration : IEntityTypeConfiguration<BookListing>
 {
-    public void Configure(EntityTypeBuilder<UserBook> builder)
+    public void Configure(EntityTypeBuilder<BookListing> builder)
     {
         builder.ToTable("UserBooks");
 

@@ -8,5 +8,5 @@ public sealed class Category : BaseEntity
     public string? Description { get; set; }
     public string? IconUrl { get; set; }
 
-    public ICollection<UserBook> Books { get; set; } = new List<UserBook>();
+    public ICollection<BookListing> BookListings { get; set; } = new List<BookListing>();
 }
