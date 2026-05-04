@@ -14,9 +14,22 @@ public static class InfrastructureRegistration
         services.AddDbContext<KetabiDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-        //services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
-        //    .AddEntityFrameworkStores<KetabiDbContext>()
-        //    .AddDefaultTokenProviders();
+        services.AddIdentityCore<KetabiUser>(options =>
+        {
+            options.User.RequireUniqueEmail = true;
+            options.Password.RequiredLength = 8;
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireNonAlphanumeric = false;
+        })
+        .AddRoles<IdentityRole<Guid>>()
+        .AddEntityFrameworkStores<KetabiDbContext>()
+        .AddDefaultTokenProviders();
+
+
+
+
 
         return services;
     }
