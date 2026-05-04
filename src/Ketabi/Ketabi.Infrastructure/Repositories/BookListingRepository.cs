@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace Ketabi.Infrastructure.Repositories
 {
-    internal class UserBookRepository : GenericRepository<BookListing>, IBookListingRepository
+    internal class BookListingRepository : GenericRepository<BookListing>, IBookListingRepository
     {
-        public UserBookRepository(KetabiDbContext context) : base(context)
+        public BookListingRepository(KetabiDbContext context) : base(context)
         {
         }
 
