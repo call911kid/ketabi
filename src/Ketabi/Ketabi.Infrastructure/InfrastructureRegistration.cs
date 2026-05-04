@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Ketabi.Core.Interfaces;
+using Ketabi.Core.Interfaces.Repositories;
+using Ketabi.Infrastructure.Repositories;
 
 namespace Ketabi.Infrastructure;
 
@@ -23,13 +26,22 @@ public static class InfrastructureRegistration
             options.Password.RequireDigit = true;
             options.Password.RequireLowercase = true;
             options.Password.RequireUppercase = true;
-            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireNonAlphanumeric = false; 
         })
         .AddRoles<IdentityRole<Guid>>()
         .AddEntityFrameworkStores<KetabiDbContext>()
         .AddDefaultTokenProviders();
 
         services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+        services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IBookListingRepository, BookListingRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IReviewRepository, ReviewRepository>();
+        services.AddScoped<IRequestRepository, RequestRepository>();
 
 
 
