@@ -13,15 +13,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasKey(u => u.Id);
 
-        builder.HasIndex(u => u.Email).IsUnique();
+        builder.Property(u => u.FirstName).IsRequired().HasMaxLength(100);
 
-        builder.Property(u => u.UserName).IsRequired().HasMaxLength(50);
-
-        builder.Property(u => u.FullName).IsRequired().HasMaxLength(100);
-
-        builder.Property(u => u.Email).IsRequired().HasMaxLength(256);
-
-        builder.Property(u => u.PhoneNumber).HasMaxLength(20);
+        builder.Property(u => u.LastName).IsRequired().HasMaxLength(100);
 
         builder.Property(u => u.Bio).HasMaxLength(1000);
 
@@ -43,7 +37,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.DeletedAt);
 
-        builder.HasMany(u => u.Books)
+        builder.HasMany(u => u.Listings)
             .WithOne(b => b.User)
             .HasForeignKey(b => b.UserId)
             .OnDelete(DeleteBehavior.Cascade);
