@@ -2,8 +2,6 @@ using Ketabi.Core.Domain.Enums;
 
 namespace Ketabi.Application.DTOs.Notifications;
 
-// ── Notification ───────────────────────────────────────────────────────────
-
 /// <summary>
 /// Single notification record returned by the service layer.
 /// Maps from: Notification entity → NotificationItemViewModel.
@@ -22,16 +20,4 @@ public class NotificationDto
 
     /// <summary>Optional deep-link URL to the related entity (book, request, etc.).</summary>
     public string? ActionUrl { get; init; }
-}
-
-// ── Notification Summary ───────────────────────────────────────────────────
-
-/// <summary>
-/// Unread count + recent notifications for the navbar dropdown.
-/// Maps to: NavbarViewModel.UnreadNotifications.
-/// </summary>
-public class NotificationSummaryDto
-{
-    public int UnreadCount { get; init; }
-    public IReadOnlyList<NotificationDto> Recent { get; init; } = [];
 }
