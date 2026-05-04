@@ -7,8 +7,8 @@ public sealed class BookListing : BaseEntity
     public BookListing() : base() { }
     public BookListing(Guid id) : base(id) { }
 
-    public string Title { get; set; }
-    public string Author { get; set; }
+    public required string Title { get; set; }
+    public required string Author { get; set; }
     public string? ISBN { get; set; }
     public string? Description { get; set; }
     public string? Language { get; set; }
