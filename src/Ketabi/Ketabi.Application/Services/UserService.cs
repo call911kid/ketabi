@@ -1,0 +1,56 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Ketabi.Application.DTOs.User;
+using Ketabi.Application.Interfaces;
+using Ketabi.Core.Domain.Entities;
+using Ketabi.Core.Interfaces;
+
+namespace Ketabi.Application.Services
+{
+    internal class UserService:IUserService
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        public UserService(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork=unitOfWork;
+        }
+
+        public async Task<CreatedUserDto> CreateUserAsync(CreateUserDto createUserDto)
+        {
+            string? pUrl=null!;
+            if (createUserDto.ProfilePicture != null)
+                pUrl = await FileService.UploadFileAsync(createUserDto.ProfilePicture);
+
+            var user = new User
+            {
+                Id=Guid.NewGuid(),
+                FirstName = createUserDto.FirstName,
+                LastName = createUserDto.LastName,
+                Bio = createUserDto.Bio,
+                City = createUserDto.City,
+                Governorate = createUserDto.Governorate,
+                ReputationScore = 0,
+                ProfilePictureUrl = pUrl
+
+            };
+
+            await _unitOfWork.Users.AddAsync(user);
+            await _unitOfWork.SaveChangesAsync();
+
+            return new CreatedUserDto
+            {
+                Id = user.Id,
+                FirstName= user.FirstName,
+                LastName= user.LastName,
+                Bio= user.Bio,
+                City= user.City,
+                Governorate= user.Governorate,
+                ReputationScore= user.ReputationScore,
+                ProfilePictureUrl= pUrl
+            };
+        }
+    }
+}
