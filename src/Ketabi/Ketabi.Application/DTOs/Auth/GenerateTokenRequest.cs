@@ -11,6 +11,6 @@ namespace Ketabi.Application.DTOs.Auth
         public Guid UserId { get; set; }
         public string Email { get; set; } = string.Empty;
         public string UserName { get; set; } = string.Empty;
-        public IReadOnlyCollection<string> Roles { get; init; } = new List<string>();
+        public IEnumerable<string> Roles { get; init; } = new List<string>();
     }
 }
