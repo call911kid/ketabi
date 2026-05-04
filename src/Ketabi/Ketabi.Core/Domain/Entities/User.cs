@@ -3,6 +3,7 @@ namespace Ketabi.Core.Domain.Entities;
 public sealed class User : BaseEntity
 {
     public User(Guid id) : base(id) { }
+    public User() : base() { }
 
     public string FirstName { get; set; }
     public string LastName { get; set; }

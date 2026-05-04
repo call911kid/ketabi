@@ -4,6 +4,7 @@ using Ketabi.Core.Domain.Enums;
 
 public sealed class BookListing : BaseEntity
 {
+    public BookListing() : base() { }
     public BookListing(Guid id) : base(id) { }
 
     public string Title { get; set; }

@@ -3,6 +3,7 @@ namespace Ketabi.Core.Domain.Entities;
 public sealed class Review : BaseEntity
 {
     public Review(Guid id) : base(id) { }
+    public Review() : base() { }
 
     public int Rating { get; set; }
     public string? Comment { get; set; }

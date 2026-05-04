@@ -4,6 +4,7 @@ using Ketabi.Core.Domain.Enums;
 
 public abstract class Request : BaseEntity
 {
+    protected Request() : base() { }
     protected Request(Guid id) : base(id) { }
 
     public RequestStatus Status { get; set; } = RequestStatus.Pending;
