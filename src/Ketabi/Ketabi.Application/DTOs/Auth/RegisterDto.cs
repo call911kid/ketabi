@@ -1,27 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using Ketabi.Application.DTOs.Users;
 
 namespace Ketabi.Application.DTOs.Auth;
-
-// ── Login ──────────────────────────────────────────────────────────────────
-
-/// <summary>Credentials submitted by the login form. Maps from LoginViewModel.</summary>
-public class LoginDto
-{
-    [Required(ErrorMessage = "Email is required.")]
-    [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
-    [MaxLength(254)]
-    public string Email { get; init; } = string.Empty;
-
-    [Required(ErrorMessage = "Password is required.")]
-    [MinLength(8, ErrorMessage = "Password must be at least 8 characters.")]
-    [MaxLength(128)]
-    public string Password { get; init; } = string.Empty;
-
-    public bool RememberMe { get; init; }
-}
-
-// ── Register ───────────────────────────────────────────────────────────────
 
 /// <summary>New account payload. Maps from RegisterViewModel.</summary>
 public class RegisterDto
@@ -61,19 +40,4 @@ public class RegisterDto
     [Url]
     [MaxLength(500)]
     public string? ProfilePictureUrl { get; init; }
-}
-
-// ── Auth Result ────────────────────────────────────────────────────────────
-
-/// <summary>
-/// Returned on successful authentication.
-/// Contains enough user info to bootstrap the navbar and redirect logic.
-/// </summary>
-public class AuthResultDto
-{
-    /// <summary>Lightweight user snapshot for populating NavbarViewModel.</summary>
-    public UserSummaryDto User { get; init; } = new();
-
-    /// <summary>True on first-time registration (used for redirect logic).</summary>
-    public bool IsNewUser { get; init; }
 }
