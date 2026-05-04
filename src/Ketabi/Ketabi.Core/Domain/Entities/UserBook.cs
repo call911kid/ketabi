@@ -6,8 +6,8 @@ public sealed class UserBook : BaseEntity
 {
     public UserBook(Guid id) : base(id) { }
 
-    public string Title { get; set; }
-    public string Author { get; set; }
+    public required string Title { get; set; }
+    public required string Author { get; set; }
     public string? ISBN { get; set; }
     public string? Description { get; set; }
     public string? Language { get; set; }

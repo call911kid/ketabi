@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Ketabi.Core.Domain.Entities;
@@ -10,7 +10,7 @@ namespace Ketabi.Infrastructure.Persistence
     {
         public KetabiDbContext(DbContextOptions<KetabiDbContext> options) : base(options) { }
 
-        public DbSet<User> Users { get; set; }
+        public new DbSet<User> Users { get; set; }
         public DbSet<UserBook> UserBooks { get; set; }
         public DbSet<Request> Requests { get; set; }
         public DbSet<Review> Reviews { get; set; }
