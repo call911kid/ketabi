@@ -1,5 +1,7 @@
 ﻿using Ketabi.Infrastructure.Persistence;
 using Ketabi.Infrastructure.Persistence.Identity;
+using Ketabi.Application.Interfaces;
+using Ketabi.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +29,7 @@ public static class InfrastructureRegistration
         .AddEntityFrameworkStores<KetabiDbContext>()
         .AddDefaultTokenProviders();
 
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 
 

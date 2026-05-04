@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ketabi.Application\Ketabi.Application.csproj" />
     <ProjectReference Include="..\Ketabi.Core\Ketabi.Core.csproj" />
   </ItemGroup>
 
