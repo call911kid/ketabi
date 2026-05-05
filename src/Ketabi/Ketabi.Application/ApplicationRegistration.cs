@@ -11,6 +11,7 @@ public static class ApplicationRegistration
         services.AddAutoMapper(cfg =>
              cfg.AddMaps(typeof(ApplicationRegistration).Assembly));
         services.AddScoped<IReviewService, ReviewService>();
+        services.AddScoped<IRequestService, RequestService>();
         return services;
     }
 }
