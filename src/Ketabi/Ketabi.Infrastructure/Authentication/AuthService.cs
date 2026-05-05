@@ -65,9 +65,10 @@ namespace Ketabi.Infrastructure.Authentication
             {
                 throw new InvalidOperationException("Failed to register user."); // change later with custom exception
             }
+            ketabiUser = await _userManager.FindByEmailAsync(request.Email);
             var createUserDto= new CreateUserDto
             {
-                
+                Id= ketabiUser.Id,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 Email = request.Email,

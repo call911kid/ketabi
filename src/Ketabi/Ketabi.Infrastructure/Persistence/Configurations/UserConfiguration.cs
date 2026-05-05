@@ -69,7 +69,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasOne<KetabiUser>()
                .WithOne()
-               .HasForeignKey<User>(u => u.Email)
+               .HasForeignKey<User>(u => u.Id)
                .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -26,7 +26,7 @@ namespace Ketabi.Application.Services
 
             var user = new User
             {
-                Id=Guid.NewGuid(),
+                Id=createUserDto.Id,
                 FirstName = createUserDto.FirstName,
                 LastName = createUserDto.LastName,
                 Bio = createUserDto.Bio,
