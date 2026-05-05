@@ -1,0 +1,67 @@
+<div class="auth-left-panel" aria-hidden="true">
+    <div class="auth-left-overlay"></div>
+    <div class="blur-c1"></div>
+    <div class="blur-c2"></div>
+
+    <!-- Floating book shapes — background uses indigo token vars -->
+    <div class="floating-book" style="top:12%;left:8%;width:44px;height:62px;background:var(--color-indigo-7C);--book-rotate:-12deg;animation-duration:3.0s;"></div>
+    <div class="floating-book" style="top:22%;right:10%;width:36px;height:52px;background:var(--color-indigo);--book-rotate:8deg;animation-duration:3.7s;"></div>
+    <div class="floating-book" style="top:55%;left:5%;width:52px;height:72px;background:var(--color-indigo-4F);--book-rotate:6deg;animation-duration:4.4s;"></div>
+    <div class="floating-book" style="top:65%;right:8%;width:40px;height:58px;background:var(--color-indigo-6D);--book-rotate:-10deg;animation-duration:5.1s;"></div>
+    <div class="floating-book" style="top:80%;left:18%;width:34px;height:48px;background:var(--color-indigo-8B);--book-rotate:3deg;animation-duration:3.4s;"></div>
+
+    <div class="auth-left-content">
+
+        <!-- Logo -->
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:40px;height:40px;border-radius:var(--radius-xl);background:rgba(255,255,255,0.18);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;">
+                <i class="bi bi-book" style="color:white;font-size:18px;"></i>
+            </div>
+            <span style="color:white;font-size:1.3rem;font-weight:var(--weight-extrabold);letter-spacing:var(--tracking-tight);font-family:var(--font-primary);">ketabi</span>
+        </div>
+
+        <!-- Hero copy -->
+        <div>
+            <h2 style="color:white;font-size:clamp(1.8rem,3.5vw,2.4rem);font-weight:var(--weight-extrabold);line-height:1.15;letter-spacing:-0.025em;font-family:var(--font-primary);margin-bottom:1rem;">
+                Books find<br>
+                <span style="color:var(--color-indigo-light);">new lives</span><br>
+                in community.
+            </h2>
+            <p style="color:rgba(255,255,255,0.70);font-size:1rem;line-height:var(--leading-body);max-width:340px;margin-bottom:2rem;">
+                Join thousands of readers across Cairo, Alexandria and beyond — sharing, borrowing, and exchanging books with people who love them as much as you do.
+            </p>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+                @foreach (var bullet in new[] {
+                    "Borrow books for free from people near you",
+                    "Exchange your reads for something new",
+                    "Build a trusted community of booklovers"
+                })
+                {
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div style="width:20px;height:20px;border-radius:50%;flex-shrink:0;background:rgba(196,181,253,0.3);border:1px solid rgba(196,181,253,0.5);display:flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-check" style="color:var(--color-indigo-light);font-size:11px;"></i>
+                        </div>
+                        <p style="color:rgba(255,255,255,0.80);font-size:0.875rem;margin:0;">@bullet</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Trust signal bar -->
+        <div style="display:flex;align-items:center;gap:16px;padding:16px;border-radius:var(--radius-2xl);background:rgba(255,255,255,0.08);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.15);">
+            <div style="display:flex;">
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--color-indigo-7C);border:2px solid rgba(255,255,255,0.4);"></div>
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--color-indigo);border:2px solid rgba(255,255,255,0.4);margin-left:-10px;"></div>
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--color-indigo-4F);border:2px solid rgba(255,255,255,0.4);margin-left:-10px;"></div>
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--color-indigo-8B);border:2px solid rgba(255,255,255,0.4);margin-left:-10px;display:flex;align-items:center;justify-content:center;">
+                    <span style="color:white;font-size:0.5rem;font-weight:var(--weight-bold);">+2k</span>
+                </div>
+            </div>
+            <div>
+                <p style="color:white;font-size:0.875rem;font-weight:var(--weight-bold);margin:0;font-family:var(--font-primary);">Trusted by 2,000+ readers</p>
+                <p style="color:rgba(255,255,255,0.60);font-size:0.72rem;margin:0;">Join our growing book community today</p>
+            </div>
+        </div>
+
+    </div>
+</div>
