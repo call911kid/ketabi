@@ -1,8 +1,9 @@
-using System.Text;
 using Ketabi.Application;
 using Ketabi.Infrastructure;
+using Ketabi.Web.Mappings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Ketabi.Web
 {
@@ -19,6 +20,11 @@ namespace Ketabi.Web
             // Add infrastructure services
             builder.Services.AddInfrastructureServices(builder.Configuration);
 
+            // Add mapping services
+            builder.Services.AddAutoMapper(cfg =>
+            {
+                cfg.AddProfile<AccountWebProfile>();
+            }, typeof(AccountWebProfile).Assembly);
             // Add controllers with views
             builder.Services.AddControllersWithViews();
 
