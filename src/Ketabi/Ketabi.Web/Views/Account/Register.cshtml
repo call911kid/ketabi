@@ -1,0 +1,216 @@
+@model Ketabi.Web.ViewModels.Account.RegisterViewModel
+@{
+    ViewData["Title"] = "Create Account — Ketabi";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="auth-form-inner">
+
+    <h1 style="font-size:1.75rem;font-weight:var(--weight-extrabold);color:var(--color-text);letter-spacing:var(--tracking-tight);margin-bottom:4px;font-family:var(--font-primary);">
+        Join Ketabi
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="auth-title-icon inline-block text-indigo-600 mb-1" style="vertical-align: middle;">
+            <path d="m16 6 4 14"/>
+            <path d="M12 6v14"/>
+            <path d="M8 8v12"/>
+            <path d="M4 4v16"/>
+        </svg>
+    </h1>
+    <p style="font-size:0.875rem;color:var(--color-text-muted);margin-bottom:1.75rem;">Create your account and start sharing books today.</p>
+
+    <!-- Mode Toggle — Sign Up active -->
+    <div style="display:flex;background:var(--color-surface-muted);border-radius:var(--radius-lg);padding:4px;margin-bottom:1.5rem;">
+        <a asp-controller="Account" asp-action="Login" class="auth-mode-btn-inactive"
+           style="flex:1;text-align:center;padding:10px;border-radius:var(--radius-md);font-size:0.875rem;font-weight:var(--weight-semibold);font-family:var(--font-primary);text-decoration:none;transition:all var(--duration-base) var(--ease-default);">Sign In</a>
+        <a asp-controller="Account" asp-action="Register" class="auth-mode-btn-active"
+           style="flex:1;text-align:center;padding:10px;border-radius:var(--radius-md);font-size:0.875rem;font-weight:var(--weight-semibold);font-family:var(--font-primary);text-decoration:none;transition:all var(--duration-base) var(--ease-default);">Sign Up</a>
+    </div>
+
+    <!-- Google OAuth -->
+    <button type="button" id="googleRegisterBtn" class="auth-google-btn"
+            onclick="window.location.href='@Url.Action("GoogleLogin","Account")'"
+            style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:13px 20px;border-radius:var(--radius-lg);border:1.5px solid var(--border);background:var(--color-surface);font-size:0.875rem;font-weight:var(--weight-semibold);color:var(--color-text);font-family:var(--font-primary);cursor:pointer;margin-bottom:1.25rem;">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+    </button>
+
+    <!-- Divider -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;">
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <span style="font-size:0.75rem;color:var(--color-text-muted);white-space:nowrap;">or continue with email</span>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+    </div>
+
+    <!-- ── Register Form ── -->
+    <form id="registerForm" asp-controller="Account" asp-action="Register" method="post" novalidate>
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly"
+             style="border-radius:var(--radius-lg);background:var(--color-error-bg);border:1px solid var(--color-error-border);color:var(--color-error-strong);font-size:0.8rem;padding:10px 14px;margin-bottom:1rem;"></div>
+
+        <!-- First / Last Name — 2-column on sm+ -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;">
+            <div>
+                <label asp-for="FirstName"
+                       style="display:block;font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);margin-bottom:6px;font-family:var(--font-primary);"></label>
+                <input asp-for="FirstName" type="text" id="regFirstName" placeholder="First name"
+                       class="form-control ketabi-input" style="height:48px;font-size:0.875rem;" />
+                <span asp-validation-for="FirstName" class="field-validation-error"></span>
+            </div>
+            <div>
+                <label asp-for="LastName"
+                       style="display:block;font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);margin-bottom:6px;font-family:var(--font-primary);"></label>
+                <input asp-for="LastName" type="text" id="regLastName" placeholder="Last name"
+                       class="form-control ketabi-input" style="height:48px;font-size:0.875rem;" />
+                <span asp-validation-for="LastName" class="field-validation-error"></span>
+            </div>
+        </div>
+
+        <!-- Username -->
+        <div style="margin-bottom:1rem;">
+            <label asp-for="UserName"
+                   style="display:block;font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);margin-bottom:6px;font-family:var(--font-primary);"></label>
+            <input asp-for="UserName" type="text" id="regUserName" placeholder="e.g. bookworm_cairo"
+                   class="form-control ketabi-input" style="height:48px;font-size:0.875rem;" />
+            <span asp-validation-for="UserName" class="field-validation-error"></span>
+        </div>
+
+        <!-- Email -->
+        <div style="margin-bottom:1rem;">
+            <label asp-for="Email"
+                   style="display:block;font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);margin-bottom:6px;font-family:var(--font-primary);"></label>
+            <input asp-for="Email" type="email" id="regEmail" placeholder="you@example.com"
+                   class="form-control ketabi-input" style="height:48px;font-size:0.875rem;" />
+            <span asp-validation-for="Email" class="field-validation-error"></span>
+        </div>
+
+        <!-- Password -->
+        <div style="margin-bottom:1rem;">
+            <label asp-for="Password"
+                   style="display:block;font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);margin-bottom:6px;font-family:var(--font-primary);"></label>
+            <div style="position:relative;">
+                <input asp-for="Password" type="password" id="regPasswordInput" placeholder="••••••••"
+                       class="form-control ketabi-input" style="height:48px;font-size:0.875rem;padding-right:48px;" />
+                <button type="button" id="regPasswordToggle" onclick="togglePassword('regPasswordInput', this)"
+                        style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--color-text-muted);padding:4px;line-height:1;"
+                        aria-label="Toggle password visibility">
+                    <i class="bi bi-eye" style="font-size:16px;"></i>
+                </button>
+            </div>
+            <span asp-validation-for="Password" class="field-validation-error"></span>
+        </div>
+
+        <!-- Confirm Password -->
+        <div style="margin-bottom:1rem;">
+            <label asp-for="ConfirmPassword"
+                   style="display:block;font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);margin-bottom:6px;font-family:var(--font-primary);"></label>
+            <div style="position:relative;">
+                <input asp-for="ConfirmPassword" type="password" id="regConfirmInput" placeholder="••••••••"
+                       class="form-control ketabi-input" style="height:48px;font-size:0.875rem;padding-right:48px;" />
+                <button type="button" id="regConfirmToggle" onclick="togglePassword('regConfirmInput', this)"
+                        style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--color-text-muted);padding:4px;line-height:1;"
+                        aria-label="Toggle confirm password visibility">
+                    <i class="bi bi-eye" style="font-size:16px;"></i>
+                </button>
+            </div>
+            <span asp-validation-for="ConfirmPassword" class="field-validation-error"></span>
+        </div>
+
+        <!-- City / District with geo icon -->
+        <div style="margin-bottom:1rem;">
+            <label asp-for="City"
+                   style="display:block;font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);margin-bottom:6px;font-family:var(--font-primary);"></label>
+            <div style="position:relative;">
+                <i class="bi bi-geo-alt" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--color-indigo);font-size:16px;pointer-events:none;"></i>
+                <input asp-for="City" type="text" id="regCity" placeholder="e.g. Maadi, Cairo"
+                       class="form-control ketabi-input" style="height:48px;padding-left:42px;font-size:0.875rem;" />
+            </div>
+            <span asp-validation-for="City" class="field-validation-error"></span>
+            <p style="font-size:0.70rem;color:var(--color-text-muted);margin-top:4px;margin-bottom:0;">Helps us surface books near you first.</p>
+        </div>
+
+        <!-- Favourite Genres -->
+        <div style="margin-bottom:1.25rem;">
+            <label style="font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);display:block;margin-bottom:4px;">
+                Favourite Genres
+                <span style="font-weight:var(--weight-normal);color:var(--color-text-muted);margin-left:6px;">(pick any)</span>
+            </label>
+            <p style="font-size:0.70rem;color:var(--color-text-muted);margin-bottom:10px;">We'll personalise your book feed based on your interests.</p>
+            <input type="hidden" name="SelectedGenres" id="selectedGenresInput" value="" />
+            <div id="genreContainer" style="display:flex;flex-wrap:wrap;gap:4px;">
+                @foreach (var genre in new[] {
+                    "Fiction","Philosophy","Science","History","Psychology",
+                    "Self-Help","Economics","Literature","Science Fiction","Biography",
+                    "Mathematics","Business","Art & Design","Poetry","Mystery",
+                    "Thriller","Romance","Health","Travel","Technology"
+                })
+                {
+                    <button type="button" class="genre-pill" data-genre="@genre" onclick="toggleGenre(this)">+ @genre</button>
+                }
+            </div>
+        </div>
+
+        <!-- Submit — ketabi-btn-primary handles color, hover & shadow -->
+        <button type="submit" id="registerSubmitBtn" class="btn ketabi-btn-primary auth-submit-btn">
+            Create Account &nbsp;<i class="bi bi-arrow-right"></i>
+        </button>
+    </form>
+
+    <!-- Switch to Login -->
+    <p style="text-align:center;margin-top:1.25rem;font-size:0.78rem;color:var(--color-text-muted);">
+        Already have an account?
+        <a asp-controller="Account" asp-action="Login"
+           style="color:var(--color-indigo);font-weight:var(--weight-bold);text-decoration:none;">Sign in</a>
+    </p>
+
+</div>
+
+@* ═══════════════════════════════════════════════════════
+   SCRIPTS — pushed before </body> by _AuthLayout
+   ═══════════════════════════════════════════════════════ *@
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        // Toggle password field visibility
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon  = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('bi-eye', 'bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('bi-eye-slash', 'bi-eye');
+            }
+        }
+
+        // Genre pill selection — syncs to hidden CSV input
+        const selectedGenres = new Set();
+        function toggleGenre(btn) {
+            const genre = btn.dataset.genre;
+            if (selectedGenres.has(genre)) {
+                selectedGenres.delete(genre);
+                btn.classList.remove('selected');
+                btn.textContent = '+ ' + genre;
+            } else {
+                selectedGenres.add(genre);
+                btn.classList.add('selected');
+                btn.textContent = '\u2713 ' + genre;
+            }
+            document.getElementById('selectedGenresInput').value = [...selectedGenres].join(',');
+        }
+
+        // Submit loading state
+        document.getElementById('registerForm')?.addEventListener('submit', function () {
+            const btn = document.getElementById('registerSubmitBtn');
+            if (btn && this.checkValidity()) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Creating your account\u2026';
+            }
+        });
+    </script>
+}
