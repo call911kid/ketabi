@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Ketabi.Application.DTOs.Auth;
 using Ketabi.Application.Interfaces;
 using Ketabi.Application.Services;
@@ -97,5 +97,6 @@ namespace Ketabi.Web.Controllers
             Response.Cookies.Delete("AuthToken");
             return RedirectToAction("Login");
         }
+
     }
 }

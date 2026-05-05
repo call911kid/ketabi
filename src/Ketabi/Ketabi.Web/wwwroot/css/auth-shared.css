@@ -1,0 +1,145 @@
+* { box-sizing: border-box; }
+
+/* ── Split-screen wrapper ── */
+.auth-page-wrapper {
+    min-height: 100vh;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+}
+@media (min-width: 992px) {
+    .auth-page-wrapper { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── Left decorative panel ── */
+.auth-left-panel {
+    display: none;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-indigo-deeper);
+    background-image: url('/images/KetabiBG.jpg');
+    background-size: cover;
+    background-position: center;
+}
+@media (min-width: 992px) {
+    .auth-left-panel { display: flex; flex-direction: column; min-height: 100vh; }
+}
+
+/* Purple gradient overlay */
+.auth-left-overlay {
+    background: linear-gradient(
+        145deg,
+        rgba(55, 30, 160, 0.88) 0%,
+        rgba(75, 0,  130, 0.72) 50%,
+        rgba(10, 10,  40, 0.85) 100%
+    );
+    position: absolute; inset: 0; z-index: 1;
+}
+
+/* Blur decoration circles */
+.blur-c1 {
+    position: absolute; width: 320px; height: 320px; top: -80px; right: -80px;
+    background: radial-gradient(circle, var(--color-indigo-8B), transparent);
+    border-radius: 50%; filter: blur(40px); opacity: 0.10; z-index: 2;
+}
+.blur-c2 {
+    position: absolute; width: 240px; height: 240px; bottom: 80px; left: -60px;
+    background: radial-gradient(circle, var(--color-indigo), transparent);
+    border-radius: 50%; filter: blur(32px); opacity: 0.15; z-index: 2;
+}
+
+/* Floating animated book shapes */
+@keyframes floatBook {
+    0%, 100% { transform: translateY(0px)   rotate(var(--book-rotate, 0deg)); }
+    50%      { transform: translateY(-8px) rotate(var(--book-rotate, 0deg)); }
+}
+.floating-book {
+    position: absolute;
+    border-radius: var(--radius-lg);
+    opacity: 0.30;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(2px);
+    animation: floatBook linear infinite;
+    z-index: 2;
+}
+
+/* Left panel content layer */
+.auth-left-content {
+    position: relative; z-index: 10; padding: 3rem; height: 100%;
+    display: flex; flex-direction: column; justify-content: space-between;
+}
+
+/* ── Right form panel ── */
+.auth-right-panel {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 2rem 1.5rem;
+    background: var(--color-surface);
+    min-height: 100vh; overflow-y: auto;
+}
+@media (min-width: 576px) {
+    .auth-right-panel { padding: 3rem 2.5rem; }
+}
+.auth-form-inner { width: 100%; max-width: 440px; }
+
+/* ── Mode toggle tabs ── */
+.auth-mode-btn-active {
+    background: var(--color-surface) !important;
+    color: var(--color-text) !important;
+    box-shadow: var(--shadow-card) !important;
+}
+.auth-mode-btn-inactive {
+    background: transparent !important;
+    color: var(--color-text-muted) !important;
+}
+
+/* ── Google button ── */
+.auth-google-btn { transition: box-shadow var(--duration-base) var(--ease-default), transform var(--duration-fast) var(--ease-default); }
+.auth-google-btn:hover  { box-shadow: var(--shadow-hover); transform: translateY(-1px); }
+.auth-google-btn:active { transform: translateY(0); }
+
+/* ── Submit button overrides on top of ketabi-btn-primary ── */
+.auth-submit-btn {
+    width: 100%;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 24px;
+    border-radius: var(--radius-2xl);
+    font-size: 0.9rem;
+    font-weight: var(--weight-extrabold);
+    font-family: var(--font-primary);
+}
+
+/* ── Genre pills (from Register.cshtml) ── */
+.genre-pill {
+    padding: 5px 12px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-muted);
+    border: 1.5px solid transparent;
+    color: var(--color-text);
+    font-size: 0.72rem;
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    font-family: var(--font-primary);
+    transition: border-color var(--duration-fast) var(--ease-default),
+                color       var(--duration-fast) var(--ease-default);
+    display: inline-block;
+    margin: 3px;
+}
+.genre-pill:hover  { border-color: var(--color-indigo); color: var(--color-indigo); }
+.genre-pill.selected { background: var(--color-indigo); color: white; border-color: var(--color-indigo); }
+
+/* ── Validation ── */
+.field-validation-error { font-size: 0.72rem; color: var(--color-error-strong); margin-top: 4px; display: block; }
+.input-validation-error { border-color: var(--color-error-strong) !important; }
+
+/* ── Micro-interaction Upgrade ── */
+.auth-title-icon {
+    transition: transform 0.3s ease;
+}
+.auth-title-icon:hover {
+    transform: translateY(-4px);
+}
+
+/* Utilities requested */
+.inline-block { display: inline-block; }
+.mb-1 { margin-bottom: 0.25rem; }
+.text-indigo-600 { color: var(--color-indigo, #4F46E5); }
