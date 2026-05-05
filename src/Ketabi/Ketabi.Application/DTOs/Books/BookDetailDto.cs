@@ -23,11 +23,12 @@ public class BookDetailDto
     public int? SharingDurationInDays { get; set; }
     public bool IsAvailable { get; init; }
     public string ImageUrl { get; init; } = string.Empty;
+    public List<string> ImageUrls { get; set; } = new();
     public string? LocationNote { get; init; }
     public DateTime ListedAt { get; init; }
     public double? DistanceInKm { get; set; }
 
-    public List<string>? Tags { get; set; }
+    public List<string>? Tags { get; set; } = new();
 
     /// <summary>Owner summary for the owner card panel.</summary>
     public UserSummaryDto Owner { get; init; } = new();
