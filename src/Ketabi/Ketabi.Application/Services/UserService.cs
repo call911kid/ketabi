@@ -20,10 +20,7 @@ namespace Ketabi.Application.Services
 
         public async Task<CreatedUserDto> CreateUserAsync(CreateUserDto createUserDto)
         {
-            string? pUrl=null!;
-            if (createUserDto.ProfilePicture != null)
-                pUrl = await FileService.UploadFileAsync(createUserDto.ProfilePicture);
-
+            
             var user = new User
             {
                 Id=createUserDto.Id,
@@ -33,7 +30,7 @@ namespace Ketabi.Application.Services
                 City = createUserDto.City,
                 Governorate = createUserDto.Governorate,
                 ReputationScore = 0,
-                ProfilePictureUrl = pUrl
+                ProfilePictureUrl = createUserDto.ProfilePictureUrl
 
             };
 
@@ -49,7 +46,7 @@ namespace Ketabi.Application.Services
                 City= user.City,
                 Governorate= user.Governorate,
                 ReputationScore= user.ReputationScore,
-                ProfilePictureUrl= pUrl
+                ProfilePictureUrl= user.ProfilePictureUrl
             };
         }
     }

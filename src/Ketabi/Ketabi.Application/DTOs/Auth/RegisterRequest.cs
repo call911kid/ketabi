@@ -12,5 +12,5 @@ public sealed class RegisterRequest
     public string? Bio { get; set; }
     public string? City { get; set; }
     public string? Governorate { get; set; }
-    public IFormFile? ProfilePicture { get; set; }
+    public string? ProfilePictureUrl { get; set; }
 }

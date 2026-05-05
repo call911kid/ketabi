@@ -17,6 +17,6 @@ namespace Ketabi.Application.DTOs.User
         public string? City { get; set; }
         public string? Governorate { get; set; }
         public double ReputationScore { get; set; }
-        public IFormFile? ProfilePicture { get; set; }
+        public string? ProfilePictureUrl { get; set; }
     }
 }

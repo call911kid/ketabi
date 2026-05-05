@@ -75,7 +75,7 @@ namespace Ketabi.Infrastructure.Authentication
                 Bio = request.Bio,
                 City = request.City,
                 Governorate = request.Governorate,
-                ProfilePicture = request.ProfilePicture
+                ProfilePictureUrl = request.ProfilePictureUrl
             };
 
             var createdUser =await _userService.CreateUserAsync(createUserDto);
