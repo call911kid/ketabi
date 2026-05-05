@@ -24,6 +24,24 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
 
         builder.Property(u => u.UpdatedAt);
 
+        builder.Property(u => u.TargetUserId).IsRequired(); 
+        builder.Property(u => u.ReviewerId).IsRequired();
+        builder.Property(u => u.RelatedRequestId).IsRequired();
+        builder.HasOne(r => r.TargetUser)
+            .WithMany()
+            .HasForeignKey(r => r.TargetUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(r => r.Reviewer)
+            .WithMany()
+            .HasForeignKey(r => r.ReviewerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(r => r.RelatedRequest)
+            .WithMany()
+            .HasForeignKey(r => r.RelatedRequestId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.Property(u => u.IsDeleted).HasDefaultValue(false);
 
         builder.HasQueryFilter(e => !e.IsDeleted);
