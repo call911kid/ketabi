@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ketabi.Application.DTOs.Auth;
+using Ketabi.Application.DTOs.User;
 using Ketabi.Application.Interfaces;
 using Ketabi.Core.Interfaces.Repositories;
 using Ketabi.Infrastructure.Persistence.Identity;
@@ -14,16 +15,16 @@ namespace Ketabi.Infrastructure.Authentication
     internal class AuthService : IAuthService
     {
         private readonly IJwtTokenService _jwtTokenService;
-        private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
         private readonly UserManager<KetabiUser> _userManager;
 
         public AuthService(IJwtTokenService jwtTokenService,
-            IUserRepository userRepository,
+            IUserService userService,
             UserManager<KetabiUser> userManager
             )
         {
             _jwtTokenService = jwtTokenService;
-            _userRepository = userRepository;
+            _userService = userService;
             _userManager = userManager;
         }
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
@@ -53,7 +54,34 @@ namespace Ketabi.Infrastructure.Authentication
         }
         public async Task RegisterAsync(RegisterRequest request)
         {
-            throw new NotImplementedException();
+            var ketabiUser = new KetabiUser
+            {
+                UserName = request.UserName,
+                Email = request.Email,
+            };
+
+            var result = await _userManager.CreateAsync(ketabiUser, request.Password);
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException("Failed to register user."); // change later with custom exception
+            }
+            var createUserDto= new CreateUserDto
+            {
+                
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+                Bio = request.Bio,
+                City = request.City,
+                Governorate = request.Governorate,
+                ProfilePicture = request.ProfilePicture
+            };
+
+            var createdUser =await _userService.CreateUserAsync(createUserDto);
+
+            await _userManager.AddToRoleAsync(ketabiUser, "User");
+
+
         }
     }
 }
