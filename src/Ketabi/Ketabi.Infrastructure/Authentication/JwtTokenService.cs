@@ -32,12 +32,11 @@ internal sealed class JwtTokenService : IJwtTokenService
 
         var claims = new List<Claim>
         {
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(JwtRegisteredClaimNames.Sub, request.UserId.ToString()),
             new(JwtRegisteredClaimNames.Email, request.Email),
-            new(JwtRegisteredClaimNames.UniqueName, request.UserName),
             new(ClaimTypes.NameIdentifier, request.UserId.ToString()),
             new(ClaimTypes.Email, request.Email),
-            new(ClaimTypes.Name, request.UserName)
         };
 
         claims.AddRange(request.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
