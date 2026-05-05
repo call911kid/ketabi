@@ -13,6 +13,10 @@ public sealed class BookListing : BaseEntity
     public string? Description { get; set; }
     public string? Language { get; set; }
     public string? Publisher { get; set; }
+
+    public int? SharingDurationInDays { get; set; }
+    public ICollection<BookListingTag> Tags { get; set; } = new List<BookListingTag>();
+
     public ListingCondition Condition { get; set; }
     public SharingMode SharingMode { get; set; }
     public bool IsAvailable { get; set; } = true;

@@ -20,10 +20,14 @@ public class BookDetailDto
     public Guid CategoryId { get; init; }
     public ListingCondition Condition { get; init; }
     public SharingMode SharingMode { get; init; }
+    public int? SharingDurationInDays { get; set; }
     public bool IsAvailable { get; init; }
     public string ImageUrl { get; init; } = string.Empty;
     public string? LocationNote { get; init; }
     public DateTime ListedAt { get; init; }
+    public double? DistanceInKm { get; set; }
+
+    public List<string>? Tags { get; set; }
 
     /// <summary>Owner summary for the owner card panel.</summary>
     public UserSummaryDto Owner { get; init; } = new();

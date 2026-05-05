@@ -18,4 +18,5 @@ public class UserSummaryDto
     /// <summary>Aggregate reputation score (0.0 – 5.0).</summary>
     public double ReputationScore { get; init; }
     public int ReviewCount { get; init; }
+    public int TradesCount { get; init; }
 }

@@ -36,6 +36,9 @@ public class UpdateBookDto
 
     [EnumDataType(typeof(SharingMode))]
     public SharingMode? SharingMode { get; init; }
+    [Range(1, 365, ErrorMessage = "Sharing duration must be between 1 and 365 days.")]
+    public int? SharingDurationInDays { get; init; }
+    
 
     /// <summary>
     /// Resolved URL of the replacement cover image.

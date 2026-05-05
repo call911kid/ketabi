@@ -24,6 +24,8 @@ public class CreateBookDto
 
     [MaxLength(2000, ErrorMessage = "Description cannot exceed 2000 characters.")]
     public string? Description { get; init; }
+    [MaxLength(5, ErrorMessage = "A maximum of 5 tags is allowed.")]
+    public List<string>? Tags { get; init; }
 
     [MaxLength(60)]
     public string? Language { get; init; }
@@ -41,6 +43,8 @@ public class CreateBookDto
     [Required(ErrorMessage = "Sharing mode is required.")]
     [EnumDataType(typeof(SharingMode))]
     public SharingMode SharingMode { get; init; }
+    [Range(1, 365, ErrorMessage = "Sharing duration must be between 1 and 365 days.")]
+    public int? SharingDurationInDays { get; init; }
 
     /// <summary>
     /// Resolved URL of the uploaded cover image.

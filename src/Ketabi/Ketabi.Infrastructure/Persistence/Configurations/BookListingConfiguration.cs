@@ -44,6 +44,13 @@ public class BookListingConfiguration : IEntityTypeConfiguration<BookListing>
 
         builder.Property(u => u.IsDeleted).HasDefaultValue(false);
 
+        builder.Property(b => b.SharingDurationInDays);
+
+        builder.HasMany(b => b.Tags)
+            .WithOne(t => t.BookListing)
+            .HasForeignKey(t => t.BookListingId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasQueryFilter(e => !e.IsDeleted);
 
         builder.Property(u => u.DeletedAt);
