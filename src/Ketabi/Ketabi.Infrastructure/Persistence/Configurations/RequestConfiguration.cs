@@ -8,6 +8,8 @@ public class RequestConfiguration : IEntityTypeConfiguration<Request>
 {
     public void Configure(EntityTypeBuilder<Request> builder)
     {
+        builder.ToTable("Requests");
+
         builder.HasKey(r => r.Id);
 
         builder.Property(r => r.Type).IsRequired();

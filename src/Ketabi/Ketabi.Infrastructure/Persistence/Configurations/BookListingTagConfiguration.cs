@@ -9,13 +9,8 @@ public class BookListingTagConfiguration : IEntityTypeConfiguration<BookListingT
     public void Configure(EntityTypeBuilder<BookListingTag> builder)
     {
         builder.ToTable("BookListingTags");
-
+        builder.HasKey(t => t.Id);
         builder.Property(t => t.BookListingId).IsRequired();
         builder.Property(t => t.Tag).IsRequired().HasMaxLength(50);
-
-        builder.HasOne(t => t.BookListing)
-            .WithMany(b => b.Tags)
-            .HasForeignKey(t => t.BookListingId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

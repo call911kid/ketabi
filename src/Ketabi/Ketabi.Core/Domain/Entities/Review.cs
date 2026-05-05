@@ -10,10 +10,10 @@ public sealed class Review : BaseEntity
 
     public Guid TargetUserId { get; set; }
     public Guid ReviewerId { get; set; }
-    public Guid? RelatedRequestId { get; set; }
+    public Guid RelatedRequestId { get; set; }
 
     // Navigation
     public User? TargetUser { get; set; }
     public User? Reviewer { get; set; }
-    public Request? RelatedRequest { get; set; }
+    public Request RelatedRequest { get; set; }
 }
