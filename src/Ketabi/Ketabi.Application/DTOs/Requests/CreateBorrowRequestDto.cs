@@ -3,14 +3,12 @@ using System.ComponentModel.DataAnnotations;
 namespace Ketabi.Application.DTOs.Requests;
 
 /// <summary>
-/// POST /books/{id}/borrow — submit a new borrow request.
-/// Maps from: BorrowRequestFormViewModel → CreateBorrowRequestDto → BorrowRequest entity.
-/// SenderId resolved server-side from authenticated identity.
+/// Submit a borrow request for a listing.
 /// </summary>
 public class CreateBorrowRequestDto
 {
     [Required]
-    public Guid BookId { get; init; }
+    public Guid ListingId { get; init; }
 
     [Required(ErrorMessage = "Please select a return date.")]
     public DateTime ReturnDate { get; init; }

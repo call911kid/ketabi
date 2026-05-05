@@ -16,6 +16,4 @@ public class RequestQueryDto : PagedRequestDto
     [EnumDataType(typeof(RequestStatus))]
     public RequestStatus? Status { get; init; }
 
-    /// <summary>True = borrow requests only. False = exchange requests only. Null = both.</summary>
-    public bool? IsBorrow { get; init; }
 }

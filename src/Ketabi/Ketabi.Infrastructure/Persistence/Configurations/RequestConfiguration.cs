@@ -8,9 +8,9 @@ public class RequestConfiguration : IEntityTypeConfiguration<Request>
 {
     public void Configure(EntityTypeBuilder<Request> builder)
     {
-        builder.ToTable("Requests");
-
         builder.HasKey(r => r.Id);
+
+        builder.Property(r => r.Type).IsRequired();
 
         builder.Property(r => r.Status).IsRequired();
       
@@ -18,11 +18,15 @@ public class RequestConfiguration : IEntityTypeConfiguration<Request>
      
         builder.Property(r => r.Note).HasMaxLength(2000);
 
+        builder.Property(r => r.ReturnDate);
+
         builder.Property(r => r.SenderId).IsRequired();
        
         builder.Property(r => r.ReceiverId).IsRequired();
     
         builder.Property(r => r.ListingId).IsRequired();
+
+        builder.Property(r => r.OfferedListingId);
 
         builder.Property(u => u.CreatedAt).IsRequired();
 
@@ -38,6 +42,11 @@ public class RequestConfiguration : IEntityTypeConfiguration<Request>
             .WithOne(rv => rv.RelatedRequest)
             .HasForeignKey(rv => rv.RelatedRequestId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(r => r.OfferedListing)
+            .WithMany()
+            .HasForeignKey(r => r.OfferedListingId)
+            .OnDelete(DeleteBehavior.Restrict);
 
     }
 }
