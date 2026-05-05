@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ketabi.Application.DTOs.Auth;
-using Ketabi.Application.DTOs.User;
 using Ketabi.Application.Interfaces;
-using Ketabi.Core.Interfaces.Repositories;
+using Ketabi.Core.Domain.Entities;
+using Ketabi.Core.Interfaces;
 using Ketabi.Infrastructure.Persistence.Identity;
 using Microsoft.AspNetCore.Identity;
 
@@ -15,16 +15,16 @@ namespace Ketabi.Infrastructure.Authentication
     internal class AuthService : IAuthService
     {
         private readonly IJwtTokenService _jwtTokenService;
-        private readonly IUserService _userService;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<KetabiUser> _userManager;
 
         public AuthService(IJwtTokenService jwtTokenService,
-            IUserService userService,
+            IUnitOfWork unitOfWork,
             UserManager<KetabiUser> userManager
             )
         {
             _jwtTokenService = jwtTokenService;
-            _userService = userService;
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
         }
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
@@ -54,35 +54,53 @@ namespace Ketabi.Infrastructure.Authentication
         }
         public async Task RegisterAsync(RegisterRequest request)
         {
-            var ketabiUser = new KetabiUser
-            {
-                UserName = request.UserName,
-                Email = request.Email,
-            };
+            await using var transaction = await _unitOfWork.BeginTransactionAsync();
 
-            var result = await _userManager.CreateAsync(ketabiUser, request.Password);
-            if (!result.Succeeded)
+            try
             {
-                throw new InvalidOperationException("Failed to register user."); // change later with custom exception
+                var ketabiUser = new KetabiUser
+                {
+                    UserName = request.UserName,
+                    Email = request.Email,
+                };
+
+                var result = await _userManager.CreateAsync(ketabiUser, request.Password);
+                if (!result.Succeeded)
+                {
+                    throw new InvalidOperationException(string.Join(", ", result.Errors.Select(error => error.Description));
+                }
+
+                var user = new User
+                {
+                    Id = ketabiUser.Id,
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    Email = request.Email,
+                    Bio = request.Bio,
+                    City = request.City,
+                    Governorate = request.Governorate,
+                    ProfilePictureUrl = request.ProfilePictureUrl,
+                    ReputationScore = 0
+                };
+
+                await _unitOfWork.Users.AddAsync(user);
+
+                var roleResult = await _userManager.AddToRoleAsync(ketabiUser, "User");
+                if (!roleResult.Succeeded)
+                {
+                    throw new InvalidOperationException(string.Join(", ", roleResult.Errors.Select(error => error.Description));
+                }
+
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransactionAsync();
             }
-            ketabiUser = await _userManager.FindByEmailAsync(request.Email);
-            var createUserDto= new CreateUserDto
+            catch
             {
-                Id= ketabiUser.Id,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                Email = request.Email,
-                Bio = request.Bio,
-                City = request.City,
-                Governorate = request.Governorate,
-                ProfilePictureUrl = request.ProfilePictureUrl
-            };
-
-            var createdUser =await _userService.CreateUserAsync(createUserDto);
-
-            await _userManager.AddToRoleAsync(ketabiUser, "User");
-
+                await _unitOfWork.RollbackTransactionAsync();
+                throw;
+            }
 
         }
+
     }
 }
