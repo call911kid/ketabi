@@ -12,6 +12,5 @@ public interface IUnitOfWork : IDisposable
     IReviewRepository Reviews { get; }
     Task<int> SaveChangesAsync();
     Task<IDbContextTransaction> BeginTransactionAsync();
-    Task CommitTransactionAsync();
-    Task RollbackTransactionAsync();
+
 }

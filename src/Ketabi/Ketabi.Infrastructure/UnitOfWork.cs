@@ -1,13 +1,7 @@
 ﻿using Ketabi.Core.Interfaces;
 using Ketabi.Core.Interfaces.Repositories;
 using Ketabi.Infrastructure.Persistence;
-using Ketabi.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore.Storage;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ketabi.Infrastructure
 {
@@ -35,19 +29,14 @@ namespace Ketabi.Infrastructure
             Requests = requests;
             Reviews = reviews;
         }
-        
+
         public async Task<int> SaveChangesAsync() =>
             await _context.SaveChangesAsync();
         public async Task<IDbContextTransaction> BeginTransactionAsync() =>
             await _context.Database.BeginTransactionAsync();
-        public async Task CommitTransactionAsync() =>
-             await _context.Database.CurrentTransaction?.CommitAsync();
-        
-        public async Task RollbackTransactionAsync() =>
-             await _context.Database.CurrentTransaction?.RollbackAsync();
 
         public void Dispose() =>
             _context.Dispose();
-        
+
     }
 }
