@@ -122,9 +122,16 @@ public class HomeController : Controller
     public IActionResult Privacy() => View();
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error() =>
-        View(new ErrorViewModel
+    public IActionResult Error(int? statusCode = null)
+    {
+        if (statusCode.HasValue)
+        {
+            ViewData["StatusCode"] = statusCode.Value;
+        }
+
+        return View(new ErrorViewModel
         {
             RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
         });
+    }
 }
