@@ -71,7 +71,7 @@ namespace Ketabi.Web.Controllers
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
-                    Expires = model.RememberMe ? DateTime.UtcNow.AddDays(7) : null
+                    Expires = model.RememberMe ? DateTime.UtcNow.AddDays(7) : DateTime.UtcNow.AddDays(1)
                 };
 
                 Response.Cookies.Append(AppConstants.AuthCookieName, response.Token, cookieOptions);
