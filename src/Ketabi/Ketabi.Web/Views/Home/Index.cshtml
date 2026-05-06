@@ -1,8 +1,78 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@* ─────────────────────────────────────────────────────────────────────────
+   Views/Home/Index.cshtml
+   Model: ExplorerViewModel
+   Layout: _Layout.cshtml  (navbar + footer provided by layout)
+───────────────────────────────────────────────────────────────────────── *@
+@model ExplorerViewModel
+@{
+    ViewData["Title"] = "Explore Books";
+    const string HeroImgUrl =
+        "https://images.unsplash.com/photo-1774215915219-0daacf6e5977?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1200";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@section Styles {
+    <meta name="description"
+          content="Discover books near you to borrow or exchange. Free, simple, community-powered peer-to-peer book sharing." />
+}
+
+@* ── Hero Section ── *@
+<section class="explorer-hero" aria-label="Hero">
+
+    <img src="@HeroImgUrl"
+         alt="Open books on a desk"
+         class="explorer-hero__bg"
+         loading="eager" />
+
+    <div class="explorer-hero__overlay" aria-hidden="true"></div>
+    <div class="explorer-hero__fade"    aria-hidden="true"></div>
+
+    <div class="explorer-hero__content">
+        <p class="explorer-hero__eyebrow">Peer-to-peer book sharing</p>
+        <h1 class="explorer-hero__h1">Discover your next read.</h1>
+        <p class="explorer-hero__subtitle">
+            Borrow or exchange physical books with readers near you.<br />
+            Free. Simple. Community-powered.
+        </p>
+
+        @* ── Search bar (GET form — preserves other active filters) ── *@
+        <form method="get"
+              asp-controller="Home"
+              asp-action="Index"
+              class="explorer-search"
+              role="search"
+              aria-label="Search books">
+
+            <i class="bi bi-search explorer-search__icon" aria-hidden="true"></i>
+
+            <input id="explorer-search-input"
+                   type="search"
+                   name="q"
+                   value="@Model.Filter.SearchQuery"
+                   placeholder="Search by title, author, category, or location…"
+                   class="explorer-search__input"
+                   autocomplete="off"
+                   aria-label="Search books" />
+
+            @* Preserve active category / mode filters when the user searches *@
+            @if (Model.Filter.CategoryId.HasValue)
+            {
+                <input type="hidden" name="categoryId" value="@Model.Filter.CategoryId" />
+            }
+            @if (Model.Filter.SharingMode.HasValue)
+            {
+                <input type="hidden" name="mode" value="@((int)Model.Filter.SharingMode.Value)" />
+            }
+
+            <button type="submit" class="explorer-search__btn" aria-label="Search">
+                <i class="bi bi-sliders" aria-hidden="true"></i>
+                Filters
+            </button>
+        </form>
+    </div>
+</section>
+
+@* ── Sticky Filter Bar ── *@
+@await Html.PartialAsync("_FilterBar", Model)
+
+@* ── Book Grid + CTA ── *@
+@await Html.PartialAsync("_BookGrid", Model)

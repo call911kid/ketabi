@@ -10,6 +10,7 @@ public class BookCardViewModel
     public string           Category        { get; set; } = string.Empty;
     public string           ImageUrl        { get; set; } = string.Empty;
     public string           LocationNote    { get; set; } = string.Empty;
+    public double           DistanceInKm    { get; set; }
     public ListingCondition Condition       { get; set; }
     public SharingMode      SharingMode     { get; set; }
     public bool             IsAvailable     { get; set; }
@@ -45,7 +46,22 @@ public class BookCardViewModel
 
     public string SharingModeLabel  => SharingMode switch
     {
-        SharingMode.Both => "Borrow / Exchange",
+        SharingMode.Both => "Borrow & Exchange",
         _                => SharingMode.ToString()
     };
+
+    // Bootstrap Icons class — bound directly in Razor, no if/else needed.
+    public string IconClass => SharingMode switch
+    {
+        SharingMode.Exchange => "bi bi-arrow-left-right",
+        SharingMode.Both     => "bi bi-arrow-left-right",
+        _                    => "bi bi-book"
+    };
+
+    // Human-readable distance string (e.g. "220 km away" or "3.5 km away").
+    public string Distance => DistanceInKm > 0
+        ? (DistanceInKm < 10
+            ? $"{DistanceInKm:F1} km away"
+            : $"{Math.Round(DistanceInKm):F0} km away")
+        : string.Empty;
 }

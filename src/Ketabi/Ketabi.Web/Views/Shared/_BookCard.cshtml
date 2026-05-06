@@ -1,0 +1,81 @@
+@* ─────────────────────────────────────────────────────────────────────────
+   Views/Shared/_BookCard.cshtml
+   Model: BookCardViewModel
+   Rules:  - No if/else for CSS classes; use ViewModel computed properties
+           - No inline style duplication; use ketabi-tokens.css variables
+───────────────────────────────────────────────────────────────────────── *@
+@model BookCardViewModel
+
+<a asp-controller="Books" asp-action="Details" asp-route-id="@Model.BookId"
+   class="book-card-link d-block text-decoration-none">
+    <article class="book-card ketabi-card overflow-hidden">
+
+        @* ── Cover Image Zone ── *@
+        <div class="book-card__cover">
+
+            <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/img/cover-placeholder.svg" : Model.ImageUrl)"
+                 alt="@Model.Title cover"
+                 class="book-card__img"
+                 loading="lazy" />
+
+            @* Bottom gradient so title text is readable *@
+            <div class="book-card__gradient"></div>
+
+            @* Sharing-mode badge top-left — CSS class from SharingModeBadgeCss, icon from IconClass *@
+            <span class="book-card__badge @Model.SharingModeBadgeCss">
+                <i class="@Model.IconClass book-card__badge-icon" aria-hidden="true"></i>
+                @Model.SharingModeLabel
+            </span>
+
+            @* Title + Author overlaid on cover *@
+            <div class="book-card__overlay-text">
+                <p class="book-card__title">@Model.Title</p>
+                <p class="book-card__author">@Model.Author</p>
+            </div>
+        </div>
+
+        @* ── Footer: owner + condition + distance ── *@
+        <footer class="book-card__footer">
+
+            @* Left: avatar + owner first name + star rating *@
+            <div class="book-card__owner">
+                @if (!string.IsNullOrEmpty(Model.OwnerAvatarUrl))
+                {
+                    <img src="@Model.OwnerAvatarUrl"
+                         alt="@Model.OwnerName"
+                         class="book-card__avatar" />
+                }
+                else
+                {
+                    <span class="book-card__avatar-fallback" aria-hidden="true">
+                        @(Model.OwnerName.Length > 0 ? Model.OwnerName[0].ToString().ToUpperInvariant() : "?")
+                    </span>
+                }
+
+                <span class="book-card__owner-name">
+                    @(Model.OwnerName.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? Model.OwnerName)
+                </span>
+
+                <span class="book-card__rating">
+                    <i class="bi bi-star-fill book-card__star" aria-hidden="true"></i>
+                    @Model.OwnerReputation.ToString("F1")
+                </span>
+            </div>
+
+            @* Right: condition pill + distance *@
+            <div class="book-card__meta">
+                <span class="book-card__condition @Model.ConditionBadgeCss">
+                    @Model.ConditionLabel
+                </span>
+                @if (!string.IsNullOrEmpty(Model.Distance))
+                {
+                    <span class="book-card__distance">
+                        <i class="bi bi-geo-alt book-card__pin" aria-hidden="true"></i>
+                        @Model.Distance
+                    </span>
+                }
+            </div>
+
+        </footer>
+    </article>
+</a>

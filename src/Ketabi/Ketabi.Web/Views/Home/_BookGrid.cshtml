@@ -1,0 +1,85 @@
+@* ─────────────────────────────────────────────────────────────────────────
+   Views/Home/_BookGrid.cshtml
+   Model: ExplorerViewModel
+   Renders: section header + responsive Bootstrap grid of _BookCard partials
+            + empty state + CTA banner.
+   Grid: 2 cols (xs) → 3 cols (md) → 4 cols (xl)
+───────────────────────────────────────────────────────────────────────── *@
+@model ExplorerViewModel
+
+@{
+    var sectionTitle = Model.Filter.CategoryId.HasValue
+        ? (Model.Categories.FirstOrDefault(c => c.IsActive)?.Name ?? "Books")
+        : "All Books";
+}
+
+@* ── Grid header: title + count + optional search-tag chip ── *@
+<div class="explorer-grid-header">
+    <div>
+        <h2 class="explorer-grid-title">@sectionTitle</h2>
+        <p class="explorer-grid-count">
+            @Model.Books.Count @(Model.Books.Count == 1 ? "book" : "books") available
+        </p>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Filter.SearchQuery))
+    {
+        @* Active search tag chip with inline clear link *@
+        <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3"
+             style="background: var(--color-indigo-light);">
+            <i class="bi bi-search" style="font-size:0.8rem; color: var(--color-indigo);" aria-hidden="true"></i>
+            <span style="font-size: var(--text-sm-filter); color: var(--color-indigo); font-weight: var(--weight-semibold);">
+                "@Model.Filter.SearchQuery"
+            </span>
+            <a href="@Url.Action("Index", "Home", new { categoryId = Model.Filter.CategoryId, mode = Model.Filter.SharingMode.HasValue ? (int?)Model.Filter.SharingMode : null })"
+               style="color: var(--color-indigo); font-size: 0.85rem; line-height:1;"
+               aria-label="Clear search">
+                <i class="bi bi-x-circle" aria-hidden="true"></i>
+            </a>
+        </div>
+    }
+</div>
+
+@* ── Book Grid / Empty state ── *@
+<div class="px-3" style="max-width: var(--container-max); margin-inline: auto;">
+    @if (Model.IsEmptyState)
+    {
+        <div class="explorer-empty">
+            <div class="explorer-empty__icon" aria-hidden="true">
+                <i class="bi bi-search"></i>
+            </div>
+            <h3 class="explorer-empty__title">No books found</h3>
+            <p class="explorer-empty__sub">Try adjusting your search or filters.</p>
+            <a href="@Url.Action("Index", "Home")"
+               class="ketabi-btn-primary d-inline-block mt-3 text-decoration-none"
+               style="padding: 0.6rem 1.25rem; font-size: var(--text-base);">
+                Clear filters
+            </a>
+        </div>
+    }
+    else
+    {
+        @* Bootstrap responsive grid: 2 → 3 → 4 columns *@
+        <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3 g-md-4">
+            @foreach (var book in Model.Books)
+            {
+                <div class="col">
+                    @await Html.PartialAsync("_BookCard", book)
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@* ── Bottom CTA Banner ── *@
+<div class="explorer-cta mt-5">
+    <div class="explorer-cta__inner">
+        <div>
+            <h3 class="explorer-cta__title">Have books gathering dust?</h3>
+            <p class="explorer-cta__sub">List them in under 2 minutes. Start sharing today.</p>
+        </div>
+        <a asp-controller="Books" asp-action="Create" class="explorer-cta__btn">
+            List a Book <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        </a>
+    </div>
+</div>

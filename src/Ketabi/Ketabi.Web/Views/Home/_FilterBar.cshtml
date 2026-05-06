@@ -1,0 +1,67 @@
+@* ─────────────────────────────────────────────────────────────────────────
+   Views/Home/_FilterBar.cshtml
+   Model: ExplorerViewModel
+   Sticky filter bar: type pills + horizontal-scroll category pills.
+   All filters are GET query-string links — no JS required.
+───────────────────────────────────────────────────────────────────────── *@
+@model ExplorerViewModel
+
+@{
+    var currentSearch = Model.Filter.SearchQuery ?? string.Empty;
+    var currentCat    = Model.Filter.CategoryId;
+    var currentMode   = Model.Filter.SharingMode;
+}
+
+<nav class="explorer-filterbar" aria-label="Book filters">
+    <div class="explorer-filterbar__inner">
+
+        @* ── Type pills: All Books / Borrow / Exchange ── *@
+        <a href="@Url.Action("Index", "Home", new { q = currentSearch, categoryId = currentCat })"
+           class="filter-pill @(currentMode == null ? "active" : "")">
+            All Books
+        </a>
+
+        <a href="@Url.Action("Index", "Home", new { q = currentSearch, categoryId = currentCat, mode = (int)SharingMode.Borrow })"
+           class="filter-pill @(currentMode == SharingMode.Borrow ? "active" : "")">
+            <i class="bi bi-book" aria-hidden="true"></i> Borrow
+        </a>
+
+        <a href="@Url.Action("Index", "Home", new { q = currentSearch, categoryId = currentCat, mode = (int)SharingMode.Exchange })"
+           class="filter-pill @(currentMode == SharingMode.Exchange ? "active" : "")">
+            <i class="bi bi-arrow-left-right" aria-hidden="true"></i> Exchange
+        </a>
+
+        <div class="explorer-filterbar__divider" aria-hidden="true"></div>
+
+        @* ── Category pills (horizontal scroll) ── *@
+        <div class="explorer-filterbar__cats hide-scrollbar"
+             role="group"
+             aria-label="Category filters">
+
+            @* "All" sentinel pill *@
+            <a href="@Url.Action("Index", "Home", new { q = currentSearch, mode = currentMode.HasValue ? (int?)currentMode : null })"
+               class="cat-pill @(currentCat == null ? "active" : "")">
+                All
+            </a>
+
+            @foreach (var cat in Model.Categories)
+            {
+                <a href="@Url.Action("Index", "Home", new { q = currentSearch, categoryId = cat.CategoryId, mode = currentMode.HasValue ? (int?)currentMode : null })"
+                   class="cat-pill @(cat.IsActive ? "active" : "")">
+                    @cat.Name
+                </a>
+            }
+        </div>
+
+        @* Clear-filters link — only visible when any filter is active *@
+        @if (Model.HasActiveFilters)
+        {
+            <a href="@Url.Action("Index", "Home")"
+               class="filter-pill ms-auto"
+               style="border-color: var(--color-error-border); color: var(--color-error-strong);"
+               aria-label="Clear all filters">
+                <i class="bi bi-x-circle" aria-hidden="true"></i> Clear
+            </a>
+        }
+    </div>
+</nav>
