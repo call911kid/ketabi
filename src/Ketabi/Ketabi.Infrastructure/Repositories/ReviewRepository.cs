@@ -32,6 +32,12 @@ namespace Ketabi.Infrastructure.Repositories
         }
         public async Task<PagedResult<Review>> GetReviewsForUserAsync(Guid targetUserId, int pageNumber, int pageSize)
                 => await GetReviewsPagedAsync(r => r.TargetUserId == targetUserId, pageNumber, pageSize);
+
+        public async Task<int> CountReviewsForUserAsync(Guid targetUserId)
+        {
+            return await _dbSet.CountAsync(r => r.TargetUserId == targetUserId);
+        }
+
         private async Task<PagedResult<Review>> GetReviewsPagedAsync(
             Expression<Func<Review, bool>> predicate, int pageNumber, int pageSize)
         {

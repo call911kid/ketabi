@@ -10,4 +10,5 @@ public interface IReviewRepository : IGenericRepository<Review>
     Task<double> CalculateAverageRatingForUserAsync(Guid userId);
     // Retrieves a paginated list of reviews for a specific user, where they are the target of the reviews.
     Task<PagedResult<Review>> GetReviewsForUserAsync(Guid targetUserId, int pageNumber, int pageSize);
+    Task<int> CountReviewsForUserAsync(Guid targetUserId);
 }
