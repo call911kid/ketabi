@@ -8,7 +8,7 @@ public class BookListingConfiguration : IEntityTypeConfiguration<BookListing>
 {
     public void Configure(EntityTypeBuilder<BookListing> builder)
     {
-        builder.ToTable("UserBooks");
+        builder.ToTable(nameof(BookListing));
 
         builder.HasKey(b => b.Id);
 

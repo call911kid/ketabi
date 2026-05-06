@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ketabi.Application.DTOs.Auth;
+﻿using Ketabi.Application.DTOs.Auth;
 using Ketabi.Application.Interfaces;
 using Ketabi.Core.Domain.Entities;
 using Ketabi.Core.Interfaces;
@@ -45,7 +40,7 @@ namespace Ketabi.Infrastructure.Authentication
                 Roles = roles
             });
 
-            
+
             return new AuthResponse
             {
                 Token = token,
@@ -92,11 +87,11 @@ namespace Ketabi.Infrastructure.Authentication
                 }
 
                 await _unitOfWork.SaveChangesAsync();
-                await _unitOfWork.CommitTransactionAsync();
+                await transaction.CommitAsync();
             }
             catch
             {
-                await _unitOfWork.RollbackTransactionAsync();
+                await transaction.RollbackAsync();
                 throw;
             }
 
