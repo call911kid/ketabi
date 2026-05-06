@@ -55,43 +55,42 @@
         <!-- First / Last Name — 2-column on sm+ -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;">
             <div>
-                <label asp-for="FirstName"
-                       style="display:block;font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);margin-bottom:6px;font-family:var(--font-primary);"></label>
-                <input asp-for="FirstName" type="text" id="regFirstName" placeholder="First name"
-                       class="form-control ketabi-input" style="height:48px;font-size:0.875rem;" />
-                <span asp-validation-for="FirstName" class="field-validation-error"></span>
+                <div class="auth-field-wrapper mb-4">
+                    <label asp-for="FirstName" class="form-label"></label>
+                    <input asp-for="FirstName" type="text" id="regFirstName" placeholder="First name"
+                           class="form-control ketabi-input" style="height:48px;font-size:0.875rem;" />
+                    <span asp-validation-for="FirstName" class="custom-tooltip"></span>
+                </div>
             </div>
             <div>
-                <label asp-for="LastName"
-                       style="display:block;font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);margin-bottom:6px;font-family:var(--font-primary);"></label>
-                <input asp-for="LastName" type="text" id="regLastName" placeholder="Last name"
-                       class="form-control ketabi-input" style="height:48px;font-size:0.875rem;" />
-                <span asp-validation-for="LastName" class="field-validation-error"></span>
+                <div class="auth-field-wrapper mb-4">
+                    <label asp-for="LastName" class="form-label"></label>
+                    <input asp-for="LastName" type="text" id="regLastName" placeholder="Last name"
+                           class="form-control ketabi-input" style="height:48px;font-size:0.875rem;" />
+                    <span asp-validation-for="LastName" class="custom-tooltip"></span>
+                </div>
             </div>
         </div>
 
         <!-- Username -->
-        <div style="margin-bottom:1rem;">
-            <label asp-for="UserName"
-                   style="display:block;font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);margin-bottom:6px;font-family:var(--font-primary);"></label>
+        <div class="auth-field-wrapper mb-4">
+            <label asp-for="UserName" class="form-label"></label>
             <input asp-for="UserName" type="text" id="regUserName" placeholder="e.g. bookworm_cairo"
                    class="form-control ketabi-input" style="height:48px;font-size:0.875rem;" />
-            <span asp-validation-for="UserName" class="field-validation-error"></span>
+            <span asp-validation-for="UserName" class="custom-tooltip"></span>
         </div>
 
         <!-- Email -->
-        <div style="margin-bottom:1rem;">
-            <label asp-for="Email"
-                   style="display:block;font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);margin-bottom:6px;font-family:var(--font-primary);"></label>
+        <div class="auth-field-wrapper mb-4">
+            <label asp-for="Email" class="form-label"></label>
             <input asp-for="Email" type="email" id="regEmail" placeholder="you@example.com"
                    class="form-control ketabi-input" style="height:48px;font-size:0.875rem;" />
-            <span asp-validation-for="Email" class="field-validation-error"></span>
+            <span asp-validation-for="Email" class="custom-tooltip"></span>
         </div>
 
         <!-- Password -->
-        <div style="margin-bottom:1rem;">
-            <label asp-for="Password"
-                   style="display:block;font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);margin-bottom:6px;font-family:var(--font-primary);"></label>
+        <div class="auth-field-wrapper mb-4">
+            <label asp-for="Password" class="form-label"></label>
             <div style="position:relative;">
                 <input asp-for="Password" type="password" id="regPasswordInput" placeholder="••••••••"
                        class="form-control ketabi-input" style="height:48px;font-size:0.875rem;padding-right:48px;" />
@@ -101,13 +100,12 @@
                     <i class="bi bi-eye" style="font-size:16px;"></i>
                 </button>
             </div>
-            <span asp-validation-for="Password" class="field-validation-error"></span>
+            <span asp-validation-for="Password" class="custom-tooltip"></span>
         </div>
 
         <!-- Confirm Password -->
-        <div style="margin-bottom:1rem;">
-            <label asp-for="ConfirmPassword"
-                   style="display:block;font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);margin-bottom:6px;font-family:var(--font-primary);"></label>
+        <div class="auth-field-wrapper mb-4">
+            <label asp-for="ConfirmPassword" class="form-label"></label>
             <div style="position:relative;">
                 <input asp-for="ConfirmPassword" type="password" id="regConfirmInput" placeholder="••••••••"
                        class="form-control ketabi-input" style="height:48px;font-size:0.875rem;padding-right:48px;" />
@@ -117,19 +115,18 @@
                     <i class="bi bi-eye" style="font-size:16px;"></i>
                 </button>
             </div>
-            <span asp-validation-for="ConfirmPassword" class="field-validation-error"></span>
+            <span asp-validation-for="ConfirmPassword" class="custom-tooltip"></span>
         </div>
 
         <!-- City / District with geo icon -->
-        <div style="margin-bottom:1rem;">
-            <label asp-for="City"
-                   style="display:block;font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);margin-bottom:6px;font-family:var(--font-primary);"></label>
+        <div class="auth-field-wrapper mb-4">
+            <label asp-for="City" class="form-label"></label>
             <div style="position:relative;">
                 <i class="bi bi-geo-alt" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--color-indigo);font-size:16px;pointer-events:none;"></i>
                 <input asp-for="City" type="text" id="regCity" placeholder="e.g. Maadi, Cairo"
                        class="form-control ketabi-input" style="height:48px;padding-left:42px;font-size:0.875rem;" />
             </div>
-            <span asp-validation-for="City" class="field-validation-error"></span>
+            <span asp-validation-for="City" class="custom-tooltip"></span>
             <p style="font-size:0.70rem;color:var(--color-text-muted);margin-top:4px;margin-bottom:0;">Helps us surface books near you first.</p>
         </div>
 
@@ -190,28 +187,19 @@
 
         // Genre pill selection — syncs to hidden CSV input
         const selectedGenres = new Set();
-        // function toggleGenre(btn) {
-        //     const genre = btn.dataset.genre;
-        //     if (selectedGenres.has(genre)) {
-        //         selectedGenres.delete(genre);
-        //         btn.classList.remove('selected');
-        //         btn.textContent = '+ ' + genre;
-        //     } else {
-        //         selectedGenres.add(genre);
-        //         btn.classList.add('selected');
-        //         btn.textContent = '\u2713 ' + genre;
-        //     }
-        //     document.getElementById('selectedGenresInput').value = [...selectedGenres].join(',');
-        // }
-
-        // Submit loading state
-        // document.getElementById('registerForm')?.addEventListener('submit', function () {
-        //     const btn = document.getElementById('registerSubmitBtn');
-        //     if (btn && this.checkValidity()) {
-        //         btn.disabled = true;
-        //         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Creating your account\u2026';
-        //     }
-        // });
+        function toggleGenre(btn) {
+            const genre = btn.dataset.genre;
+            if (selectedGenres.has(genre)) {
+                selectedGenres.delete(genre);
+                btn.classList.remove('selected');
+                btn.textContent = '+ ' + genre;
+            } else {
+                selectedGenres.add(genre);
+                btn.classList.add('selected');
+                btn.textContent = '\u2713 ' + genre;
+            }
+            document.getElementById('selectedGenresInput').value = [...selectedGenres].join(',');
+        }
 
         // V2
             document.getElementById('registerForm')?.addEventListener('submit', function (e) {

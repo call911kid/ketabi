@@ -64,19 +64,16 @@
             <span asp-validation-for="Email" class="field-validation-error"></span>
         </div> *@
 
-        <div class="mb-3">
+        <div class="auth-field-wrapper mb-4">
             <label asp-for="Email" class="form-label">Email Address</label>
-            <div style="position: relative;">
-                <input asp-for="Email" class="form-control ketabi-input" placeholder="you@example.com" />
-                <!-- الـ span هنا هيفضل موجود بس الـ CSS هيخليه خفيف وجميل -->
-                <span asp-for="Email" class="text-danger" style="position: absolute; bottom: -22px; left: 0;"></span>
-            </div>
+            <input asp-for="Email" class="form-control ketabi-input" placeholder="you@example.com" />
+    
+            <span asp-validation-for="Email" class="custom-tooltip"></span>
         </div>
 
         <!-- Password -->
-        <div style="margin-bottom:0.5rem;">
-            <label asp-for="Password"
-                   style="display:block;font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);margin-bottom:6px;font-family:var(--font-primary);"></label>
+        <div class="auth-field-wrapper mb-4">
+            <label asp-for="Password" class="form-label"></label>
             <div style="position:relative;">
                 <input asp-for="Password" type="password" id="loginPasswordInput" placeholder="••••••••"
                        class="form-control ketabi-input" style="height:48px;font-size:0.875rem;padding-right:48px;" />
@@ -87,7 +84,7 @@
                     <i class="bi bi-eye" style="font-size:16px;"></i>
                 </button>
             </div>
-            <span asp-validation-for="Password" class="field-validation-error"></span>
+            <span asp-validation-for="Password" class="custom-tooltip"></span>
         </div>
 
         <!-- Forgot password -->
@@ -121,29 +118,67 @@
 @* ═══════════════════════════════════════════════════════
    SCRIPTS — pushed before </body> by _AuthLayout
    ═══════════════════════════════════════════════════════ *@
-@section Scripts {
+@* @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
     <script>
         // Toggle password field visibility
-        // function togglePassword(inputId, btn) {
-        //     const input = document.getElementById(inputId);
-        //     const icon  = btn.querySelector('i');
-        //     if (input.type === 'password') {
-        //         input.type = 'text';
-        //         icon.classList.replace('bi-eye', 'bi-eye-slash');
-        //     } else {
-        //         input.type = 'password';
-        //         icon.classList.replace('bi-eye-slash', 'bi-eye');
-        //     }
-        // }
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon  = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('bi-eye', 'bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('bi-eye-slash', 'bi-eye');
+            }
+        }
 
-        // Show spinner on submit (only when form is valid)
+        Show spinner on submit (only when form is valid)
         document.getElementById('loginForm')?.addEventListener('submit', function () {
             const btn = document.getElementById('loginSubmitBtn');
             if (btn && this.checkValidity()) {
                 btn.disabled = true;
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Signing in\u2026';
             }
+        });
+    </script>
+} *@
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 1. Toggle Password Visibility
+            const toggleBtn = document.getElementById('loginPasswordToggle');
+            const passwordInput = document.getElementById('loginPasswordInput');
+
+            if (toggleBtn && passwordInput) {
+                toggleBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const icon = this.querySelector('i');
+                    const isPassword = passwordInput.type === 'password';
+                    
+                    passwordInput.type = isPassword ? 'text' : 'password';
+                    
+                    if (isPassword) {
+                        icon.classList.replace('bi-eye', 'bi-eye-slash');
+                    } else {
+                        icon.classList.replace('bi-eye-slash', 'bi-eye');
+                    }
+                });
+            }
+
+            // 2. Show spinner on submit
+            const loginForm = document.getElementById('loginForm');
+            const submitBtn = document.getElementById('loginSubmitBtn');
+
+            loginForm?.addEventListener('submit', function (e) {
+                if ($(this).valid()) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Signing in\u2026';
+                }
+            });
         });
     </script>
 }
