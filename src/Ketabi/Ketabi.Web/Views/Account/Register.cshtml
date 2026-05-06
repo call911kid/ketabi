@@ -190,26 +190,38 @@
 
         // Genre pill selection — syncs to hidden CSV input
         const selectedGenres = new Set();
-        function toggleGenre(btn) {
-            const genre = btn.dataset.genre;
-            if (selectedGenres.has(genre)) {
-                selectedGenres.delete(genre);
-                btn.classList.remove('selected');
-                btn.textContent = '+ ' + genre;
-            } else {
-                selectedGenres.add(genre);
-                btn.classList.add('selected');
-                btn.textContent = '\u2713 ' + genre;
-            }
-            document.getElementById('selectedGenresInput').value = [...selectedGenres].join(',');
-        }
+        // function toggleGenre(btn) {
+        //     const genre = btn.dataset.genre;
+        //     if (selectedGenres.has(genre)) {
+        //         selectedGenres.delete(genre);
+        //         btn.classList.remove('selected');
+        //         btn.textContent = '+ ' + genre;
+        //     } else {
+        //         selectedGenres.add(genre);
+        //         btn.classList.add('selected');
+        //         btn.textContent = '\u2713 ' + genre;
+        //     }
+        //     document.getElementById('selectedGenresInput').value = [...selectedGenres].join(',');
+        // }
 
         // Submit loading state
-        document.getElementById('registerForm')?.addEventListener('submit', function () {
+        // document.getElementById('registerForm')?.addEventListener('submit', function () {
+        //     const btn = document.getElementById('registerSubmitBtn');
+        //     if (btn && this.checkValidity()) {
+        //         btn.disabled = true;
+        //         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Creating your account\u2026';
+        //     }
+        // });
+
+        // V2
+            document.getElementById('registerForm')?.addEventListener('submit', function (e) {
             const btn = document.getElementById('registerSubmitBtn');
-            if (btn && this.checkValidity()) {
+            if ($(this).valid()) {
                 btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Creating your account\u2026';
+                const originalText = btn.innerHTML;
+                btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> ${originalText}`;        
+            } else {
+                e.preventDefault();
             }
         });
     </script>

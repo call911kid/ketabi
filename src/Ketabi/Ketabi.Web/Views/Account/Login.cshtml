@@ -56,12 +56,21 @@
              style="border-radius:var(--radius-lg);background:var(--color-error-bg);border:1px solid var(--color-error-border);color:var(--color-error-strong);font-size:0.8rem;padding:10px 14px;margin-bottom:1rem;"></div>
 
         <!-- Email -->
-        <div style="margin-bottom:1rem;">
+        @* <div style="margin-bottom:1rem;">
             <label asp-for="Email"
                    style="display:block;font-size:0.82rem;font-weight:var(--weight-bold);color:var(--color-text);margin-bottom:6px;font-family:var(--font-primary);"></label>
             <input asp-for="Email" type="email" id="loginEmail" placeholder="you@example.com"
                    class="form-control ketabi-input" style="height:48px;font-size:0.875rem;" />
             <span asp-validation-for="Email" class="field-validation-error"></span>
+        </div> *@
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label">Email Address</label>
+            <div style="position: relative;">
+                <input asp-for="Email" class="form-control ketabi-input" placeholder="you@example.com" />
+                <!-- الـ span هنا هيفضل موجود بس الـ CSS هيخليه خفيف وجميل -->
+                <span asp-for="Email" class="text-danger" style="position: absolute; bottom: -22px; left: 0;"></span>
+            </div>
         </div>
 
         <!-- Password -->
@@ -116,17 +125,17 @@
     @await Html.PartialAsync("_ValidationScriptsPartial")
     <script>
         // Toggle password field visibility
-        function togglePassword(inputId, btn) {
-            const input = document.getElementById(inputId);
-            const icon  = btn.querySelector('i');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.replace('bi-eye', 'bi-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.replace('bi-eye-slash', 'bi-eye');
-            }
-        }
+        // function togglePassword(inputId, btn) {
+        //     const input = document.getElementById(inputId);
+        //     const icon  = btn.querySelector('i');
+        //     if (input.type === 'password') {
+        //         input.type = 'text';
+        //         icon.classList.replace('bi-eye', 'bi-eye-slash');
+        //     } else {
+        //         input.type = 'password';
+        //         icon.classList.replace('bi-eye-slash', 'bi-eye');
+        //     }
+        // }
 
         // Show spinner on submit (only when form is valid)
         document.getElementById('loginForm')?.addEventListener('submit', function () {
