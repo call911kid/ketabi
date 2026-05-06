@@ -50,10 +50,12 @@ public class CreateBookViewModel
     [Display(Name = "Available for")]
     public SharingMode SharingMode { get; set; }
 
-    // Step 3: Cover Image & Location
-
+    // Step 1: Cover Image — uploaded by the user
     [Required(ErrorMessage = "Book cover image is required.")]
     [Display(Name = "Cover Image")]
+    public IFormFile? CoverImageFile { get; set; }
+
+    // Set by the controller after saving the file via FileService (not submitted directly)
     public string CoverImageUrl { get; set; } = string.Empty;
 
     [MaxLength(120)]

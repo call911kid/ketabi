@@ -78,7 +78,7 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @* unobtrusive validation intentionally omitted: wizard uses manual JS step validation *@
     <script>
         let currentStep = 1;
         const totalSteps = 3;
@@ -122,36 +122,43 @@
 
         function validateCurrentStep() {
             const currentStepEl = document.getElementById('step' + currentStep);
-            const inputs = currentStepEl.querySelectorAll('input[required]:not([type="radio"]), select[required], textarea[required]');
             let isValid = true;
             
-            inputs.forEach(input => {
-                if (!input.checkValidity()) {
-                    isValid = false;
-                }
-            });
-            
-            // Custom Validation for Radio/Pill Groups and hidden inputs
+            // Check text/textarea inputs manually (no data-val, no HTML required)
             if (currentStep === 1) {
-                // Check if cover image is provided
-                const coverImageInput = document.getElementById('CoverImageUrl');
-                if (coverImageInput && !coverImageInput.value) {
-                    isValid = false;
-                }
-                
-                // Check category
-                const categoryChecked = document.querySelector('input[name="CategoryId"]:checked');
+                const title = document.getElementById('Title');
+                const author = document.getElementById('Author');
+                if (!title || !title.value.trim()) isValid = false;
+                if (!author || !author.value.trim()) isValid = false;
+
+                // Check cover image — now an IFormFile upload
+                const coverFileInput = document.getElementById('CoverImageFile');
+                if (!coverFileInput || !coverFileInput.files || coverFileInput.files.length === 0) isValid = false;
+
+                // Check category — reads from UI radio group (_CategoryId_UI)
+                const categoryChecked = document.querySelector('input[name="_CategoryId_UI"]:checked');
                 if (!categoryChecked) {
                     isValid = false;
+                } else {
+                    // Sync value into model-binding hidden input
+                    document.getElementById('CategoryId_Hidden').value = categoryChecked.value;
                 }
+
             } else if (currentStep === 2) {
-                const conditionChecked = document.querySelector('input[name="Condition"]:checked');
-                const sharingChecked = document.querySelector('input[name="SharingMode"]:checked');
+                // Check condition — reads from UI radio group (_Condition_UI)
+                const conditionChecked = document.querySelector('input[name="_Condition_UI"]:checked');
                 if (!conditionChecked) {
                     isValid = false;
+                } else {
+                    document.getElementById('Condition_Hidden').value = conditionChecked.value;
                 }
+
+                // Check sharing mode — reads from UI radio group (_SharingMode_UI)
+                const sharingChecked = document.querySelector('input[name="_SharingMode_UI"]:checked');
                 if (!sharingChecked) {
                     isValid = false;
+                } else {
+                    document.getElementById('SharingMode_Hidden').value = sharingChecked.value;
                 }
             }
 
@@ -247,15 +254,15 @@
                 if(titleInput) document.getElementById('previewTitle').innerText = titleInput.value || 'Unknown Title';
                 if(authorInput) document.getElementById('previewAuthor').innerText = authorInput.value || 'Unknown Author';
                 
-                // Category
-                const selectedCat = document.querySelector('input[name="CategoryId"]:checked');
+                // Category — reads from UI radio group (renamed to avoid data-val conflict)
+                const selectedCat = document.querySelector('input[name="_CategoryId_UI"]:checked');
                 if (selectedCat) {
                     const label = document.querySelector(`label[for="${selectedCat.id}"]`);
                     if(label) document.getElementById('previewCategory').innerText = label.innerText;
                 }
                 
-                // Condition
-                const selectedCond = document.querySelector('input[name="Condition"]:checked');
+                // Condition — reads from UI radio group (renamed to avoid data-val conflict)
+                const selectedCond = document.querySelector('input[name="_Condition_UI"]:checked');
                 if (selectedCond) {
                     const label = document.querySelector(`label[for="${selectedCond.id}"]`);
                     if(label) {

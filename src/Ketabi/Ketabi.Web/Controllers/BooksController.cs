@@ -1,3 +1,4 @@
+using Ketabi.Application.Common;
 using Ketabi.Application.DTOs.Books;
 using Ketabi.Application.Interfaces;
 using Ketabi.Core.Domain.Enums;
@@ -14,11 +15,13 @@ public class BooksController : Controller
 {
     private readonly IBookListingService _bookListingService;
     private readonly ICategoryService _categoryService;
+    private readonly IFileService _fileService;
 
-    public BooksController(IBookListingService bookListingService, ICategoryService categoryService)
+    public BooksController(IBookListingService bookListingService, ICategoryService categoryService, IFileService fileService)
     {
         _bookListingService = bookListingService;
         _categoryService = categoryService;
+        _fileService = fileService;
     }
 
     [HttpGet]
@@ -46,6 +49,16 @@ public class BooksController : Controller
             {
                 return RedirectToAction("Login", "Account");
             }
+
+            // Upload cover image and build the public URL
+            if (model.CoverImageFile == null || model.CoverImageFile.Length == 0)
+            {
+                ModelState.AddModelError(nameof(model.CoverImageFile), "Book cover image is required.");
+                await PopulateReferenceDataAsync(model);
+                return View(model);
+            }
+            var savedFileName = await _fileService.UploadFileAsync(model.CoverImageFile, AppConstants.Folders.BookCovers);
+            model.CoverImageUrl = $"/uploads/{AppConstants.Folders.BookCovers}/{savedFileName}";
 
             var createDto = new CreateBookDto
             {
@@ -84,7 +97,7 @@ public class BooksController : Controller
             Text = c.Name
         }).ToList();
 
-        // If no categories in DB yet, fallback to dummy
+        
         if (!model.CategoryOptions.Any())
         {
             model.CategoryOptions = new List<SelectListItem>

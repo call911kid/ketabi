@@ -1,65 +1,64 @@
 @model Ketabi.Web.ViewModels.Books.CreateBookViewModel
 
 <div class="mb-4">
-    <label class="form-label fw-bold mb-3" style="font-size: var(--text-sm);">Cover Image</label>
-    <div class="d-flex gap-3 mb-2 flex-wrap" id="imageSelectionGrid">
-        <!-- Hidden input to bind the selected image URL to the view model -->
-        <input type="hidden" asp-for="CoverImageUrl" id="CoverImageUrl" required />
-        
-        <!-- Image Options -->
-        <div class="image-option rounded-3 bg-light d-flex align-items-center justify-content-center position-relative" style="width: 80px; height: 100px; overflow: hidden; border: 2px solid transparent; cursor: pointer;" data-img-url="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=200">
-            <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=200" style="object-fit: cover; width: 100%; height: 100%;" />
-            <div class="check-icon position-absolute top-0 end-0 m-1 bg-white rounded-circle d-none text-primary" style="width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">
-                <i class="bi bi-check-circle-fill" style="font-size: 14px;"></i>
+    <label class="form-label fw-bold mb-3" style="font-size: var(--text-sm);">Cover Image <span class="text-danger">*</span></label>
+
+    @* Upload Drop Zone *@
+    <div id="coverUploadZone"
+         class="rounded-4 d-flex flex-column align-items-center justify-content-center gap-2 position-relative"
+         style="border: 2px dashed var(--color-surface-muted); background: var(--color-surface); min-height: 180px; cursor: pointer; transition: border-color .2s, background .2s;">
+
+        @* Preview image (hidden until file chosen) *@
+        <img id="coverPreview" src="#" alt="Preview"
+             class="d-none rounded-3"
+             style="max-height: 160px; max-width: 100%; object-fit: contain;" />
+
+        @* Placeholder icon + text (shown before file is chosen) *@
+        <div id="uploadPlaceholder" class="text-center px-3">
+            <i class="bi bi-cloud-arrow-up" style="font-size: 2rem; color: var(--color-indigo);"></i>
+            <div class="fw-medium mt-1" style="font-size: var(--text-sm); color: var(--color-text);">
+                Click or drag &amp; drop your cover image
             </div>
+            <div class="text-muted" style="font-size: var(--text-xs);">JPG, PNG, WEBP &mdash; max 10 MB</div>
         </div>
-        
-        <div class="image-option rounded-3 bg-light d-flex align-items-center justify-content-center position-relative" style="width: 80px; height: 100px; overflow: hidden; border: 2px solid transparent; cursor: pointer;" data-img-url="https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=200">
-            <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=200" style="object-fit: cover; width: 100%; height: 100%;" />
-            <div class="check-icon position-absolute top-0 end-0 m-1 bg-white rounded-circle d-none text-primary" style="width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">
-                <i class="bi bi-check-circle-fill" style="font-size: 14px;"></i>
-            </div>
-        </div>
-        
-        <div class="image-option rounded-3 bg-light d-flex align-items-center justify-content-center position-relative" style="width: 80px; height: 100px; overflow: hidden; border: 2px solid transparent; cursor: pointer;" data-img-url="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=200">
-            <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=200" style="object-fit: cover; width: 100%; height: 100%;" />
-            <div class="check-icon position-absolute top-0 end-0 m-1 bg-white rounded-circle d-none text-primary" style="width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">
-                <i class="bi bi-check-circle-fill" style="font-size: 14px;"></i>
-            </div>
-        </div>
-        
-        <div class="image-option rounded-3 bg-light d-flex align-items-center justify-content-center position-relative" style="width: 80px; height: 100px; overflow: hidden; border: 2px solid transparent; cursor: pointer;" data-img-url="https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=200">
-            <img src="https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=200" style="object-fit: cover; width: 100%; height: 100%;" />
-            <div class="check-icon position-absolute top-0 end-0 m-1 bg-white rounded-circle d-none text-primary" style="width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">
-                <i class="bi bi-check-circle-fill" style="font-size: 14px;"></i>
-            </div>
-        </div>
+
+        @* The real file input, covers the whole zone invisibly *@
+        <input asp-for="CoverImageFile"
+               type="file"
+               id="CoverImageFile"
+               accept="image/jpeg,image/png,image/webp"
+               class="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+               style="cursor: pointer;" />
     </div>
-    <small class="text-muted d-block mt-2" style="font-size: var(--text-xs);">Select a cover image</small>
-    <span asp-validation-for="CoverImageUrl" class="text-danger d-block mt-1" style="font-size: var(--text-sm);"></span>
+
+    @* Selected file name badge *@
+    <small id="fileNameBadge" class="text-muted d-none mt-2 d-block" style="font-size: var(--text-xs);"></small>
+    <span asp-validation-for="CoverImageFile" class="text-danger d-block mt-1" style="font-size: var(--text-sm);"></span>
 </div>
 
 <div class="mb-4">
     <label asp-for="Title" class="form-label fw-bold" style="font-size: var(--text-sm);">Book Title <span class="text-danger">*</span></label>
-    <input asp-for="Title" class="form-control bg-light border-0 py-2 rounded-3" placeholder="e.g. The Alchemist" required />
+    <input asp-for="Title" class="form-control bg-light border-0 py-2 rounded-3" placeholder="e.g. The Alchemist" />
     <span asp-validation-for="Title" class="text-danger" style="font-size: var(--text-sm);"></span>
 </div>
 
 <div class="mb-4">
     <label asp-for="Author" class="form-label fw-bold" style="font-size: var(--text-sm);">Author <span class="text-danger">*</span></label>
-    <input asp-for="Author" class="form-control bg-light border-0 py-2 rounded-3" placeholder="e.g. Paulo Coelho" required />
+    <input asp-for="Author" class="form-control bg-light border-0 py-2 rounded-3" placeholder="e.g. Paulo Coelho" />
     <span asp-validation-for="Author" class="text-danger" style="font-size: var(--text-sm);"></span>
 </div>
 
 <div class="mb-4">
     <label class="form-label fw-bold" style="font-size: var(--text-sm);">Category <span class="text-danger">*</span></label>
+    @* Hidden input handles model binding; radios use plain name= to avoid data-val conflict *@
+    <input type="hidden" name="CategoryId" id="CategoryId_Hidden" value="" />
     <div class="d-flex flex-wrap gap-2">
         @if (Model != null && Model.CategoryOptions != null && Model.CategoryOptions.Any())
         {
             foreach (var category in Model.CategoryOptions)
             {
                 <div class="category-pill">
-                    <input type="radio" asp-for="CategoryId" value="@category.Value" class="btn-check cat-check" id="cat_@category.Value" autocomplete="off" required>
+                    <input type="radio" name="_CategoryId_UI" value="@category.Value" class="btn-check cat-check" id="cat_@category.Value" autocomplete="off">
                     <label class="btn rounded-pill px-3 py-1 fw-medium" style="border: 1px solid var(--color-surface-muted); font-size: var(--text-sm-pill); color: var(--color-text-muted);" for="cat_@category.Value">@category.Text</label>
                 </div>
             }
@@ -68,19 +67,19 @@
         {
             <!-- Dummy Categories for UI visual testing if backend doesn't provide them yet -->
             <div class="category-pill">
-                <input type="radio" asp-for="CategoryId" value="1" class="btn-check cat-check" id="cat_fiction" autocomplete="off" required checked>
+                <input type="radio" name="_CategoryId_UI" value="1" class="btn-check cat-check" id="cat_fiction" autocomplete="off" checked>
                 <label class="btn rounded-pill px-3 py-1 fw-medium" style="border: 1px solid var(--color-surface-muted); font-size: var(--text-sm-pill); color: var(--color-text-muted);" for="cat_fiction">Fiction</label>
             </div>
             <div class="category-pill">
-                <input type="radio" asp-for="CategoryId" value="2" class="btn-check cat-check" id="cat_philosophy" autocomplete="off" required>
+                <input type="radio" name="_CategoryId_UI" value="2" class="btn-check cat-check" id="cat_philosophy" autocomplete="off">
                 <label class="btn rounded-pill px-3 py-1 fw-medium" style="border: 1px solid var(--color-surface-muted); font-size: var(--text-sm-pill); color: var(--color-text-muted);" for="cat_philosophy">Philosophy</label>
             </div>
             <div class="category-pill">
-                <input type="radio" asp-for="CategoryId" value="3" class="btn-check cat-check" id="cat_science" autocomplete="off" required>
+                <input type="radio" name="_CategoryId_UI" value="3" class="btn-check cat-check" id="cat_science" autocomplete="off">
                 <label class="btn rounded-pill px-3 py-1 fw-medium" style="border: 1px solid var(--color-surface-muted); font-size: var(--text-sm-pill); color: var(--color-text-muted);" for="cat_science">Science</label>
             </div>
             <div class="category-pill">
-                <input type="radio" asp-for="CategoryId" value="4" class="btn-check cat-check" id="cat_history" autocomplete="off" required>
+                <input type="radio" name="_CategoryId_UI" value="4" class="btn-check cat-check" id="cat_history" autocomplete="off">
                 <label class="btn rounded-pill px-3 py-1 fw-medium" style="border: 1px solid var(--color-surface-muted); font-size: var(--text-sm-pill); color: var(--color-text-muted);" for="cat_history">History</label>
             </div>
         }
@@ -94,48 +93,80 @@
     <span asp-validation-for="Description" class="text-danger" style="font-size: var(--text-sm);"></span>
 </div>
 
-<!-- Inline CSS just for this view to handle active state of pills -->
 <style>
     .cat-check:checked + .btn {
         background-color: var(--color-indigo) !important;
         color: white !important;
         border-color: var(--color-indigo) !important;
     }
-    .image-option.selected {
+    #coverUploadZone:hover,
+    #coverUploadZone.drag-over {
         border-color: var(--color-indigo) !important;
+        background-color: var(--color-indigo-surface) !important;
     }
-    .image-option.selected .check-icon {
-        display: flex !important;
-        color: var(--color-indigo) !important;
+    #coverUploadZone.has-file {
+        border-style: solid;
+        border-color: var(--color-indigo) !important;
     }
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const imageOptions = document.querySelectorAll('.image-option');
-        const coverImageUrlInput = document.getElementById('CoverImageUrl');
-        
-        imageOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                // Remove selected class from all
-                imageOptions.forEach(opt => opt.classList.remove('selected'));
-                
-                // Add selected class to clicked
-                this.classList.add('selected');
-                
-                // Update hidden input
-                const imgUrl = this.getAttribute('data-img-url');
-                coverImageUrlInput.value = imgUrl;
-                
-                // Trigger change event for validation check
-                coverImageUrlInput.dispatchEvent(new Event('change', { bubbles: true }));
-                
-                // Update preview in step 3 if it exists
-                const previewStep3 = document.getElementById('previewCoverImage');
-                if(previewStep3) {
-                    previewStep3.src = imgUrl;
-                }
-            });
+    document.addEventListener('DOMContentLoaded', function () {
+        const zone        = document.getElementById('coverUploadZone');
+        const fileInput   = document.getElementById('CoverImageFile');
+        const preview     = document.getElementById('coverPreview');
+        const placeholder = document.getElementById('uploadPlaceholder');
+        const badge       = document.getElementById('fileNameBadge');
+
+        function handleFile(file) {
+            if (!file || !file.type.startsWith('image/')) return;
+
+            // Live preview via FileReader
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+                placeholder.classList.add('d-none');
+                zone.classList.add('has-file');
+
+                // Also update Step-3 preview image if it exists
+                const step3Preview = document.getElementById('previewCoverImage');
+                if (step3Preview) step3Preview.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+
+            // Show filename badge
+            badge.textContent = file.name;
+            badge.classList.remove('d-none');
+
+            // Trigger change so wizard's validateCurrentStep() re-runs
+            fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        // Click to browse
+        fileInput.addEventListener('change', function () {
+            if (this.files && this.files[0]) handleFile(this.files[0]);
+        });
+
+        // Drag & Drop
+        zone.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            zone.classList.add('drag-over');
+        });
+        zone.addEventListener('dragleave', function () {
+            zone.classList.remove('drag-over');
+        });
+        zone.addEventListener('drop', function (e) {
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                // Assign dropped file to the real input so FormData sends it
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                fileInput.files = dt.files;
+                handleFile(file);
+            }
         });
     });
 </script>

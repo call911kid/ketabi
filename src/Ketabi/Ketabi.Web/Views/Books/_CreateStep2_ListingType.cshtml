@@ -2,10 +2,12 @@
 
 <div class="mb-5">
     <h5 class="fw-bold mb-3" style="font-size: var(--text-md);">Book Condition</h5>
+    @* Hidden input handles model binding; radios use plain name= to avoid data-val conflict *@
+    <input type="hidden" name="Condition" id="Condition_Hidden" value="" />
     <div class="row g-3">
         <!-- New -->
         <div class="col-md-6">
-            <input type="radio" asp-for="Condition" value="New" class="btn-check condition-check" id="cond_New" autocomplete="off" required>
+            <input type="radio" name="_Condition_UI" value="New" class="btn-check condition-check" id="cond_New" autocomplete="off">
             <label class="btn w-100 text-start p-3 rounded-3 condition-card bg-white" for="cond_New" style="border: 1px solid var(--color-surface-muted);">
                 <div class="d-flex justify-content-between align-items-center mb-1">
                     <span class="fw-bold condition-title" style="color: var(--color-success); font-size: var(--text-sm);">New</span>
@@ -17,7 +19,7 @@
         
         <!-- Good -->
         <div class="col-md-6">
-            <input type="radio" asp-for="Condition" value="Good" class="btn-check condition-check" id="cond_Good" autocomplete="off" required>
+            <input type="radio" name="_Condition_UI" value="Good" class="btn-check condition-check" id="cond_Good" autocomplete="off">
             <label class="btn w-100 text-start p-3 rounded-3 condition-card bg-white" for="cond_Good" style="border: 1px solid var(--color-surface-muted);">
                 <div class="d-flex justify-content-between align-items-center mb-1">
                     <span class="fw-bold condition-title" style="color: var(--color-info); font-size: var(--text-sm);">Good</span>
@@ -29,7 +31,7 @@
         
         <!-- Fair -->
         <div class="col-md-6">
-            <input type="radio" asp-for="Condition" value="Fair" class="btn-check condition-check" id="cond_Fair" autocomplete="off" required>
+            <input type="radio" name="_Condition_UI" value="Fair" class="btn-check condition-check" id="cond_Fair" autocomplete="off">
             <label class="btn w-100 text-start p-3 rounded-3 condition-card bg-white" for="cond_Fair" style="border: 1px solid var(--color-surface-muted);">
                 <div class="d-flex justify-content-between align-items-center mb-1">
                     <span class="fw-bold condition-title" style="color: var(--color-warning); font-size: var(--text-sm);">Fair</span>
@@ -41,7 +43,7 @@
         
         <!-- Worn -->
         <div class="col-md-6">
-            <input type="radio" asp-for="Condition" value="Worn" class="btn-check condition-check" id="cond_Worn" autocomplete="off" required>
+            <input type="radio" name="_Condition_UI" value="Worn" class="btn-check condition-check" id="cond_Worn" autocomplete="off">
             <label class="btn w-100 text-start p-3 rounded-3 condition-card bg-white" for="cond_Worn" style="border: 1px solid var(--color-surface-muted);">
                 <div class="d-flex justify-content-between align-items-center mb-1">
                     <span class="fw-bold condition-title" style="color: var(--color-error); font-size: var(--text-sm);">Worn</span>
@@ -55,12 +57,14 @@
 
 <div class="mb-4">
     <h5 class="fw-bold mb-3" style="font-size: var(--text-md);">How do you want to share it?</h5>
+    @* Hidden input handles model binding; radios use plain name= to avoid data-val conflict *@
+    <input type="hidden" name="SharingMode" id="SharingMode_Hidden" value="" />
     <div class="d-flex flex-column gap-3">
         
         <!-- Borrow Only -->
         <div class="sharing-option">
             <!-- Assuming value 'Borrow' maps to SharingMode enum. Adjust if your enum names differ (e.g. BorrowOnly, Free, etc) -->
-            <input type="radio" asp-for="SharingMode" value="Borrow" class="btn-check sharing-check" id="share_Borrow" autocomplete="off" required>
+            <input type="radio" name="_SharingMode_UI" value="Borrow" class="btn-check sharing-check" id="share_Borrow" autocomplete="off">
             <label class="btn w-100 text-start p-3 rounded-3 d-flex align-items-center sharing-card bg-white" for="share_Borrow" style="border: 1px solid var(--color-surface-muted);">
                 <div class="icon-box rounded-3 bg-light d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                     <i class="bi bi-book text-muted"></i>
@@ -75,7 +79,7 @@
 
         <!-- Exchange Only -->
         <div class="sharing-option">
-            <input type="radio" asp-for="SharingMode" value="Exchange" class="btn-check sharing-check" id="share_Exchange" autocomplete="off" required>
+            <input type="radio" name="_SharingMode_UI" value="Exchange" class="btn-check sharing-check" id="share_Exchange" autocomplete="off">
             <label class="btn w-100 text-start p-3 rounded-3 d-flex align-items-center sharing-card bg-white" for="share_Exchange" style="border: 1px solid var(--color-surface-muted);">
                 <div class="icon-box rounded-3 bg-light d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                     <i class="bi bi-arrow-left-right text-muted"></i>
@@ -90,13 +94,13 @@
 
         <!-- Both -->
         <div class="sharing-option">
-            <input type="radio" asp-for="SharingMode" value="Both" class="btn-check sharing-check" id="share_Both" autocomplete="off" required>
+            <input type="radio" name="_SharingMode_UI" value="Both" class="btn-check sharing-check" id="share_Both" autocomplete="off">
             <label class="btn w-100 text-start p-3 rounded-3 d-flex align-items-center sharing-card bg-white" for="share_Both" style="border: 1px solid var(--color-surface-muted);">
                 <div class="icon-box rounded-3 bg-light d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                     <i class="bi bi-arrow-repeat text-muted"></i>
                 </div>
                 <div class="flex-grow-1">
-                    <div class="fw-bold" style="font-size: var(--text-sm); color: var(--color-success);">Both Options</div>
+                    <div class="fw-bold" style="font-size: var(--text-sm); color: var(--color-text);">Both Options</div>
                     <div class="text-muted" style="font-size: var(--text-xs);">Open to borrowing or exchanging.</div>
                 </div>
                 <i class="bi bi-check-circle-fill check-icon d-none" style="color: var(--color-success); font-size: 20px;"></i>
