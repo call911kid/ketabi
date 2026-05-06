@@ -8,7 +8,8 @@ public class UserProfileDto
 {
     public Guid UserId { get; init; }
     public string UserName { get; init; } = string.Empty;
-    public string FullName { get; init; } = string.Empty;
+    public string FirstName { get; init; } = string.Empty;
+    public string LastName { get; init; } = string.Empty;
     public string? Bio { get; init; }
     public string AvatarUrl { get; init; } = string.Empty;
     public string Location { get; init; } = string.Empty;

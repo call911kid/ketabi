@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
-namespace Ketabi.Application.DTOs.User
+namespace Ketabi.Application.DTOs.Users
 {
-    public class CreateUserDto
+    public class CreatedUserDto
     {
         public Guid Id { get; set; }
         public string FirstName { get; set; }
@@ -18,5 +17,7 @@ namespace Ketabi.Application.DTOs.User
         public string? Governorate { get; set; }
         public double ReputationScore { get; set; }
         public string? ProfilePictureUrl { get; set; }
+
+
     }
 }

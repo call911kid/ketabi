@@ -9,9 +9,13 @@ namespace Ketabi.Application.DTOs.Users;
 /// </summary>
 public class UpdateUserProfileDto
 {
-    [MinLength(2, ErrorMessage = "Full name must be at least 2 characters.")]
-    [MaxLength(80, ErrorMessage = "Full name cannot exceed 80 characters.")]
-    public string? FullName { get; init; }
+    
+    [MinLength(2, ErrorMessage = "First name must be at least 2 characters.")]
+    [MaxLength(80, ErrorMessage = "First name cannot exceed 80 characters.")]
+    public string? FirstName { get; init; }
+    [MinLength(2, ErrorMessage = "Last name must be at least 2 characters.")]
+    [MaxLength(80, ErrorMessage = "Last name cannot exceed 80 characters.")]
+    public string? LastName { get; init; }
 
     [MinLength(3, ErrorMessage = "Username must be at least 3 characters.")]
     [MaxLength(30, ErrorMessage = "Username cannot exceed 30 characters.")]
