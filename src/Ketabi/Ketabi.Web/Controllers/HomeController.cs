@@ -4,8 +4,10 @@ using Ketabi.Core.Domain.Enums;
 using Ketabi.Web.Models;
 using Ketabi.Web.ViewModels.Home;
 using Ketabi.Web.ViewModels.Shared;
+using Ketabi.Web.ViewModels.Books;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using Ketabi.Web.ViewModels.Books;
 
 namespace Ketabi.Web.Controllers;
 
@@ -26,8 +28,34 @@ public class HomeController : Controller
         ILogger<HomeController> logger,
         IBookListingService     bookListingService)
     {
+<<<<<<< HEAD
         _logger             = logger;
         _bookListingService = bookListingService;
+=======
+        private readonly ILogger<HomeController> _logger;
+
+        public HomeController(ILogger<HomeController> logger)
+        {
+            _logger = logger;
+        }
+
+
+    public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+>>>>>>> e1641b1 (Book wazard controller and views)
     }
 
     // GET: /  or  /Home/Index?q=...&mode=...&categoryId=...&page=...

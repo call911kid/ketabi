@@ -52,10 +52,9 @@ public class CreateBookViewModel
 
     // Step 3: Cover Image & Location
 
-    // Uses IFormFile for multipart/form-data binding
     [Required(ErrorMessage = "Book cover image is required.")]
     [Display(Name = "Cover Image")]
-    public IFormFile CoverImage { get; set; } = null!;
+    public string CoverImageUrl { get; set; } = string.Empty;
 
     [MaxLength(120)]
     [Display(Name = "Pickup area")]

@@ -1,0 +1,44 @@
+@model Ketabi.Web.ViewModels.Books.CreateBookViewModel
+
+<div class="mb-4">
+    <h5 class="fw-bold mb-3" style="font-size: var(--text-md);">Preview your Listing</h5>
+    
+    <div class="card p-3 rounded-4 bg-white" style="border: 1px solid var(--color-surface-muted);">
+        <div class="d-flex gap-3">
+            <!-- Book Cover Preview -->
+            <div class="rounded-3 flex-shrink-0 bg-light" style="width: 100px; height: 130px; overflow: hidden; border: 1px solid var(--color-surface-muted);">
+                <img id="previewCoverImage" src="@(string.IsNullOrEmpty(Model?.CoverImageUrl) ? "https://via.placeholder.com/100x130?text=Cover" : Model.CoverImageUrl)" style="width: 100%; height: 100%; object-fit: cover;" alt="Book Cover" />
+            </div>
+            
+            <!-- Book Info Preview -->
+            <div class="d-flex flex-column justify-content-center w-100">
+                <div class="d-flex gap-2 mb-2">
+                    <span id="previewCategory" class="badge rounded-pill fw-medium" style="background-color: var(--color-indigo-surface); color: var(--color-indigo); font-size: var(--text-xs);">Category</span>
+                    <span id="previewCondition" class="badge rounded-pill fw-medium" style="background-color: var(--color-success-bg); color: var(--color-success); border: 1px solid var(--color-success-border); font-size: var(--text-xs);">Condition</span>
+                </div>
+                
+                <h5 id="previewTitle" class="fw-bold mb-1" style="font-size: var(--text-base); color: var(--color-text);">Book Title</h5>
+                <div class="text-muted mb-2" style="font-size: var(--text-sm);">by <span id="previewAuthor" class="fw-medium text-dark">Author Name</span></div>
+            </div>
+        </div>
+        
+        <hr class="my-3" style="border-color: var(--color-surface-muted);" />
+        
+        <!-- Owner Info Preview -->
+        <div class="d-flex align-items-center">
+            <div class="rounded-circle bg-secondary me-2 d-flex align-items-center justify-content-center text-white" style="width: 24px; height: 24px; overflow: hidden; font-size: 12px;">
+                <i class="bi bi-person-fill"></i>
+            </div>
+            <div style="font-size: var(--text-xs-loc); color: var(--color-text-muted);">
+                <span class="fw-bold" style="color: var(--color-text);">You</span> • <i class="bi bi-geo-alt"></i> Cairo
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert rounded-3 d-flex align-items-start p-3" style="background-color: var(--color-indigo-surface); border: 1px solid var(--color-indigo-border); color: var(--color-indigo-dark);">
+    <i class="bi bi-check2-circle me-2 mt-1 fs-5"></i>
+    <div style="font-size: var(--text-sm);">
+        This listing will go live immediately and be visible to all Ketabi users. You can remove or edit it anytime from your profile.
+    </div>
+</div>

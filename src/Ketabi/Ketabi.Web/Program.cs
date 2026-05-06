@@ -4,6 +4,8 @@ using Ketabi.Web.Mappings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Ketabi.Application.Interfaces;
+using Ketabi.Web.Services;
 
 namespace Ketabi.Web
 {
@@ -25,6 +27,9 @@ namespace Ketabi.Web
             {
                 cfg.AddProfile<AccountWebProfile>();
             }, typeof(AccountWebProfile).Assembly);
+
+            builder.Services.AddScoped<IFileService, FileService>();
+
             // Add controllers with views
             builder.Services.AddControllersWithViews();
 

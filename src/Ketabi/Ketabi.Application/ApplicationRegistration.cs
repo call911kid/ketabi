@@ -1,4 +1,4 @@
-﻿using Ketabi.Application.Interfaces;
+using Ketabi.Application.Interfaces;
 using Ketabi.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,6 +13,9 @@ public static class ApplicationRegistration
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<IBookListingService, BookListingService>();
         services.AddScoped<IRequestService, RequestService>();
+        services.AddScoped<IBookListingService, BookListingService>();
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IUserService, UserService>();
         return services;
     }
 }
