@@ -84,10 +84,9 @@ namespace Ketabi.Application.Services
             review.Reviewer = await _unitOfWork.Users.GetByIdAsync(review.ReviewerId);
             review.TargetUser = await _unitOfWork.Users.GetByIdAsync(review.TargetUserId);
 
-            if (review.RelatedRequestId.HasValue)
-            {
-                review.RelatedRequest = await _unitOfWork.Requests.GetByIdAsync(review.RelatedRequestId.Value);
-            }
+            
+            review.RelatedRequest = await _unitOfWork.Requests.GetByIdAsync(review.RelatedRequestId);
+
 
             return ServiceResultDto<ReviewDto>.Ok(_mapper.Map<ReviewDto>(review));
         }

@@ -67,7 +67,7 @@ namespace Ketabi.Infrastructure.Authentication
                 var result = await _userManager.CreateAsync(ketabiUser, request.Password);
                 if (!result.Succeeded)
                 {
-                    throw new InvalidOperationException(string.Join(", ", result.Errors.Select(error => error.Description));
+                    throw new InvalidOperationException(string.Join(", ", result.Errors.Select(error => error.Description)));
                 }
 
                 var user = new User
@@ -88,7 +88,7 @@ namespace Ketabi.Infrastructure.Authentication
                 var roleResult = await _userManager.AddToRoleAsync(ketabiUser, "User");
                 if (!roleResult.Succeeded)
                 {
-                    throw new InvalidOperationException(string.Join(", ", roleResult.Errors.Select(error => error.Description));
+                    throw new InvalidOperationException(string.Join(", ", roleResult.Errors.Select(error => error.Description)));
                 }
 
                 await _unitOfWork.SaveChangesAsync();
