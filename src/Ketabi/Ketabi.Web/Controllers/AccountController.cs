@@ -1,7 +1,7 @@
 using AutoMapper;
+using Ketabi.Application.Common;
 using Ketabi.Application.DTOs.Auth;
 using Ketabi.Application.Interfaces;
-using Ketabi.Application.Services;
 using Ketabi.Web.ViewModels.Account;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +18,8 @@ namespace Ketabi.Web.Controllers
             _mapper = mapper;
         }
 
+        #region Register
+
         [HttpGet]
         public IActionResult Register() => View(new RegisterViewModel());
 
@@ -27,33 +29,26 @@ namespace Ketabi.Web.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            if (model.ProfilePicture != null && model.ProfilePicture.Length > 10 * 1024 * 1024)
-            {
-                ModelState.AddModelError("ProfilePicture", "Profile picture must be less than 10MB.");
-                return View(model);
-            }
             var request = _mapper.Map<RegisterRequest>(model);
+            request.ProfilePictureUrl = AppConstants.DefaultProfilePic;
 
             try
             {
-                if (model.ProfilePicture != null && model.ProfilePicture.Length > 0)
-                {
-                    // TODO: must reimplement FileService
-                    string fileName = await FileService.UploadFileAsync(model.ProfilePicture);
-                    request.ProfilePictureUrl = $"/Uploads/{fileName}";
-                }
-
                 await _authService.RegisterAsync(request);
 
-                TempData["SuccessMessage"] = "Account created successfully!";
+                TempData[AppConstants.SuccessMessageKey] = Messages.Auth.RegisterSuccess;
                 return RedirectToAction(nameof(Login));
             }
-            catch (Exception ex) // add specific exception type for better error handling
+            catch (InvalidOperationException ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return View(model);
             }
         }
+
+        #endregion
+
+        #region Login
 
         [HttpGet]
         public IActionResult Login(string? returnUrl = null)
@@ -75,28 +70,38 @@ namespace Ketabi.Web.Controllers
                 {
                     HttpOnly = true,
                     Secure = true,
+                    SameSite = SameSiteMode.Strict,
                     Expires = model.RememberMe ? DateTime.UtcNow.AddDays(7) : null
                 };
 
-                Response.Cookies.Append("AuthToken", response.Token, cookieOptions);
+                Response.Cookies.Append(AppConstants.AuthCookieName, response.Token, cookieOptions);
 
-                return string.IsNullOrEmpty(model.ReturnUrl)
-                    ? RedirectToAction("Index", "Home")
-                    : Redirect(model.ReturnUrl);
+                if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
+                {
+                    return Redirect(model.ReturnUrl);
+                }
+
+                return RedirectToAction("Index", "Home");
             }
-            catch (Exception) // add specific exception type for better error handling
+            catch (UnauthorizedAccessException)
             {
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                ModelState.AddModelError(string.Empty, Messages.Auth.LoginFailed);
                 return View(model);
             }
         }
 
+        #endregion
+
+        #region Logout
+
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Logout()
         {
-            Response.Cookies.Delete("AuthToken");
-            return RedirectToAction("Login");
+            Response.Cookies.Delete(AppConstants.AuthCookieName);
+            return RedirectToAction(nameof(Login));
         }
 
+        #endregion
     }
 }
