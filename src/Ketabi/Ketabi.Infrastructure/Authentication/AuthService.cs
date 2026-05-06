@@ -12,15 +12,18 @@ namespace Ketabi.Infrastructure.Authentication
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<KetabiUser> _userManager;
+        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
 
         public AuthService(IJwtTokenService jwtTokenService,
             IUnitOfWork unitOfWork,
-            UserManager<KetabiUser> userManager
+            UserManager<KetabiUser> userManager,
+            RoleManager<IdentityRole<Guid>> roleManager
             )
         {
             _jwtTokenService = jwtTokenService;
             _unitOfWork = unitOfWork;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
         public async Task<AuthResponse> LoginAsync(LoginRequest request)
         {
@@ -79,6 +82,15 @@ namespace Ketabi.Infrastructure.Authentication
                 };
 
                 await _unitOfWork.Users.AddAsync(user);
+
+                if (!await _roleManager.RoleExistsAsync("User"))
+                {
+                    var createRoleResult = await _roleManager.CreateAsync(new IdentityRole<Guid>("User"));
+                    if (!createRoleResult.Succeeded)
+                    {
+                        throw new InvalidOperationException(string.Join(", ", createRoleResult.Errors.Select(error => error.Description)));
+                    }
+                }
 
                 var roleResult = await _userManager.AddToRoleAsync(ketabiUser, "User");
                 if (!roleResult.Succeeded)
