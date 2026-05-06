@@ -79,4 +79,11 @@ internal class RequestRepository : GenericRepository<Request>, IRequestRepositor
 
         return new PagedResult<Request>(items, totalCount, pageNumber, pageSize);
     }
+
+    public async Task<int> CountCompletedTradesForUserAsync(Guid targetUserId)
+    {
+        return await _dbSet.CountAsync(r =>
+            (r.SenderId == targetUserId || r.ReceiverId == targetUserId) &&
+            r.Status == RequestStatus.Completed);
+    }
 }
