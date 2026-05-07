@@ -169,4 +169,28 @@
             }
         });
     });
+
+    // Sync category UI radios with hidden input used for model binding
+    document.addEventListener('DOMContentLoaded', function () {
+        const hiddenCat = document.getElementById('CategoryId_Hidden');
+        const uiRadios = document.querySelectorAll('input[name="_CategoryId_UI"]');
+
+        function syncCategory(e) {
+            const val = this.value || (e && e.target && e.target.value) || '';
+            if (hiddenCat) hiddenCat.value = val;
+            // Trigger change so parent form validation runs
+            hiddenCat && hiddenCat.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        uiRadios.forEach(r => {
+            r.addEventListener('change', syncCategory);
+            // If radio is initially checked, copy value
+            if (r.checked && hiddenCat && !hiddenCat.value) {
+                hiddenCat.value = r.value;
+            }
+        });
+
+        // Ensure validation runs if we seeded a value
+        if (hiddenCat && hiddenCat.value) hiddenCat.dispatchEvent(new Event('change', { bubbles: true }));
+    });
 </script>

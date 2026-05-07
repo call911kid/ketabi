@@ -7,16 +7,14 @@
 @model BookCardViewModel
 
 <a asp-controller="Books" asp-action="Details" asp-route-id="@Model.BookId"
-   class="book-card-link d-block text-decoration-none">
+       class="book-card-link d-block text-decoration-none" aria-label="View details for @Model.Title">
     <article class="book-card ketabi-card overflow-hidden">
 
         @* ── Cover Image Zone ── *@
         <div class="book-card__cover">
 
             <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/img/cover-placeholder.svg" : Model.ImageUrl)"
-                 alt="@Model.Title cover"
-                 class="book-card__img"
-                 loading="lazy" />
+                 alt="@Model.Title cover" class="book-card__img" loading="lazy" />
 
             @* Bottom gradient so title text is readable *@
             <div class="book-card__gradient"></div>
@@ -41,9 +39,7 @@
             <div class="book-card__owner">
                 @if (!string.IsNullOrEmpty(Model.OwnerAvatarUrl))
                 {
-                    <img src="@Model.OwnerAvatarUrl"
-                         alt="@Model.OwnerName"
-                         class="book-card__avatar" />
+                    <img src="@Model.OwnerAvatarUrl" alt="@Model.OwnerName" class="book-card__avatar" />
                 }
                 else
                 {
@@ -53,7 +49,8 @@
                 }
 
                 <span class="book-card__owner-name">
-                    @(Model.OwnerName.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? Model.OwnerName)
+                    @(Model.OwnerName.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ??
+                    Model.OwnerName)
                 </span>
 
                 <span class="book-card__rating">

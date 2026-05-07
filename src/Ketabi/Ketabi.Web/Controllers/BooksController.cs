@@ -1,8 +1,11 @@
 using Ketabi.Application.Common;
+using AutoMapper;
 using Ketabi.Application.DTOs.Books;
+using Ketabi.Application.DTOs.Category;
 using Ketabi.Application.Interfaces;
 using Ketabi.Core.Domain.Enums;
 using Ketabi.Web.ViewModels.Books;
+using Ketabi.Web.ViewModels.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -15,12 +18,15 @@ public class BooksController : Controller
 {
     private readonly IBookListingService _bookListingService;
     private readonly ICategoryService _categoryService;
+    private readonly IMapper _mapper;
     private readonly IFileService _fileService;
 
-    public BooksController(IBookListingService bookListingService, ICategoryService categoryService, IFileService fileService)
+
+    public BooksController(IBookListingService bookListingService, ICategoryService categoryService, IFileService fileService , IMapper mapper)
     {
         _bookListingService = bookListingService;
         _categoryService = categoryService;
+        _mapper = mapper;
         _fileService = fileService;
     }
 
@@ -76,9 +82,9 @@ public class BooksController : Controller
             };
 
             await _bookListingService.CreateBookAsync(createDto, userId);
-            
+
             TempData["SuccessMessage"] = "Book listed successfully!";
-            return RedirectToAction("Index", "Home"); 
+            return RedirectToAction("Index", "Home");
         }
         catch (Exception ex)
         {
@@ -88,9 +94,99 @@ public class BooksController : Controller
         }
     }
 
+    [AllowAnonymous]
+    [HttpGet]
+    public async Task<IActionResult> Details(Guid id)
+    {
+        try
+        {
+            Guid? currentUserId = null;
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(userIdString) && Guid.TryParse(userIdString, out var parsedUserId))
+            {
+                currentUserId = parsedUserId;
+            }
+
+            // Fetch book details
+            var bookDetailDto = await _bookListingService.GetBookByIdAsync(id);
+            if (bookDetailDto == null)
+            {
+                return NotFound("Book not found");
+            }
+
+            // Map to ViewModel
+            var viewModel = new BookDetailViewModel
+            {
+                BookId = bookDetailDto.BookId,
+                Title = bookDetailDto.Title,
+                Author = bookDetailDto.Author,
+                ISBN = bookDetailDto.ISBN,
+                Description = bookDetailDto.Description,
+                Language = bookDetailDto.Language,
+                Publisher = bookDetailDto.Publisher,
+                Category = bookDetailDto.Category,
+                Condition = bookDetailDto.Condition,
+                SharingMode = bookDetailDto.SharingMode,
+                IsAvailable = bookDetailDto.IsAvailable,
+                ImageUrl = bookDetailDto.ImageUrl,
+                LocationNote = bookDetailDto.LocationNote,
+                Owner = _mapper.Map<UserSummaryViewModel>(bookDetailDto.Owner),
+                IsOwner = currentUserId.HasValue && bookDetailDto.Owner.UserId == currentUserId.Value
+            };
+
+            // Fetch related books
+            var relatedBooksDto = await _bookListingService.GetRelatedBooksAsync(id, 1, 4);
+            viewModel.RelatedBooks = relatedBooksDto
+                .Select(rb => new BookCardViewModel
+                {
+                    BookId = rb.Id,
+                    Title = rb.Title,
+                    Author = rb.Author ?? string.Empty,
+                    ImageUrl = rb.ImageUrl ?? string.Empty,
+                    IsAvailable = true
+                })
+                .ToList();
+
+            // Populate borrow duration options
+            viewModel.BorrowDurationOptions = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "3", Text = "3 Days" },
+                new SelectListItem { Value = "7", Text = "1 Week" },
+                new SelectListItem { Value = "14", Text = "2 Weeks" },
+                new SelectListItem { Value = "30", Text = "1 Month" }
+            };
+
+            return View(viewModel);
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = "An error occurred while loading the book details: " + ex.Message;
+            return RedirectToAction("Index", "Home");
+        }
+    }
+
     private async Task PopulateReferenceDataAsync(CreateBookViewModel model)
     {
-        var categories = await _categoryService.GetAllCategoriesAsync();
+        var categories = (await _categoryService.GetAllCategoriesAsync()).ToList();
+
+        if (!categories.Any())
+        {
+            var defaultCategories = new[]
+            {
+                new CreateCategoryDto { Name = "Fiction", Description = "Fiction books and stories" },
+                new CreateCategoryDto { Name = "Philosophy", Description = "Philosophy and self-reflection" },
+                new CreateCategoryDto { Name = "Science", Description = "Science and technology books" },
+                new CreateCategoryDto { Name = "History", Description = "History and biographies" }
+            };
+
+            foreach (var defaultCategory in defaultCategories)
+            {
+                await _categoryService.CreateCategoryAsync(defaultCategory);
+            }
+
+            categories = (await _categoryService.GetAllCategoriesAsync()).ToList();
+        }
+
         model.CategoryOptions = categories.Select(c => new SelectListItem
         {
             Value = c.Id.ToString(),

@@ -1,0 +1,36 @@
+@model Ketabi.Web.ViewModels.Books.BookDetailViewModel
+
+<div class="modal fade" id="borrowModal" tabindex="-1" aria-labelledby="borrowModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="borrowModalLabel">Borrow this book</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if (!Model.CanBorrow)
+                {
+                    <div class="alert alert-warning mb-0">This listing is not available for borrowing.</div>
+                }
+                else
+                {
+                    <p>Borrow requests are currently not live in this preview. Contact the owner directly or check back once
+                        request support is enabled.</p>
+                        <ul class="list-unstyled">
+                            <li><strong>Book:</strong> @Model.Title</li>
+                            <li><strong>Owner:</strong> @Model.Owner.FullName</li>
+                            <li><strong>Suggested duration:</strong> @Model.BorrowDurationOptions.FirstOrDefault()?.Text ?? "3
+                                Days"</li>
+                            </ul>
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        @if (Model.CanBorrow)
+                        {
+                            <button type="button" class="btn btn-primary" disabled>Request borrow (coming soon)</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>

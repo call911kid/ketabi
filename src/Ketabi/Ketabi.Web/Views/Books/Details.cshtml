@@ -1,0 +1,68 @@
+﻿@model Ketabi.Web.ViewModels.Books.BookDetailViewModel
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container my-5" style="max-width: var(--container-max); padding: 0 var(--container-px);">
+    <div class="mb-4">
+        <a asp-controller="Home" asp-action="Index" class="text-decoration-none d-flex align-items-center gap-2"
+               style="color: var(--color-text-muted); font-size: var(--text-sm); font-weight: var(--weight-medium);">
+            <i class="bi bi-arrow-left" style="font-size: var(--icon-md);"></i> Back to Explorer
+        </a>
+    </div>
+
+    <div class="row g-5">
+        <div class="col-lg-4 col-md-5">
+            <div class="position-sticky" style="top: 2rem;">
+                <img src="@Model.ImageUrl" alt="@Model.Title" class="w-100"
+                     style="aspect-ratio: var(--ratio-book-cover); object-fit: cover; border-radius: var(--radius-2xl); box-shadow: var(--shadow-card);">
+            </div>
+        </div>
+
+        <div class="col-lg-5 col-md-7">
+            <partial name="_BookInfoPanel" model="Model" />
+        </div>
+
+        <div class="col-lg-3 col-md-12">
+            <partial name="_OwnerCard" model="Model" />
+        </div>
+    </div>
+
+    @if (Model.RelatedBooks.Any())
+    {
+        <div class="mt-5 pt-5 border-top" style="border-color: var(--color-border) !important;">
+            <h3 class="mb-4"
+                style="font-size: var(--text-lg-section); font-weight: var(--weight-bold); color: var(--color-text);">
+                More from @Model.Owner.FullName
+            </h3>
+            <div class="row row-cols-1 row-cols-md-4 g-4">
+                @foreach (var book in Model.RelatedBooks)
+                {
+                    <div class="col">
+                        <partial name="_BookCard" model="book" />
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.IsOwner)
+{
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <partial name="_BorrowForm" model="Model" />
+        <partial name="_ExchangeForm" model="Model" />
+    }
+    else
+    {
+        <div class="mt-5 p-4 rounded-4" style="background-color: var(--color-surface); border: 1px solid var(--color-border);">
+            <h4 class="mb-3" style="font-size: var(--text-lg); color: var(--color-text);">Want to borrow or exchange?</h4>
+            <p class="mb-3" style="color: var(--color-text-muted);">Log in to see the available request options and contact the
+                owner.</p>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-primary px-4 py-3"
+                   style="font-weight: var(--weight-bold);">Log in to continue</a>
+            </div>
+        }
+    }

@@ -14,265 +14,316 @@
     <!-- Step Indicator -->
     <div class="d-flex justify-content-center align-items-center mb-5 position-relative">
         <!-- Connecting lines behind steps -->
-        <div class="position-absolute" style="height: 2px; width: 60%; background-color: var(--color-surface-muted); z-index: 0; top: 50%; transform: translateY(-50%);"></div>
+        <div class="position-absolute"
+             style="height: 2px; width: 60%; background-color: var(--color-surface-muted); z-index: 0; top: 50%; transform: translateY(-50%);">
+        </div>
 
         <!-- Step 1 Indicator -->
-        <div class="step-indicator active d-flex align-items-center me-4 position-relative z-1 bg-white pe-2" data-step="1">
-            <span class="step-circle rounded-circle text-white d-flex justify-content-center align-items-center shadow-sm" style="width: 28px; height: 28px; background-color: var(--color-indigo); font-size: 14px;">1</span>
+        <div class="step-indicator active d-flex align-items-center me-4 position-relative z-1 bg-white pe-2"
+             data-step="1">
+            <span
+            class="step-circle rounded-circle text-white d-flex justify-content-center align-items-center shadow-sm"
+            style="width: 28px; height: 28px; background-color: var(--color-indigo); font-size: 14px;">1</span>
             <span class="ms-2 fw-medium" style="color: var(--color-text); font-size: var(--text-sm);">Book Info</span>
         </div>
         
         <!-- Step 2 Indicator -->
         <div class="step-indicator d-flex align-items-center mx-4 position-relative z-1 bg-white px-2" data-step="2">
-            <span class="step-circle rounded-circle d-flex justify-content-center align-items-center" style="width: 28px; height: 28px; background-color: var(--color-surface-muted); color: var(--color-text-muted); font-size: 14px;">2</span>
-            <span class="ms-2 fw-medium" style="color: var(--color-text-muted); font-size: var(--text-sm);">Listing Type</span>
-        </div>
+            <span class="step-circle rounded-circle d-flex justify-content-center align-items-center"
+                  style="width: 28px; height: 28px; background-color: var(--color-surface-muted); color: var(--color-text-muted); font-size: 14px;">2</span>
+            <span class="ms-2 fw-medium" style="color: var(--color-text-muted); font-size: var(--text-sm);">Listing
+                Type</span>
+            </div>
         
-        <!-- Step 3 Indicator -->
-        <div class="step-indicator d-flex align-items-center ms-4 position-relative z-1 bg-white ps-2" data-step="3">
-            <span class="step-circle rounded-circle d-flex justify-content-center align-items-center" style="width: 28px; height: 28px; background-color: var(--color-surface-muted); color: var(--color-text-muted); font-size: 14px;">3</span>
-            <span class="ms-2 fw-medium" style="color: var(--color-text-muted); font-size: var(--text-sm);">Preview</span>
-        </div>
-    </div>
-
-    <!-- Form -->
-    <form asp-action="Create" asp-controller="Books" method="post" enctype="multipart/form-data" id="wizardForm" novalidate>
-        
-        <!-- Step 1 -->
-        <div class="wizard-step" id="step1">
-            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4" style="background-color: var(--color-surface);">
-                <h4 class="fw-bold mb-4">Tell us about the book</h4>
-                <partial name="~/Views/Books/_CreateStep1_BookInfo.cshtml" model="Model" />
-            </div>
-            <div class="d-flex justify-content-between">
-                <button type="button" class="btn btn-light rounded-pill px-4" style="z-index: 10; position: relative;" onclick="window.location.href='/'">Cancel</button>
-                <button type="button" class="btn text-white rounded-pill px-4 continue-btn" id="btnNext1" style="background-color: var(--color-indigo-light); color: var(--color-indigo); font-weight: 600; z-index: 10; position: relative;">Continue &gt;</button>
+            <!-- Step 3 Indicator -->
+            <div class="step-indicator d-flex align-items-center ms-4 position-relative z-1 bg-white ps-2" data-step="3">
+                <span class="step-circle rounded-circle d-flex justify-content-center align-items-center"
+                      style="width: 28px; height: 28px; background-color: var(--color-surface-muted); color: var(--color-text-muted); font-size: 14px;">3</span>
+                <span class="ms-2 fw-medium"
+                      style="color: var(--color-text-muted); font-size: var(--text-sm);">Preview</span>
             </div>
         </div>
 
-        <!-- Step 2 -->
-        <div class="wizard-step d-none" id="step2">
-            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4" style="background-color: var(--color-surface);">
-                <partial name="~/Views/Books/_CreateStep2_ListingType.cshtml" model="Model" />
-            </div>
-            <div class="d-flex justify-content-between">
-                <button type="button" class="btn btn-light rounded-pill px-4" style="z-index: 10; position: relative;" onclick="prevStep()">Back</button>
-                <button type="button" class="btn text-white rounded-pill px-4 continue-btn" id="btnNext2" style="background-color: var(--color-indigo); font-weight: 600; z-index: 10; position: relative;">Continue &gt;</button>
-            </div>
-        </div>
+        <!-- Form -->
+        <form asp-action="Create" asp-controller="Books" method="post" enctype="multipart/form-data" id="wizardForm"
+              novalidate>
+            @Html.AntiForgeryToken()
+            <!-- Step 1 -->
+            <div class="wizard-step" id="step1">
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4"
+                     style="background-color: var(--color-surface);">
+                    <h4 class="fw-bold mb-4">Tell us about the book</h4>
+                    <partial name="~/Views/Books/_CreateStep1_BookInfo.cshtml" model="Model" />
+                </div>
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-light rounded-pill px-4" style="z-index: 10; position: relative;"
+                            onclick="window.location.href='/'">Cancel</button>
+                    <button type="button" class="btn text-white rounded-pill px-4 continue-btn" id="btnNext1"
+                            style="background-color: var(--color-indigo-light); color: var(--color-indigo); font-weight: 600; z-index: 10; position: relative;">Continue
+                        &gt;</button>
+                    </div>
+                </div>
 
-        <!-- Step 3 -->
-        <div class="wizard-step d-none" id="step3">
-            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4" style="background-color: var(--color-surface);">
-                <partial name="~/Views/Books/_CreateStep3_Preview.cshtml" model="Model" />
+                <!-- Step 2 -->
+                <div class="wizard-step d-none" id="step2">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4"
+                         style="background-color: var(--color-surface);">
+                        <partial name="~/Views/Books/_CreateStep2_ListingType.cshtml" model="Model" />
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-light rounded-pill px-4" style="z-index: 10; position: relative;"
+                                onclick="prevStep()">Back</button>
+                        <button type="button" class="btn text-white rounded-pill px-4 continue-btn" id="btnNext2"
+                                style="background-color: var(--color-indigo); font-weight: 600; z-index: 10; position: relative;">Continue
+                            &gt;</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="wizard-step d-none" id="step3">
+                        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4"
+                             style="background-color: var(--color-surface);">
+                            <partial name="~/Views/Books/_CreateStep3_Preview.cshtml" model="Model" />
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-light rounded-pill px-4" style="z-index: 10; position: relative;"
+                                    onclick="prevStep()">Back</button>
+                            <button type="button" class="btn text-white rounded-pill px-4 shadow-sm" id="btnPublish"
+                                    style="background-color: var(--color-indigo); font-weight: 600; z-index: 10; position: relative;">
+                                <i class="bi bi-upload me-2"></i> Publish Listing
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
             </div>
-            <div class="d-flex justify-content-between">
-                <button type="button" class="btn btn-light rounded-pill px-4" style="z-index: 10; position: relative;" onclick="prevStep()">Back</button>
-                <button type="button" class="btn text-white rounded-pill px-4 shadow-sm" id="btnPublish" style="background-color: var(--color-indigo); font-weight: 600; z-index: 10; position: relative;">
-                    <i class="bi bi-upload me-2"></i> Publish Listing
-                </button>
-            </div>
-        </div>
 
-    </form>
-</div>
+            @section Scripts {
+                <partial name="_ValidationScriptsPartial" />
+                <script>
+                    let currentStep = 1;
+                    const totalSteps = 3;
 
-@section Scripts {
-    @* unobtrusive validation intentionally omitted: wizard uses manual JS step validation *@
-    <script>
-        let currentStep = 1;
-        const totalSteps = 3;
-
-        function updateStepIndicators() {
-            document.querySelectorAll('.step-indicator').forEach((el, index) => {
-                const stepNum = index + 1;
-                const circle = el.querySelector('.step-circle');
-                const text = el.querySelector('span:not(.step-circle)');
+                    function updateStepIndicators() {
+                        document.querySelectorAll('.step-indicator').forEach((el, index) => {
+                            const stepNum = index + 1;
+                            const circle = el.querySelector('.step-circle');
+                            const text = el.querySelector('span:not(.step-circle)');
                 
-                if (stepNum === currentStep) {
-                    circle.style.backgroundColor = 'var(--color-indigo)';
-                    circle.style.color = 'white';
-                    circle.innerHTML = stepNum;
-                    text.style.color = 'var(--color-text)';
-                } else if (stepNum < currentStep) {
-                    // Completed step
-                    circle.style.backgroundColor = 'var(--color-indigo)';
-                    circle.style.color = 'white';
-                    circle.innerHTML = '&#10003;'; // Checkmark
-                    text.style.color = 'var(--color-text)';
-                } else {
-                    // Future step
-                    circle.style.backgroundColor = 'var(--color-surface-muted)';
-                    circle.style.color = 'var(--color-text-muted)';
-                    circle.innerHTML = stepNum;
-                    text.style.color = 'var(--color-text-muted)';
-                }
-            });
-        }
+                            if (stepNum === currentStep) {
+                                circle.style.backgroundColor = 'var(--color-indigo)';
+                                circle.style.color = 'white';
+                                circle.innerHTML = stepNum;
+                                text.style.color = 'var(--color-text)';
+                            } else if (stepNum < currentStep) {
+                                // Completed step
+                                circle.style.backgroundColor = 'var(--color-indigo)';
+                                circle.style.color = 'white';
+                                circle.innerHTML = '&#10003;'; // Checkmark
+                                text.style.color = 'var(--color-text)';
+                            } else {
+                                // Future step
+                                circle.style.backgroundColor = 'var(--color-surface-muted)';
+                                circle.style.color = 'var(--color-text-muted)';
+                                circle.innerHTML = stepNum;
+                                text.style.color = 'var(--color-text-muted)';
+                            }
+                        });
+                    }
 
-        function showStep(stepNum) {
-            document.querySelectorAll('.wizard-step').forEach(el => el.classList.add('d-none'));
-            document.getElementById('step' + stepNum).classList.remove('d-none');
-            updateStepIndicators();
+                    function showStep(stepNum) {
+                        document.querySelectorAll('.wizard-step').forEach(el => el.classList.add('d-none'));
+                        document.getElementById('step' + stepNum).classList.remove('d-none');
+                        updateStepIndicators();
             
-            if(stepNum === 3) {
-                populatePreview();
-            }
-        }
+                        if (stepNum === 3) {
+                            populatePreview();
+                        }
+                    }
 
-        function validateCurrentStep() {
-            const currentStepEl = document.getElementById('step' + currentStep);
-            let isValid = true;
+                    function validateCurrentStep() {
+                        const currentStepEl = document.getElementById('step' + currentStep);
+                        const inputs = currentStepEl.querySelectorAll('input[required]:not([type="radio"]), select[required], textarea[required]');
+                        let isValid = true;
             
-            // Check text/textarea inputs manually (no data-val, no HTML required)
-            if (currentStep === 1) {
-                const title = document.getElementById('Title');
-                const author = document.getElementById('Author');
-                if (!title || !title.value.trim()) isValid = false;
-                if (!author || !author.value.trim()) isValid = false;
+                        inputs.forEach(input => {
+                            if (!input.checkValidity()) {
+                                isValid = false;
+                            }
+                        });
+            
+                        // Custom Validation for Radio/Pill Groups and hidden inputs
+                        if (currentStep === 1) {
+                            // Check if cover image is provided (file input used in step1)
+                            const coverFileInput = document.getElementById('CoverImageFile');
+                            if (coverFileInput) {
+                                if (coverFileInput.type === 'file') {
+                                    if (!coverFileInput.files || coverFileInput.files.length === 0) {
+                                        isValid = false;
+                                    }
+                                } else if (!coverFileInput.value) {
+                                    isValid = false;
+                                }
+                            }
 
-                // Check cover image — now an IFormFile upload
-                const coverFileInput = document.getElementById('CoverImageFile');
-                if (!coverFileInput || !coverFileInput.files || coverFileInput.files.length === 0) isValid = false;
+                            // Check category - the UI uses radio name "_CategoryId_UI" and a hidden input named "CategoryId"
+                            const categoryChecked = document.querySelector('input[name="_CategoryId_UI"]:checked') || document.querySelector('input[name="CategoryId"]:checked');
+                            if (!categoryChecked) {
+                                // Also check the hidden input value
+                                const hiddenCat = document.getElementById('CategoryId_Hidden');
+                                if (!hiddenCat || !hiddenCat.value) {
+                                    isValid = false;
+                                }
+                            }
+                        } else if (currentStep === 2) {
+                            // The UI radios use names _Condition_UI and _SharingMode_UI, while hidden inputs Condition_Hidden and SharingMode_Hidden hold model values
+                            const conditionChecked = document.querySelector('input[name="_Condition_UI"]:checked') || document.querySelector('input[name="Condition"]:checked');
+                            const sharingChecked = document.querySelector('input[name="_SharingMode_UI"]:checked') || document.querySelector('input[name="SharingMode"]:checked');
+                            if (!conditionChecked) {
+                                const hiddenCond = document.getElementById('Condition_Hidden');
+                                if (!hiddenCond || !hiddenCond.value) isValid = false;
+                            }
+                            if (!sharingChecked) {
+                                const hiddenShare = document.getElementById('SharingMode_Hidden');
+                                if (!hiddenShare || !hiddenShare.value) isValid = false;
+                            }
+                        }
 
-                // Check category — reads from UI radio group (_CategoryId_UI)
-                const categoryChecked = document.querySelector('input[name="_CategoryId_UI"]:checked');
-                if (!categoryChecked) {
-                    isValid = false;
-                } else {
-                    // Sync value into model-binding hidden input
-                    document.getElementById('CategoryId_Hidden').value = categoryChecked.value;
-                }
-
-            } else if (currentStep === 2) {
-                // Check condition — reads from UI radio group (_Condition_UI)
-                const conditionChecked = document.querySelector('input[name="_Condition_UI"]:checked');
-                if (!conditionChecked) {
-                    isValid = false;
-                } else {
-                    document.getElementById('Condition_Hidden').value = conditionChecked.value;
-                }
-
-                // Check sharing mode — reads from UI radio group (_SharingMode_UI)
-                const sharingChecked = document.querySelector('input[name="_SharingMode_UI"]:checked');
-                if (!sharingChecked) {
-                    isValid = false;
-                } else {
-                    document.getElementById('SharingMode_Hidden').value = sharingChecked.value;
-                }
-            }
-
-            // Enable or disable the continue button for the current step
-            const continueBtn = currentStepEl.querySelector('.continue-btn');
-            if (continueBtn) {
-                if (isValid) {
-                    continueBtn.disabled = false;
-                    continueBtn.style.opacity = "1";
-                    continueBtn.style.cursor = "pointer";
+                        // Enable or disable the continue button for the current step
+                        const continueBtn = currentStepEl.querySelector('.continue-btn');
+                        if (continueBtn) {
+                            if (isValid) {
+                                continueBtn.disabled = false;
+                                continueBtn.style.opacity = "1";
+                                continueBtn.style.cursor = "pointer";
                     
-                    if (currentStep === 1) {
-                        continueBtn.style.backgroundColor = 'var(--color-indigo)';
-                        continueBtn.style.color = 'white';
+                                if (currentStep === 1) {
+                                    continueBtn.style.backgroundColor = 'var(--color-indigo)';
+                                    continueBtn.style.color = 'white';
+                                }
+                            } else {
+                                continueBtn.disabled = true;
+                                if (currentStep === 1) {
+                                    continueBtn.style.backgroundColor = 'var(--color-indigo-light)';
+                                    continueBtn.style.color = 'var(--color-indigo)';
+                                }
+                            }
+                        }
+            
+                        return isValid;
                     }
-                } else {
-                    continueBtn.disabled = true;
-                    if (currentStep === 1) {
-                        continueBtn.style.backgroundColor = 'var(--color-indigo-light)';
-                        continueBtn.style.color = 'var(--color-indigo)';
+
+                    function nextStep() {
+                        if (validateCurrentStep() && currentStep < totalSteps) {
+                            currentStep++;
+                            showStep(currentStep);
+                            validateCurrentStep(); // Check if new step is already valid
+                        }
                     }
-                }
-            }
+
+                    function prevStep() {
+                        if (currentStep > 1) {
+                            currentStep--;
+                            showStep(currentStep);
+                            validateCurrentStep();
+                        }
+                    }
+
+                    // Setup real-time validation listeners
+                    document.addEventListener('DOMContentLoaded', function () {
+                        console.log("Wizard initialized");
+                        const form = document.getElementById('wizardForm');
             
-            return isValid;
-        }
-
-        function nextStep() {
-            if (validateCurrentStep() && currentStep < totalSteps) {
-                currentStep++;
-                showStep(currentStep);
-                validateCurrentStep(); // Check if new step is already valid
-            }
-        }
-
-        function prevStep() {
-            if (currentStep > 1) {
-                currentStep--;
-                showStep(currentStep);
-                validateCurrentStep();
-            }
-        }
-
-        // Setup real-time validation listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("Wizard initialized");
-            const form = document.getElementById('wizardForm');
+                        // Add click listeners to buttons
+                        const btnNext1 = document.getElementById('btnNext1');
+                        const btnNext2 = document.getElementById('btnNext2');
             
-            // Add click listeners to buttons
-            const btnNext1 = document.getElementById('btnNext1');
-            const btnNext2 = document.getElementById('btnNext2');
+                        if (btnNext1) btnNext1.addEventListener('click', function () {
+                            console.log("Next 1 clicked");
+                            nextStep();
+                        });
             
-            if(btnNext1) btnNext1.addEventListener('click', function() {
-                console.log("Next 1 clicked");
-                nextStep();
-            });
+                        if (btnNext2) btnNext2.addEventListener('click', function () {
+                            console.log("Next 2 clicked");
+                            nextStep();
+                        });
+
+                        const btnPublish = document.getElementById('btnPublish');
+                        if (btnPublish) btnPublish.addEventListener('click', function () {
+                            console.log("Publish clicked");
+                            if (validateCurrentStep()) {
+                                console.log("Form is valid, submitting...");
+                                form.submit();
+                            } else {
+                                console.log("Form validation failed on final step");
+                                // Optionally go back to the step that has errors
+                            }
+                        });
+
+                        // Listen to all input changes to trigger validation
+                        form.addEventListener('input', function (e) {
+                            validateCurrentStep();
+                        });
             
-            if(btnNext2) btnNext2.addEventListener('click', function() {
-                console.log("Next 2 clicked");
-                nextStep();
-            });
+                        form.addEventListener('change', function (e) {
+                            validateCurrentStep();
+                        });
 
-            const btnPublish = document.getElementById('btnPublish');
-            if(btnPublish) btnPublish.addEventListener('click', function() {
-                console.log("Publish clicked");
-                if(validateCurrentStep()) {
-                    console.log("Form is valid, submitting...");
-                    form.submit();
-                } else {
-                    console.log("Form validation failed on final step");
-                    // Optionally go back to the step that has errors
-                }
-            });
+                        // Initial validation check
+                        validateCurrentStep();
+                    });
 
-            // Listen to all input changes to trigger validation
-            form.addEventListener('input', function(e) {
-                validateCurrentStep();
-            });
-            
-            form.addEventListener('change', function(e) {
-                validateCurrentStep();
-            });
-
-            // Initial validation check
-            validateCurrentStep();
-        });
-
-        function populatePreview() {
-            try {
-                // Title & Author
-                const titleInput = document.getElementById('Title');
-                const authorInput = document.getElementById('Author');
-                if(titleInput) document.getElementById('previewTitle').innerText = titleInput.value || 'Unknown Title';
-                if(authorInput) document.getElementById('previewAuthor').innerText = authorInput.value || 'Unknown Author';
+                    function populatePreview() {
+                        try {
+                            // Title & Author
+                            const titleInput = document.getElementById('Title');
+                            const authorInput = document.getElementById('Author');
+                            if (titleInput) document.getElementById('previewTitle').innerText = titleInput.value || 'Unknown Title';
+                            if (authorInput) document.getElementById('previewAuthor').innerText = authorInput.value || 'Unknown Author';
                 
-                // Category — reads from UI radio group (renamed to avoid data-val conflict)
-                const selectedCat = document.querySelector('input[name="_CategoryId_UI"]:checked');
-                if (selectedCat) {
-                    const label = document.querySelector(`label[for="${selectedCat.id}"]`);
-                    if(label) document.getElementById('previewCategory').innerText = label.innerText;
-                }
-                
-                // Condition — reads from UI radio group (renamed to avoid data-val conflict)
-                const selectedCond = document.querySelector('input[name="_Condition_UI"]:checked');
-                if (selectedCond) {
-                    const label = document.querySelector(`label[for="${selectedCond.id}"]`);
-                    if(label) {
-                        const condTitle = label.querySelector('.condition-title');
-                        if(condTitle) document.getElementById('previewCondition').innerText = condTitle.innerText;
+                            // Category - prefer the UI radios, fallback to hidden value
+                            const selectedCatUI = document.querySelector('input[name="_CategoryId_UI"]:checked');
+                            if (selectedCatUI) {
+                                const label = document.querySelector(`label[for="${selectedCatUI.id}"]`);
+                                if (label) document.getElementById('previewCategory').innerText = label.innerText;
+                            } else {
+                                const hiddenCat = document.getElementById('CategoryId_Hidden');
+                                if (hiddenCat && hiddenCat.value) {
+                                    const matching = document.querySelector(`input[name="_CategoryId_UI"][value="${hiddenCat.value}"]`);
+                                    if (matching) {
+                                        const label = document.querySelector(`label[for="${matching.id}"]`);
+                                        if (label) document.getElementById('previewCategory').innerText = label.innerText;
+                                    }
+                                }
+                            }
+
+                            // Condition - prefer UI, fallback to hidden value
+                            const selectedCondUI = document.querySelector('input[name="_Condition_UI"]:checked');
+                            if (selectedCondUI) {
+                                const label = document.querySelector(`label[for="${selectedCondUI.id}"]`);
+                                if (label) {
+                                    const condTitle = label.querySelector('.condition-title');
+                                    if (condTitle) document.getElementById('previewCondition').innerText = condTitle.innerText;
+                                }
+                            } else {
+                                const hiddenCond = document.getElementById('Condition_Hidden');
+                                if (hiddenCond && hiddenCond.value) {
+                                    const matching = document.querySelector(`input[name="_Condition_UI"][value="${hiddenCond.value}"]`);
+                                    if (matching) {
+                                        const label = document.querySelector(`label[for="${matching.id}"]`);
+                                        if (label) {
+                                            const condTitle = label.querySelector('.condition-title');
+                                            if (condTitle) document.getElementById('previewCondition').innerText = condTitle.innerText;
+                                        }
+                                    } else {
+                                        // Fallback: show the raw value
+                                        document.getElementById('previewCondition').innerText = hiddenCond.value;
+                                    }
+                                }
+                            }
+                        } catch (err) {
+                            console.error("Error in populatePreview:", err);
+                        }
                     }
-                }
-            } catch (err) {
-                console.error("Error in populatePreview:", err);
+                </script>
             }
-        }
-    </script>
-}

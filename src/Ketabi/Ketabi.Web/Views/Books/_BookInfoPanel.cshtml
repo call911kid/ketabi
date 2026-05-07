@@ -1,0 +1,34 @@
+﻿@model Ketabi.Web.ViewModels.Books.BookDetailViewModel
+
+<div class="book-details-panel">
+    <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="badge" style="background-color: var(--color-indigo-light); color: var(--color-indigo); padding: 6px 16px; border-radius: var(--radius-full); font-size: var(--text-sm-pill); font-weight: var(--weight-medium);">
+            @Model.Category
+        </span>
+        <span class="badge" style="background-color: var(--color-surface); color: var(--color-text-muted); border: 1px solid var(--color-border); padding: 6px 16px; border-radius: var(--radius-full); font-size: var(--text-sm-pill);">
+            @Model.Language
+        </span>
+    </div>
+
+    <h1 class="mb-2" style="font-size: 2.5rem; font-weight: var(--weight-extrabold); letter-spacing: var(--tracking-tight); color: var(--color-text);">
+        @Model.Title
+    </h1>
+    <p class="mb-4" style="font-size: var(--text-base); color: var(--color-text-muted); font-weight: var(--weight-medium);">
+        by <span style="color: var(--color-text);">@Model.Author</span>
+    </p>
+
+    <div class="mb-4">
+        <span class="d-inline-flex align-items-center gap-2 px-3 py-1"
+              style="background-color: var(--color-info-bg); color: var(--color-info); border-radius: var(--radius-full); font-size: var(--text-xs-badge); font-weight: var(--weight-bold);">
+            <span style="width: 6px; height: 6px; background-color: var(--color-info); border-radius: 50%;"></span>
+            @Model.Condition Condition
+        </span>
+    </div>
+
+    <div class="description-section">
+        <h5 class="mb-3" style="font-size: var(--text-base); font-weight: var(--weight-bold); color: var(--color-text);">Description</h5>
+        <p style="font-size: var(--text-base); line-height: var(--leading-body); color: var(--color-text-muted);">
+            @Model.Description
+        </p>
+    </div>
+</div>
