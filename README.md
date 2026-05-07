@@ -1,8 +1,8 @@
-# 📚 Ketabi
+# Ketabi
 
 **Ketabi** is a peer-to-peer platform where users can list, exchange, and borrow books from each other. Designed initially for students and academic books, it aims to reduce financial strain and wasted resources by facilitating local book sharing and exchanges.
 
-## 🚀 Features (MVP)
+## Features (MVP)
 
 - **Book Listing:** List books with title, description, condition, category, and transaction type (borrow/exchange).
 - **Search & Filtering:** Browse available books by title, category, or location.
@@ -13,7 +13,7 @@
 
 *(See [`docs/Ketabi_BRD.md`](docs/Ketabi_BRD.md) for full Business Requirements and Roadmap)*
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Framework:** .NET 8.0 / ASP.NET Core MVC
 - **Architecture:** Clean Architecture (Domain, Application, Infrastructure, Web)
@@ -22,7 +22,7 @@
 - **Libraries:** AutoMapper, FluentValidation, ASP.NET Core Identity
 - **Frontend:** HTML5, CSS, Bootstrap, jQuery (with unobtrusive validation)
 
-## 🏛 Architecture Overview
+## Architecture Overview
 
 The application follows **Clean Architecture** principles to ensure separation of concerns, testability, and maintainability:
 
@@ -31,7 +31,7 @@ The application follows **Clean Architecture** principles to ensure separation o
 - **`Ketabi.Infrastructure` (Infrastructure Layer):** Implements data access using EF Core (`KetabiDbContext`), repository implementations, and external services. Depends on the Core layer.
 - **`Ketabi.Web` (Presentation Layer):** The ASP.NET Core MVC project that serves as the application's entry point. It contains controllers, views, and view models, handling all user interactions. Depends on the Application and Infrastructure layers.
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 ketabi/
@@ -45,7 +45,7 @@ ketabi/
 └── README.md                     # Project documentation
 ```
 
-## 🚦 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -65,10 +65,15 @@ ketabi/
    Update the `ConnectionStrings` in `src/Ketabi/Ketabi.Web/appsettings.Development.json` (or `appsettings.json`) to point to your local SQL Server instance.
 
 3. **Apply Database Migrations:**
-   Ensure the Entity Framework Core CLI tools are installed, then run:
+   If you are using **Visual Studio**, open the Package Manager Console and run:
+   ```powershell
+   Update-Database -Project Ketabi.Infrastructure -StartupProject Ketabi.Web
+   ```
+   
+   If you are using the **.NET CLI** (e.g., in VS Code or terminal), run:
    ```bash
    cd src/Ketabi/Ketabi.Web
-   dotnet ef database update
+   dotnet ef database update --project ../Ketabi.Infrastructure --startup-project .
    ```
 
 4. **Run the Application:**
@@ -78,17 +83,3 @@ ketabi/
    *Alternatively, open the solution folder or `src/Ketabi/Ketabi.slnx` in your IDE and run the `Ketabi.Web` project.*
 
 5. Navigate to the local URL (e.g., `https://localhost:5001`) provided in your terminal or IDE console.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is intended for educational and practical use. Please refer to the repository's main branch for any specific licensing files added in the future.
