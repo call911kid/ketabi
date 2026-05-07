@@ -1,10 +1,9 @@
-﻿using Ketabi.Application.DTOs.Books;
+﻿using Ketabi.Application.Common;
+using Ketabi.Application.DTOs.Books;
 using Ketabi.Application.DTOs.Users;
 using Ketabi.Application.Interfaces;
-using Ketabi.Core.Interfaces;
 using Ketabi.Core.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using Ketabi.Core.Interfaces;
 
 namespace Ketabi.Application.Services
 {
@@ -194,7 +193,7 @@ namespace Ketabi.Application.Services
                     UserId = listing.User != null ? listing.User.Id : Guid.Empty,
                     FullName = listing.User != null ? $"{listing.User.FirstName} {listing.User.LastName}" : string.Empty,
                     UserName = listing.User != null ? (listing.User.Email?.Split('@')[0] ?? string.Empty) : string.Empty,
-                    AvatarUrl = listing.User != null ? listing.User.ProfilePictureUrl : string.Empty,
+                    AvatarUrl = listing.User?.ProfilePictureUrl ?? AppConstants.DefaultProfilePic,
                     Location = listing.User != null ? $"{listing.User.City}, {listing.User.Governorate}" : string.Empty,
                     ReputationScore = listing.User != null ? listing.User.ReputationScore : 0,
                     ReviewCount = 0,

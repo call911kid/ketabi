@@ -38,8 +38,8 @@ namespace Ketabi.Infrastructure.Authentication
             var token = await _jwtTokenService.GenerateTokenAsync(new GenerateTokenRequest
             {
                 UserId = user.Id,
-                Email = user.Email,
-                UserName = user.UserName,
+                Email = user.Email ?? string.Empty,
+                UserName = user.UserName ?? string.Empty,
                 Roles = roles
             });
 

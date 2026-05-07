@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Ketabi.Application.Common;
 using Ketabi.Application.DTOs.Users;
 using Ketabi.Application.Exceptions;
 using Ketabi.Application.Interfaces;
@@ -96,7 +92,7 @@ namespace Ketabi.Application.Services
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Bio = user.Bio,
-                AvatarUrl = user.ProfilePictureUrl
+                AvatarUrl = user.ProfilePictureUrl ?? AppConstants.DefaultProfilePic,
             };
         }
     }

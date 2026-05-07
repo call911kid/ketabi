@@ -1,21 +1,52 @@
-@* Views/Shared/_Navbar.cshtml (Placeholder for now) *@
-<header>
-    <nav class="navbar navbar-expand-md fixed-top ketabi-glass border-bottom mb-3" style="box-shadow: var(--shadow-navbar); backdrop-filter: var(--blur-lg); -webkit-backdrop-filter: var(--blur-lg);">
-        <div class="container-fluid px-4">
-            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" asp-area="" asp-controller="Home" asp-action="Index" style="background: linear-gradient(135deg, var(--color-indigo), var(--color-indigo-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                Ketabi
-            </a>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-md-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1 mx-md-4 gap-2">
+@model Ketabi.Web.ViewModels.Shared.NavbarViewModel
+
+@{
+    var currentPath = Context.Request.Path;
+    bool isExplorer = currentPath == "/" || currentPath.StartsWithSegments("/Home");
+    bool isLibrary = currentPath.StartsWithSegments("/Profile") || currentPath.StartsWithSegments("/Library");
+    bool isRequests = currentPath.StartsWithSegments("/Requests");
+    bool isActivity = currentPath.StartsWithSegments("/Activity") || currentPath.StartsWithSegments("/Chat"); 
+}
+
+<nav class="navbar navbar-expand-md fixed-top border-bottom ketabi-glass p-0 ketabi-navbar" role="navigation">
+    <div class="container-fluid px-3 px-lg-5 h-100 d-flex align-items-center">
+        <!-- Brand -->
+        <a asp-controller="Home" asp-action="Index" class="navbar-brand d-flex align-items-center gap-2 me-4">
+            <div class="navbar-brand-icon d-flex align-items-center justify-content-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </div>
+            <span class="navbar-brand-text d-none d-sm-inline fw-bolder">ketabi</span>
+        </a>
+
+        <!-- Desktop Nav Links -->
+        <div class="collapse navbar-collapse d-none d-md-flex" id="ketabiNavbarDesktop">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0 d-flex align-items-center gap-1">
+                <li class="nav-item">
+                    <a asp-controller="Home" asp-action="Index" class="nav-link nav-btn d-flex align-items-center gap-2 rounded-3 @(isExplorer ? "active" : "")">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <span class="nav-btn-text">Explore</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="Profile" asp-action="Index" class="nav-link nav-btn d-flex align-items-center gap-2 rounded-3 @(isLibrary ? "active" : "")">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg>
+                        <span class="nav-btn-text">My Library</span>
+                    </a>
+                </li>
+                
+                @if (Model?.IsAuthenticated == true)
+                {
                     <li class="nav-item">
-                        <a class="nav-link fw-medium" asp-area="" asp-controller="Home" asp-action="Index">Explorer</a>
+                        <a asp-controller="Requests" asp-action="Index" class="nav-link nav-btn d-flex align-items-center gap-2 rounded-3 @(isRequests ? "active" : "")">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+                            <span class="nav-btn-text">Requests</span>
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link fw-medium" href="#">Requests</a>
+                        <a asp-controller="Activity" asp-action="Index" class="nav-link nav-btn d-flex align-items-center gap-2 rounded-3 @(isActivity ? "active" : "")">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>
+                            <span class="nav-btn-text">Activity</span>
+                        </a>
                     </li>
                 }
             </ul>
@@ -43,21 +74,276 @@
                         <span class="position-absolute top-0 start-100 translate-middle p-1 rounded-circle navbar-notification-dot">
                             <span class="visually-hidden">New alerts</span>
                         </span>
+                    }
+                </button>
+
+                <!-- Extremely Simplified Dropdown -->
+                <div class="dropdown">
+                    <button class="btn p-0 border-0 d-flex align-items-center dropdown-toggle-no-caret navbar-avatar-btn" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="~/uploads/users/@(string.IsNullOrEmpty(Model?.AvatarUrl) ? "profile-picture.png" : Model.AvatarUrl)" alt="Avatar" class="navbar-avatar" />
                     </button>
 
-                    <div class="dropdown">
-                        <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle" style="box-shadow: var(--shadow-avatar-focus); border: 2px solid white;">
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="dropdownUser">
-                            <li><a class="dropdown-item" href="#">Profile</a></li>
-                            <li><a class="dropdown-item" href="#">Settings</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="#">Sign out</a></li>
-                        </ul>
-                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2 navbar-dropdown-menu" aria-labelledby="profileDropdown">
+                        <li>
+                            <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2" asp-controller="Profile" asp-action="Index">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                <span class="navbar-dropdown-text">My Profile</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2" asp-controller="Profile" asp-action="Index">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted"><path d="M10 2v8l3-3 3 3V2"/><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg>
+                                <span class="navbar-dropdown-text">My Library</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2" asp-controller="Settings" asp-action="Index">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <span class="navbar-dropdown-text">Settings</span>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider mx-3 my-1" /></li>
+                        <li>
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="m-0 p-0 w-100">
+                                <button type="submit" class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-danger bg-transparent w-100 border-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                                    <span class="navbar-dropdown-text text-danger">Logout</span>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
                 </div>
-            </div>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login" class="navbar-login-btn">
+                    Sign in
+                </a>
+            }
+
+            <!-- Mobile Toggler -->
+            <button class="navbar-toggler border-0 p-1 ms-1 d-md-none navbar-toggler-btn" type="button" data-bs-toggle="collapse" data-bs-target="#ketabiMobileNav" aria-controls="ketabiMobileNav" aria-expanded="false" aria-label="Toggle navigation">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="navbar-toggler-icon-svg"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+            </button>
         </div>
-    </nav>
-</header>
+    </div>
+
+    
+</nav>
+
+<style>
+    /* Lightweight Scoped Navbar Overrides */
+    
+    .ketabi-navbar {
+        height: var(--navbar-height);
+        z-index: var(--z-navbar);
+    }
+    
+    .ketabi-glass {
+        background: rgba(255, 255, 255, 0.90);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+    
+    .navbar-brand-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-md);
+        background: linear-gradient(135deg, var(--color-indigo), var(--color-indigo-dark));
+    }
+    
+    .navbar-brand-text {
+        font-size: 1.1rem;
+        color: var(--color-text);
+        letter-spacing: var(--tracking-tight);
+    }
+    
+    .nav-btn {
+        color: var(--color-text-muted);
+        transition: background-color var(--duration-normal), color var(--duration-normal);
+        padding: 0.5rem 1rem;
+    }
+    
+    .nav-btn-text {
+        font-size: var(--text-sm-nav);
+        font-weight: var(--weight-medium);
+    }
+    
+    .nav-btn:hover {
+        background-color: var(--color-surface-muted);
+        color: var(--color-text);
+    }
+    
+    .nav-btn.active {
+        background-color: var(--color-indigo-light);
+        color: var(--color-indigo);
+    }
+    
+    .nav-btn.active .nav-btn-text {
+        font-weight: var(--weight-bold);
+    }
+    
+    .navbar-btn-primary {
+        /* ??????? ?????? */
+        background-color: var(--color-indigo);
+        color: #ffffff !important; /* ???? ????? ?????? ?????? */
+        /* ??????? ??????? */
+        padding: 8px 20px;
+        border-radius: var(--radius-xl);
+        font-size: var(--text-sm-nav);
+        font-weight: var(--weight-semibold);
+        text-decoration: none;
+        border: none;
+        /* ???????? */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        /* ??????? ????????? */
+        transition: all var(--duration-fast) var(--ease-default);
+        cursor: pointer;
+    }
+
+        .navbar-btn-primary:hover {
+            /* ??? ??????????? ?????? ??? ???? ?????? ????? ???? ????? */
+            background-color: var(--color-indigo-dark);
+            color: #ffffff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25); /* ?? ???? ???????? */
+        }
+
+        .navbar-btn-primary:active {
+            transform: translateY(0);
+        }
+    
+    .nav-icon-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-lg);
+        color: var(--color-text-muted);
+        transition: background-color var(--duration-normal), color var(--duration-normal);
+    }
+    
+    .nav-icon-btn:hover {
+        background-color: var(--color-surface-muted);
+        color: var(--color-text);
+    }
+    
+    .navbar-notification-dot {
+        background-color: var(--color-error);
+        margin-top: 8px;
+        margin-left: -8px;
+        width: 8px;
+        height: 8px;
+    }
+    
+    .navbar-avatar-btn {
+        border-radius: var(--radius-md);
+    }
+    
+    .navbar-avatar {
+        width: 32px;
+        height: 32px;
+        object-fit: cover;
+        border-radius: var(--radius-md);
+    }
+    
+    .navbar-dropdown-menu {
+        border-radius: var(--radius-xl);
+        min-width: 180px;
+    }
+    
+    .navbar-dropdown-text {
+        font-size: var(--text-sm-nav);
+        font-weight: var(--weight-medium);
+        color: var(--color-text);
+    }
+    
+    .dropdown-divider {
+        border-color: var(--border);
+    }
+    
+    .dropdown-toggle-no-caret::after {
+        display: none !important;
+    }
+    
+/* ??????? ?????? ??? Dropdown Items */
+    .dropdown-item {
+        margin: 4px 8px; /* ?????? ????? ??????? ??????? */
+        width: calc(100% - 16px);
+        border-radius: var(--radius-md);
+        transition: all var(--duration-fast) var(--ease-default);
+        color: var(--color-text);
+    }
+    
+    .dropdown-item:hover {
+        background-color: var(--color-indigo-light); /* ????? ?????? ????? ???? */
+        color: var(--color-indigo) !important; /* ????? ??? ???? */
+        padding-left: 1.25rem !important; /* ????? ????? ?????? ???? ??? "????" */
+    }
+
+    /* ????? ??? ???????? ????? ??? ?????? */
+    .dropdown-item:hover svg {
+        color: var(--color-indigo) !important;
+        transform: scale(1.1);
+        transition: all var(--duration-fast);
+    }
+
+    /* ????? ??? ??? ????? ?????? */
+    .dropdown-item.text-danger:hover {
+        background-color: #FFF5F5; /* ????? ????? ????? ???? */
+        color: #E53E3E !important;
+        padding-left: 1.25rem !important;
+    }
+
+    .dropdown-item.text-danger:hover svg {
+        color: #E53E3E !important;
+    }
+    
+    .navbar-login-btn {
+        background-color: var(--color-indigo);
+        color: #ffffff !important; 
+        font-size: var(--text-base);
+        font-weight: var(--weight-semibold);
+        border-radius: var(--radius-xl);
+        padding: 8px 24px;
+        text-decoration: none;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        transition: all var(--duration-fast) var(--ease-default);
+        border: none;
+        cursor: pointer;
+    }
+
+    .navbar-login-btn:hover {
+        background-color: var(--color-indigo-dark); 
+        color: #ffffff !important;
+        transform: translateY(-1px); 
+        box-shadow: var(--shadow-btn-hover); 
+    }
+
+    .navbar-login-btn:active {
+        transform: translateY(0);
+    }
+    
+    .navbar-toggler-icon-svg {
+        color: var(--color-text);
+    }
+    
+    .navbar-mobile-menu {
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .mobile-nav-btn {
+        color: var(--color-text);
+        font-weight: var(--weight-medium);
+        transition: background-color var(--duration-normal), color var(--duration-normal);
+    }
+    
+    .mobile-nav-btn.active {
+        color: var(--color-indigo);
+        font-weight: var(--weight-bold);
+    }
+</style>

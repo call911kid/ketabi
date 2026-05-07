@@ -4,14 +4,12 @@ using Ketabi.Core.Domain.Enums;
 using Ketabi.Web.Models;
 using Ketabi.Web.ViewModels.Home;
 using Ketabi.Web.ViewModels.Shared;
-using Ketabi.Web.ViewModels.Books;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using Ketabi.Web.ViewModels.Books;
 
 namespace Ketabi.Web.Controllers;
 
-public class HomeController : Controller
+public class HomeController : BaseController
 {
     private readonly ILogger<HomeController> _logger;
     private readonly IBookListingService _bookListingService;

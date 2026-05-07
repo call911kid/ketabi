@@ -34,7 +34,8 @@
 </head>
 <body style="background-color: var(--color-bg); font-family: var(--font-primary);">
 
-    @await Html.PartialAsync("_Navbar")
+    @{ var navbarModel = ViewData["NavbarModel"] as Ketabi.Web.ViewModels.Shared.NavbarViewModel; }
+    @await Html.PartialAsync("_Navbar", navbarModel)
 
     <main style="padding-top: var(--navbar-height);">
         @RenderBody()
