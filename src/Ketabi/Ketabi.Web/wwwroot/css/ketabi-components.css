@@ -280,7 +280,7 @@
 .explorer-hero__overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(91,91,214,0.75) 0%, rgba(10,10,20,0.6) 100%);
+  background: linear-gradient(to right, rgba(10,10,30,0.82) 0%, rgba(40,30,80,0.60) 50%, rgba(10,10,20,0.20) 100%);
 }
 .explorer-hero__fade {
   position: absolute;
@@ -293,11 +293,13 @@
 .explorer-hero__content {
   position: relative;
   z-index: 2;
-  max-width: var(--container-max);
-  margin-inline: auto;
-  padding-inline: 1rem;                      /* reduced from 24px to minimise side gaps */
+  width: 100%;                               /* stretch across the full hero */
+  max-width: var(--container-max);           /* same cap as filter bar inner */
+  margin-inline: auto;                       /* centre the container block */
+  padding-inline: 1rem;                      /* matches .explorer-filterbar__inner */
   display: flex;
   flex-direction: column;
+  align-items: flex-start;                   /* left-align title, subtitle, search */
   justify-content: center;
   flex: 1;                                   /* fill the flex hero column */
   padding-top: 2.5rem;
@@ -329,7 +331,7 @@
   font-size: var(--text-body);              /* 15.2px */
   font-weight: var(--weight-normal);
   line-height: var(--leading-body);
-  max-width: 36rem;                         /* wider to match Figma */
+  max-width: 30rem;                         /* constrain to left half */
   margin-bottom: 0;
 }
 
@@ -338,13 +340,14 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem 1.5rem;                    /* taller, wider padding to match Figma */
+  padding: 0.75rem 1rem;                   /* reduced horizontal padding */
   border-radius: var(--radius-2xl);        /* 16px */
   background: rgba(255,255,255,0.95);
   backdrop-filter: var(--blur-lg);
   -webkit-backdrop-filter: var(--blur-lg);
   box-shadow: var(--shadow-search-bar);
-  max-width: 680px;                        /* wider to match Figma */
+  width: 100%;
+  max-width: 640px;                        /* increased width of the search bar */
   margin-top: 2rem;
 }
 .explorer-search__icon { color: var(--color-text-muted); font-size: 1.1rem; flex-shrink: 0; }
