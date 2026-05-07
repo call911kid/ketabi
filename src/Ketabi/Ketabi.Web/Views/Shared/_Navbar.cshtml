@@ -17,17 +17,30 @@
                     <li class="nav-item">
                         <a class="nav-link fw-medium" href="#">Requests</a>
                     </li>
-                </ul>
-                <div class="d-flex align-items-center gap-3">
-                    <a asp-controller="Books" asp-action="Create"
-                           class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm d-none d-md-block"
-                           style="box-shadow: var(--shadow-btn-nav) !important;">
-                        + Add Book
-                    </a>
-                    
-                    <button class="btn btn-link position-relative text-muted p-2">
-                        <i class="bi bi-bell fs-5"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle p-1 rounded-circle border border-2 border-white" style="background-color: var(--color-error);">
+                }
+            </ul>
+        </div>
+
+        <!-- Right actions -->
+        <div class="d-flex align-items-center gap-2 gap-sm-3 ms-auto">
+            @if (Model?.IsAuthenticated == true)
+            {
+                <a asp-controller="Books" asp-action="Create" class="navbar-btn-primary d-none d-sm-inline-flex align-items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+                    <span>Add Book</span>
+                </a>
+
+                <!-- Message / Chat Icon -->
+                <a asp-controller="Chat" asp-action="Index" class="text-decoration-none d-none d-sm-flex align-items-center justify-content-center nav-icon-btn" title="Messages">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </a>
+
+                <!-- Notification Bell -->
+                <button class="btn position-relative d-none d-sm-flex align-items-center justify-content-center p-0 border-0 nav-icon-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                    @if (Model.UnreadNotifications > 0)
+                    {
+                        <span class="position-absolute top-0 start-100 translate-middle p-1 rounded-circle navbar-notification-dot">
                             <span class="visually-hidden">New alerts</span>
                         </span>
                     </button>

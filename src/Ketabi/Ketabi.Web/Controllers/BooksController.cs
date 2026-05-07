@@ -14,7 +14,7 @@ using System.Security.Claims;
 namespace Ketabi.Web.Controllers;
 
 [Authorize]
-public class BooksController : Controller
+public class BooksController : BaseController
 {
     private readonly IBookListingService _bookListingService;
     private readonly ICategoryService _categoryService;
