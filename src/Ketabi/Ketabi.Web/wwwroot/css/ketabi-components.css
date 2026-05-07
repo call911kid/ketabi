@@ -340,14 +340,14 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;                   /* reduced horizontal padding */
+  padding: 1rem 1.5rem;                    /* taller, wider padding to match Figma */
   border-radius: var(--radius-2xl);        /* 16px */
   background: rgba(255,255,255,0.95);
   backdrop-filter: var(--blur-lg);
   -webkit-backdrop-filter: var(--blur-lg);
   box-shadow: var(--shadow-search-bar);
   width: 100%;
-  max-width: 640px;                        /* increased width of the search bar */
+  max-width: 540px;                        /* constrain to left half */
   margin-top: 2rem;
 }
 .explorer-search__icon { color: var(--color-text-muted); font-size: 1.1rem; flex-shrink: 0; }
