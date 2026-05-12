@@ -141,3 +141,44 @@
         color: white !important;
     }
 </style>
+
+<script>
+    // Sync Condition and SharingMode UI radios with hidden inputs used for model binding
+    document.addEventListener('DOMContentLoaded', function () {
+        const hiddenCond = document.getElementById('Condition_Hidden');
+        const condRadios = document.querySelectorAll('input[name="_Condition_UI"]');
+
+        function syncCondition(e) {
+            const val = this.value || (e && e.target && e.target.value) || '';
+            if (hiddenCond) hiddenCond.value = val;
+            hiddenCond && hiddenCond.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        condRadios.forEach(r => {
+            r.addEventListener('change', syncCondition);
+            if (r.checked && hiddenCond && !hiddenCond.value) {
+                hiddenCond.value = r.value;
+            }
+        });
+
+        if (hiddenCond && hiddenCond.value) hiddenCond.dispatchEvent(new Event('change', { bubbles: true }));
+
+        const hiddenShare = document.getElementById('SharingMode_Hidden');
+        const shareRadios = document.querySelectorAll('input[name="_SharingMode_UI"]');
+
+        function syncSharing(e) {
+            const val = this.value || (e && e.target && e.target.value) || '';
+            if (hiddenShare) hiddenShare.value = val;
+            hiddenShare && hiddenShare.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        shareRadios.forEach(r => {
+            r.addEventListener('change', syncSharing);
+            if (r.checked && hiddenShare && !hiddenShare.value) {
+                hiddenShare.value = r.value;
+            }
+        });
+
+        if (hiddenShare && hiddenShare.value) hiddenShare.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+</script>
