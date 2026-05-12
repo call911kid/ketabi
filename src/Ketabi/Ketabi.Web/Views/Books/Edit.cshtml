@@ -1,0 +1,130 @@
+@model Ketabi.Web.ViewModels.Books.EditBookViewModel
+
+@{
+    ViewData["Title"] = "Edit Book";
+}
+
+<div class="container my-5 max-w-3xl mx-auto" style="max-width: 800px;">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold mb-2">Edit Book Listing</h1>
+        <p class="text-muted">Update the book details and save your changes.</p>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5" style="background-color: var(--color-surface);">
+        <form asp-action="Edit" asp-controller="Books" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input asp-for="BookId" type="hidden" />
+
+            <div class="mb-4">
+                <label asp-for="Title" class="form-label fw-bold">Title</label>
+                <input asp-for="Title" class="form-control bg-light border-0 py-2 rounded-3" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Author" class="form-label fw-bold">Author</label>
+                <input asp-for="Author" class="form-control bg-light border-0 py-2 rounded-3" />
+                <span asp-validation-for="Author" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="ISBN" class="form-label fw-bold">ISBN</label>
+                <input asp-for="ISBN" class="form-control bg-light border-0 py-2 rounded-3" />
+                <span asp-validation-for="ISBN" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Description" class="form-label fw-bold">Description</label>
+                <textarea asp-for="Description" class="form-control bg-light border-0 rounded-3 p-3" rows="4"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label asp-for="Language" class="form-label fw-bold">Language</label>
+                    <input asp-for="Language" class="form-control bg-light border-0 py-2 rounded-3" />
+                    <span asp-validation-for="Language" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Publisher" class="form-label fw-bold">Publisher</label>
+                    <input asp-for="Publisher" class="form-control bg-light border-0 py-2 rounded-3" />
+                    <span asp-validation-for="Publisher" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="CategoryId" class="form-label fw-bold">Category</label>
+                <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="form-select bg-light border-0 py-2 rounded-3"></select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label asp-for="Condition" class="form-label fw-bold">Condition</label>
+                    <select asp-for="Condition" class="form-select bg-light border-0 py-2 rounded-3">
+                        @foreach (var condition in Enum.GetValues(typeof(Ketabi.Core.Domain.Enums.ListingCondition)).Cast<Ketabi.Core.Domain.Enums.ListingCondition>())
+                        {
+                            <option value="@condition">@condition</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Condition" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="SharingMode" class="form-label fw-bold">Available For</label>
+                    <select asp-for="SharingMode" class="form-select bg-light border-0 py-2 rounded-3">
+                        @foreach (var mode in Enum.GetValues(typeof(Ketabi.Core.Domain.Enums.SharingMode)).Cast<Ketabi.Core.Domain.Enums.SharingMode>())
+                        {
+                            <option value="@mode">@mode</option>
+                        }
+                    </select>
+                    <span asp-validation-for="SharingMode" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label asp-for="SharingDurationInDays" class="form-label fw-bold">Sharing Duration (days)</label>
+                    <input asp-for="SharingDurationInDays" type="number" min="1" max="365" class="form-control bg-light border-0 py-2 rounded-3" />
+                    <span asp-validation-for="SharingDurationInDays" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 align-self-end">
+                    <div class="form-check mt-2">
+                        <input asp-for="IsAvailable" class="form-check-input" />
+                        <label asp-for="IsAvailable" class="form-check-label">Available</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="LocationNote" class="form-label fw-bold">Pickup Area</label>
+                <input asp-for="LocationNote" class="form-control bg-light border-0 py-2 rounded-3" />
+                <span asp-validation-for="LocationNote" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="CoverImage" class="form-label fw-bold">Cover Image</label>
+                <input asp-for="CoverImage" type="file" class="form-control form-control-sm" />
+                <span asp-validation-for="CoverImage" class="text-danger"></span>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.ExistingImageUrl))
+            {
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Current Cover</label>
+                    <div>
+                        <img src="@Model.ExistingImageUrl" alt="Current cover" class="img-fluid rounded-3" style="max-height: 260px;" />
+                    </div>
+                </div>
+            }
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <a asp-action="Details" asp-route-id="@Model.BookId" class="btn btn-light rounded-pill px-4">Cancel</a>
+                <button type="submit" class="btn btn-primary rounded-pill px-4">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

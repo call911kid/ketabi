@@ -173,6 +173,138 @@ public class BooksController : BaseController
         }
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Edit(Guid id)
+    {
+        var bookDetailDto = await _bookListingService.GetBookByIdAsync(id);
+        if (bookDetailDto == null)
+        {
+            return NotFound("Book not found");
+        }
+
+        var model = new EditBookViewModel
+        {
+            BookId = bookDetailDto.BookId,
+            Title = bookDetailDto.Title,
+            Author = bookDetailDto.Author,
+            ISBN = bookDetailDto.ISBN,
+            Description = bookDetailDto.Description,
+            Language = bookDetailDto.Language,
+            Publisher = bookDetailDto.Publisher,
+            CategoryId = bookDetailDto.CategoryId,
+            Condition = bookDetailDto.Condition,
+            SharingMode = bookDetailDto.SharingMode,
+            SharingDurationInDays = bookDetailDto.SharingDurationInDays,
+            LocationNote = bookDetailDto.LocationNote,
+            IsAvailable = bookDetailDto.IsAvailable,
+            ExistingImageUrl = bookDetailDto.ImageUrl
+        };
+
+        await PopulateEditReferenceDataAsync(model);
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(EditBookViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await PopulateEditReferenceDataAsync(model);
+            return View(model);
+        }
+
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        try
+        {
+            string? uploadedImageUrl = null;
+            if (model.CoverImage != null && model.CoverImage.Length > 0)
+            {
+                var savedFileName = await _fileService.UploadFileAsync(model.CoverImage, AppConstants.Folders.BookCovers);
+                uploadedImageUrl = $"/uploads/{AppConstants.Folders.BookCovers}/{savedFileName}";
+            }
+
+            var updateDto = new UpdateBookDto
+            {
+                Title = model.Title,
+                Author = model.Author,
+                ISBN = model.ISBN,
+                Description = model.Description,
+                Language = model.Language,
+                Publisher = model.Publisher,
+                CategoryId = model.CategoryId,
+                Condition = model.Condition,
+                SharingMode = model.SharingMode,
+                SharingDurationInDays = model.SharingDurationInDays,
+                LocationNote = model.LocationNote,
+                IsAvailable = model.IsAvailable,
+                ImageUrl = uploadedImageUrl
+            };
+
+            await _bookListingService.UpdateBookAsync(model.BookId, updateDto, userId);
+            TempData["SuccessMessage"] = "Book listing updated successfully.";
+            return RedirectToAction("Details", new { id = model.BookId });
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError(string.Empty, "An error occurred while updating the listing: " + ex.Message);
+            await PopulateEditReferenceDataAsync(model);
+            return View(model);
+        }
+    }
+
+    private async Task PopulateEditReferenceDataAsync(EditBookViewModel model)
+    {
+        model.CategoryOptions = await GetCategoryOptionsAsync();
+    }
+
+    private async Task<IList<SelectListItem>> GetCategoryOptionsAsync()
+    {
+        var categories = (await _categoryService.GetAllCategoriesAsync()).ToList();
+
+        if (!categories.Any())
+        {
+            var defaultCategories = new[]
+            {
+                new CreateCategoryDto { Name = "Fiction", Description = "Fiction books and stories" },
+                new CreateCategoryDto { Name = "Philosophy", Description = "Philosophy and self-reflection" },
+                new CreateCategoryDto { Name = "Science", Description = "Science and technology books" },
+                new CreateCategoryDto { Name = "History", Description = "History and biographies" }
+            };
+
+            foreach (var defaultCategory in defaultCategories)
+            {
+                await _categoryService.CreateCategoryAsync(defaultCategory);
+            }
+
+            categories = (await _categoryService.GetAllCategoriesAsync()).ToList();
+        }
+
+        var options = categories.Select(c => new SelectListItem
+        {
+            Value = c.Id.ToString(),
+            Text = c.Name
+        }).ToList();
+
+        if (!options.Any())
+        {
+            options = new List<SelectListItem>
+            {
+                new SelectListItem { Value = Guid.NewGuid().ToString(), Text = "Fiction" },
+                new SelectListItem { Value = Guid.NewGuid().ToString(), Text = "Philosophy" },
+                new SelectListItem { Value = Guid.NewGuid().ToString(), Text = "Science" },
+                new SelectListItem { Value = Guid.NewGuid().ToString(), Text = "History" }
+            };
+        }
+
+        return options;
+    }
+
     private async Task PopulateReferenceDataAsync(CreateBookViewModel model)
     {
         var categories = (await _categoryService.GetAllCategoriesAsync()).ToList();
