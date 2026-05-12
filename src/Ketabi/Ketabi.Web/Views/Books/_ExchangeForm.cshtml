@@ -7,39 +7,55 @@
                 <h5 class="modal-title" id="exchangeModalLabel">Propose an exchange</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                @if (!Model.CanExchange)
-                {
-                    <div class="alert alert-warning mb-0">This listing is not available for exchange.</div>
-                }
-                else
-                {
-                    <p>Exchange requests are not yet available in this version.</p>
-                    @if (Model.ViewerAvailableBooks.Any())
+
+            <form asp-action="CreateExchangeRequest" asp-controller="Books" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <input asp-for="ExchangeRequest.BookId" type="hidden" />
+
+                    @if (!Model.CanExchange)
                     {
-                        <p>Select one of your own books to offer in exchange, then submit the request.</p>
-                        <div class="list-group">
-                            @foreach (var book in Model.ViewerAvailableBooks)
-                            {
-                                <div class="list-group-item">
-                                    <strong>@book.Title</strong> by @book.Author
-                                </div>
-                            }
-                        </div>
+                        <div class="alert alert-warning mb-0">This listing is not available for exchange.</div>
                     }
-                    else
+                    else if (!Model.ViewerAvailableBooks.Any())
                     {
                         <div class="alert alert-info">You do not have any available books to offer for exchange yet.</div>
                     }
-                }
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                @if (Model.CanExchange && Model.ViewerAvailableBooks.Any())
-                {
-                    <button type="button" class="btn btn-warning" disabled>Propose exchange (coming soon)</button>
-                }
-            </div>
+                    else
+                    {
+                        <p>Select one of your own books to offer in exchange, then submit the request.</p>
+
+                        <div class="list-group mb-3">
+                            @foreach (var book in Model.ViewerAvailableBooks)
+                            {
+                                <label class="list-group-item d-flex align-items-center gap-3">
+                                    <input type="radio" name="ExchangeRequest.OfferedBookId" value="@book.BookId" class="form-check-input mt-0" />
+                                    <div>
+                                        <strong>@book.Title</strong>
+                                        <div class="text-muted">by @book.Author</div>
+                                    </div>
+                                </label>
+                            }
+                        </div>
+
+                        <span asp-validation-for="ExchangeRequest.OfferedBookId" class="text-danger"></span>
+
+                        <div class="mb-3 mt-3">
+                            <label asp-for="ExchangeRequest.Note" class="form-label">Message to owner (optional)</label>
+                            <textarea asp-for="ExchangeRequest.Note" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="ExchangeRequest.Note" class="text-danger"></span>
+                        </div>
+                    }
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    @if (Model.CanExchange && Model.ViewerAvailableBooks.Any())
+                    {
+                        <button type="submit" class="btn btn-warning">Propose exchange</button>
+                    }
+                </div>
+            </form>
         </div>
     </div>
 </div>

@@ -1,0 +1,234 @@
+@model Ketabi.Web.ViewModels.Requests.RequestCardViewModel
+
+<div class="card h-100 shadow-sm">
+    <div class="card-header bg-light">
+        <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+                <i class="bi bi-calendar-event me-1"></i>
+                @Model.RequestDate.ToString("MMM dd, yyyy")
+            </small>
+            <span class="badge @(Model.Status switch
+            {
+                Ketabi.Core.Domain.Enums.RequestStatus.Pending => "bg-warning text-dark",
+                Ketabi.Core.Domain.Enums.RequestStatus.Approved => "bg-success",
+                Ketabi.Core.Domain.Enums.RequestStatus.Rejected => "bg-danger",
+                Ketabi.Core.Domain.Enums.RequestStatus.Cancelled => "bg-secondary",
+                Ketabi.Core.Domain.Enums.RequestStatus.Completed => "bg-info",
+                _ => "bg-secondary"
+            })">
+                @Model.Status.ToString()
+            </span>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <!-- Book Information -->
+        <div class="d-flex mb-3">
+            <img src="@(string.IsNullOrEmpty(Model.BookImageUrl) ? "/images/book-placeholder.png" : Model.BookImageUrl)"
+                 alt="@Model.BookTitle"
+                 class="rounded me-3"
+                 style="width: 60px; height: 80px; object-fit: cover;">
+            <div class="flex-grow-1">
+                <h6 class="card-title mb-1">
+                    <a href="@Url.Action("Details", "Books", new { id = Model.BookId })" class="text-decoration-none">
+                        @Model.BookTitle
+                    </a>
+                </h6>
+                <p class="card-text small text-muted mb-1">@Model.BookCategory</p>
+                <p class="card-text small mb-0">
+                    @if (Model.IsBorrow)
+                    {
+                        <text>
+                        <i class="bi bi-arrow-left-right me-1"></i>Borrow Request
+                        </text>
+                        @if (Model.ReturnDate.HasValue)
+                        {
+                            <text>
+                            <br><small class="text-muted">Return by: @Model.ReturnDate.Value.ToString("MMM dd, yyyy")</small>
+                            </text>
+                        }
+                    }
+                    else
+                    {
+                        <text>
+                        <i class="bi bi-gift me-1"></i>Exchange Request
+                        </text>
+                    }
+                </p>
+            </div>
+        </div>
+
+        <!-- Offered Book (if exchange) -->
+        @if (Model.OfferedBook != null)
+        {
+            <div class="border-top pt-3 mb-3">
+                <small class="text-muted d-block mb-2">Offering in exchange:</small>
+                <div class="d-flex">
+                    <img src="@(string.IsNullOrEmpty(Model.OfferedBook.ImageUrl) ? "/images/book-placeholder.png" : Model.OfferedBook.ImageUrl)"
+                         alt="@Model.OfferedBook.Title"
+                         class="rounded me-2"
+                         style="width: 40px; height: 50px; object-fit: cover;">
+                    <div>
+                        <small class="fw-semibold">@Model.OfferedBook.Title</small><br>
+                        <small class="text-muted">@Model.OfferedBook.Author</small>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Requester/Owner Info -->
+        <div class="d-flex align-items-center mb-3">
+            @if (Model.CanAcceptOrReject)
+            {
+                <!-- Incoming request - show requester -->
+                <img src="@(string.IsNullOrEmpty(Model.Requester.AvatarUrl) ? "/images/avatar-placeholder.png" : Model.Requester.AvatarUrl)"
+                     alt="@Model.Requester.FullName"
+                     class="rounded-circle me-2"
+                     style="width: 32px; height: 32px; object-fit: cover;">
+                <div class="flex-grow-1">
+                    <small class="fw-semibold">@Model.Requester.FullName</small><br>
+                    <small class="text-muted">@@Model.Requester.UserName</small>
+                </div>
+            }
+            else
+            {
+                <!-- Outgoing request - show owner -->
+                <img src="@(string.IsNullOrEmpty(Model.Owner.AvatarUrl) ? "/images/avatar-placeholder.png" : Model.Owner.AvatarUrl)"
+                     alt="@Model.Owner.FullName"
+                     class="rounded-circle me-2"
+                     style="width: 32px; height: 32px; object-fit: cover;">
+                <div class="flex-grow-1">
+                    <small class="fw-semibold">@Model.Owner.FullName</small><br>
+                    <small class="text-muted">@@Model.Owner.UserName</small>
+                </div>
+            }
+        </div>
+
+        <!-- Note -->
+        @if (!string.IsNullOrEmpty(Model.Note))
+        {
+            <div class="bg-light p-2 rounded mb-3">
+                <small class="text-muted d-block mb-1">Note:</small>
+                <small>@Model.Note</small>
+            </div>
+        }
+
+        <!-- Action Buttons -->
+        @if (Model.CanAcceptOrReject)
+        {
+            <div class="d-flex gap-2">
+                <button type="button"
+                        class="btn btn-success btn-sm flex-fill"
+                        onclick="updateRequestStatus('@Model.RequestId', 'Accepted')">
+                    <i class="bi bi-check-circle me-1"></i>Accept
+                </button>
+                <button type="button"
+                        class="btn btn-danger btn-sm flex-fill"
+                        onclick="updateRequestStatus('@Model.RequestId', 'Rejected')">
+                    <i class="bi bi-x-circle me-1"></i>Reject
+                </button>
+            </div>
+        }
+        else if (Model.CanWithdraw)
+        {
+            <button type="button"
+                    class="btn btn-outline-secondary btn-sm w-100"
+                    onclick="cancelRequest('@Model.RequestId')">
+                <i class="bi bi-x me-1"></i>Cancel Request
+            </button>
+        }
+        else if (Model.Status == Ketabi.Core.Domain.Enums.RequestStatus.Approved)
+        {
+            <button type="button"
+                    class="btn btn-primary btn-sm w-100"
+                    onclick="completeRequest('@Model.RequestId')">
+                <i class="bi bi-check2-all me-1"></i>Mark as Completed
+            </button>
+        }
+    </div>
+</div>
+
+<script>
+    function updateRequestStatus(requestId, status) {
+        const note = status === 'Rejected' ? prompt('Optional note for rejection:') : '';
+
+        fetch('@Url.Action("UpdateStatus", "Requests")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            },
+            body: new URLSearchParams({
+                requestId: requestId,
+                status: status,
+                note: note || ''
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the request.');
+        });
+    }
+
+    function cancelRequest(requestId) {
+        if (!confirm('Are you sure you want to cancel this request?')) return;
+
+        fetch('@Url.Action("CancelRequest", "Requests")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            },
+            body: new URLSearchParams({
+                requestId: requestId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while cancelling the request.');
+        });
+    }
+
+    function completeRequest(requestId) {
+        if (!confirm('Are you sure you want to mark this request as completed?')) return;
+
+        fetch('@Url.Action("CompleteRequest", "Requests")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            },
+            body: new URLSearchParams({
+                requestId: requestId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while completing the request.');
+        });
+    }
+</script>

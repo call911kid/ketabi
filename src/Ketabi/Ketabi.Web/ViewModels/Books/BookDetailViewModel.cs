@@ -45,11 +45,13 @@ public class BookDetailViewModel
 
     // Duration options for the borrow form dropdown.
     public IList<SelectListItem> BorrowDurationOptions { get; set; } = [];
+    public BorrowRequestFormViewModel BorrowRequest { get; set; } = new();
 
     // Exchange Form Data
 
     // Books owned by the viewer that are available to offer in exchange.
     public IList<BookCardViewModel> ViewerAvailableBooks { get; set; } = [];
+    public ExchangeRequestFormViewModel ExchangeRequest { get; set; } = new();
 
     // Related Books
     public IList<BookCardViewModel> RelatedBooks { get; set; } = [];
