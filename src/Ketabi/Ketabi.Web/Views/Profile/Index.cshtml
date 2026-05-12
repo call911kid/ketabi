@@ -115,10 +115,13 @@
                     const formData = new FormData();
                     formData.append('file', file);
 
-                    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                    const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+                    const token = tokenElement ? tokenElement.value : null;
+                    const headers = token ? { 'RequestVerificationToken': token } : {};
+
                     const response = await fetch('@Url.Action("UploadAvatar", "Profile")', {
                         method: 'POST',
-                        headers: token ? { 'RequestVerificationToken': token } : {},
+                        headers,
                         body: formData
                     });
 

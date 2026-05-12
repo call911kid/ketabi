@@ -18,7 +18,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form asp-action="EditProfile" asp-controller="Profile" method="post">
+            <form asp-action="Edit" asp-controller="Profile" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="UserId" />
 
                 <div class="modal-body">
@@ -88,7 +89,7 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label asp-for="City" class="profile-form__label"></label>
-                                    <select asp-for="City" class="ketabi-input" id="citySelect">
+                                    <select asp-for="City" class="ketabi-input" id="citySelect" data-val="@Model.City">
                                         <option value="">Select city</option>
                                         <option value="Cairo">Cairo</option>
                                         <option value="Alexandria">Alexandria</option>
@@ -111,7 +112,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label asp-for="Governorate" class="profile-form__label"></label>
-                                    <select asp-for="Governorate" class="ketabi-input" id="governorateSelect">
+                                    <select asp-for="Governorate" class="ketabi-input" id="governorateSelect" data-val="@Model.Governorate">
                                         <option value="">Select governorate</option>
                                         <option value="Cairo">Cairo</option>
                                         <option value="Alexandria">Alexandria</option>

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Ketabi.Application.Interfaces
 {
-    internal interface IReviewService
+    public interface IReviewService
     {
         Task<ServiceResultDto<PagedResponseDto<ReviewDto>>> GetReviewsForUserAsync(Guid userId, PagedRequestDto pagination);
         Task<ServiceResultDto<ReviewDto>> CreateReviewAsync(Guid reviewerId, CreateReviewDto createReviewDto);
