@@ -14,6 +14,9 @@
         <form asp-action="Edit" asp-controller="Books" method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
             <input asp-for="BookId" type="hidden" />
+            <input asp-for="ExistingImageUrl" type="hidden" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="mb-4">
                 <label asp-for="Title" class="form-label fw-bold">Title</label>
@@ -104,6 +107,7 @@
             <div class="mb-4">
                 <label asp-for="CoverImage" class="form-label fw-bold">Cover Image</label>
                 <input asp-for="CoverImage" type="file" class="form-control form-control-sm" />
+                <div class="form-text">Leave blank to keep the current cover image.</div>
                 <span asp-validation-for="CoverImage" class="text-danger"></span>
             </div>
 
