@@ -143,5 +143,55 @@
                 }
             });
         })();
+
+                $(document).ready(function () {
+            $(document).on('submit', '#editProfileForm', async function (e) {
+                e.preventDefault(); // منع المتصفح من الـ Redirect
+
+                const form = e.target;
+                const formData = new FormData(form);
+                const submitBtn = document.getElementById('btn-save-profile');
+        
+                // تغيير شكل الزرار أثناء الحفظ
+                const originalBtnContent = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        }
+                    });
+
+                    // لو السيرفر رجع JSON (حالة النجاح)
+                    const contentType = response.headers.get("content-type");
+                    if (contentType && contentType.indexOf("application/json") !== -1) {
+                        const result = await response.json();
+                        if (result.success) {
+                            // قفل المودال وعمل ريفريش عشان تظهر البيانات الجديدة
+                            bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+                            window.location.href = result.redirectUrl;
+                        }
+                    } else {
+                        // لو السيرفر رجع HTML (حالة وجود أخطاء Validation)
+                        const htmlResult = await response.text();
+                        // استبدال محتوى المودال بالـ HTML الجديد اللي فيه رسايل الخطأ
+                        $('#editProfileModal').find('.modal-content').html($(htmlResult).find('.modal-content').html());
+                
+                        // إعادة تفعيل الـ Client-side validation (مهم جداً)
+                        $.validator.unobtrusive.parse('#editProfileForm');
+                    }
+                } catch (error) {
+                    console.error("Save error:", error);
+                    alert("An error occurred while saving profile.");
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnContent;
+                }
+            });
+        });
     </script>
 }

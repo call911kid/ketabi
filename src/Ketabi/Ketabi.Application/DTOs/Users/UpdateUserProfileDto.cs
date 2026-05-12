@@ -30,10 +30,10 @@ public class UpdateUserProfileDto
     public string? Governorate { get; set; }
 
     /// <summary>
-    /// Resolved URL of the uploaded profile picture.
-    /// The Web layer resolves IFormFile → URL before populating this field.
+    /// File name of the uploaded profile picture (e.g. "{guid}_avatar.jpg").
+    /// The Web layer uploads the file and populates this property with the file name only.
+    /// Views should resolve a URL like "/uploads/users/{fileName}" when rendering.
     /// </summary>
-    [Url]
-    [MaxLength(500)]
+    [MaxLength(260)]
     public string? ProfilePictureUrl { get; set; }
 }

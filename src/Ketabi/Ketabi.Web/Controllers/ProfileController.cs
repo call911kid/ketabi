@@ -41,6 +41,7 @@ public class ProfileController : BaseController
             if (string.IsNullOrEmpty(idClaim) || !Guid.TryParse(idClaim, out var userId))
                 return Json(new { success = false, error = "Not authenticated." });
 
+            _fileService.DeleteFile(file.FileName, AppConstants.Folders.UserUploads);
             var savedFileName = await _fileService.UploadFileAsync(file, AppConstants.Folders.UserUploads);
             var newImageUrl = $"{savedFileName}";
 
@@ -91,7 +92,7 @@ public class ProfileController : BaseController
             }).ToList();
 
             vm.Books = books;
-            vm.BooksPager = new Ketabi.Web.ViewModels.Shared.PagerViewModel
+            vm.BooksPager = new PagerViewModel
             {
                 CurrentPage = booksPage,
                 TotalCount = profileDto.Stats?.BooksListed ?? 0,
@@ -114,25 +115,25 @@ public class ProfileController : BaseController
             return RedirectToAction("Index", "Home");
         }
     }
-
     [HttpGet]
     public async Task<IActionResult> Edit()
     {
         try
         {
             var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(idClaim) || !Guid.TryParse(idClaim, out var userId)) return RedirectToAction("Login", "Account");
+            if (string.IsNullOrEmpty(idClaim) || !Guid.TryParse(idClaim, out var userId))
+                return Challenge();
 
             var profileDto = await _userService.GetUserProfileAsync(userId, userId);
             var editVm = _mapper.Map<EditProfileViewModel>(profileDto);
-            editVm.UserId = profileDto.UserId;
+            editVm.UserId = userId;
 
-            return View(editVm);
+            return PartialView("_EditProfileModal", editVm);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to load edit profile");
-            return RedirectToAction("Index", "Home");
+            _logger.LogError(ex, "Failed to load edit profile modal");
+            return BadRequest();
         }
     }
 
@@ -140,45 +141,35 @@ public class ProfileController : BaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(EditProfileViewModel model)
     {
-        if (!ModelState.IsValid) return View(model);
+        if (!ModelState.IsValid)
+        {
+            return PartialView("_EditProfileModal", model);
+        }
 
         try
         {
             var idClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(idClaim) || !Guid.TryParse(idClaim, out var userId)) return RedirectToAction("Login", "Account");
+            if (string.IsNullOrEmpty(idClaim) || !Guid.TryParse(idClaim, out var userId))
+                return Json(new { success = false, message = "Unauthorized access." });
+
+            var updateDto = _mapper.Map<UpdateUserProfileDto>(model);
 
             if (model.ProfilePicture != null && model.ProfilePicture.Length > 0)
             {
-                var saved = await _fileService.UploadFileAsync(model.ProfilePicture, AppConstants.Folders.UserUploads);
-                var url = $"/uploads/{AppConstants.Folders.UserUploads}/{saved}";
-                // Map to DTO and set ProfilePictureUrl explicitly
-                var mapped = _mapper.Map<UpdateUserProfileDto>(model);
-                var updateDtoWithPic = new UpdateUserProfileDto
-                {
-                    FirstName = mapped.FirstName,
-                    LastName = mapped.LastName,
-                    Bio = mapped.Bio,
-                    City = mapped.City,
-                    Governorate = mapped.Governorate,
-                    ProfilePictureUrl = url
-                };
+                var savedFileName = await _fileService.UploadFileAsync(model.ProfilePicture, AppConstants.Folders.UserUploads);
+                updateDto.ProfilePictureUrl = savedFileName;
+            }
 
-                await _userService.UpdateUserProfileAsync(userId, updateDtoWithPic);
-            }
-            else
-            {
-                var updateDto = _mapper.Map<UpdateUserProfileDto>(model);
-                await _userService.UpdateUserProfileAsync(userId, updateDto);
-            }
+            await _userService.UpdateUserProfileAsync(userId, updateDto);
 
             TempData[AppConstants.SuccessMessageKey] = "Profile updated successfully!";
-            return RedirectToAction("Index", new { id = userId });
+            return Json(new { success = true, redirectUrl = Url.Action("Index", new { id = userId }) });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to update profile for user {UserId}", model.UserId);
-            TempData[AppConstants.ErrorMessageKey] = "Failed to update profile.";
-            return View(model);
+            ModelState.AddModelError(string.Empty, "An unexpected error occurred while saving your profile.");
+            return PartialView("_EditProfileModal", model);
         }
     }
 

@@ -18,7 +18,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form asp-action="Edit" asp-controller="Profile" method="post" enctype="multipart/form-data">
+            <form asp-action="Edit" asp-controller="Profile" method="post" enctype="multipart/form-data" id="editProfileForm">
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="UserId" />
 

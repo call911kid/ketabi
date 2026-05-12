@@ -9,7 +9,7 @@
 
     @* ── Avatar ── *@
     <div class="profile-avatar-wrap">
-        <img src="~/uploads/users/@Model.AvatarUrl"
+        <img src="~/uploads/users/@(string.IsNullOrEmpty(Model?.AvatarUrl) ? "profile-picture.png" : Model.AvatarUrl)"
              alt="@Model.FirstName @Model.LastName"
              class="profile-avatar"
              id="profileAvatarImg" />

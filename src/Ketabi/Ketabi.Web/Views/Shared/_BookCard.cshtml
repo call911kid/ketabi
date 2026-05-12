@@ -39,7 +39,7 @@
             <div class="book-card__owner">
                 @if (!string.IsNullOrEmpty(Model.OwnerAvatarUrl))
                 {
-                    <img src="@Model.OwnerAvatarUrl" alt="@Model.OwnerName" class="book-card__avatar" />
+                    <img src="~/uploads/users/@(string.IsNullOrEmpty(Model.OwnerAvatarUrl) ? "profile-picture.png" : Model.OwnerAvatarUrl)" alt="@Model.OwnerName" class="book-card__avatar" />
                 }
                 else
                 {
