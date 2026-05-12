@@ -9,6 +9,7 @@ public class UserSummaryViewModel
     public string Location { get; set; } = string.Empty;
     public double ReputationScore { get; set; }
     public int ReviewCount { get; set; }
+    public int TradesCount { get; set; }
 
     // Star rating formatted to 1 decimal place, e.g. "4.8"
     public string FormattedRating => ReputationScore.ToString("F1");

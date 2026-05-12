@@ -1,0 +1,117 @@
+@model Ketabi.Web.ViewModels.Requests.RequestsIndexViewModel
+
+@{
+    ViewData["Title"] = "My Requests";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="fw-bold mb-4">My Requests</h1>
+
+            <!-- Bootstrap Tabs -->
+            <ul class="nav nav-tabs" id="requestsTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link @(Model.ActiveTab == "incoming" ? "active" : "")"
+                            id="incoming-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#incoming"
+                            type="button"
+                            role="tab"
+                            aria-controls="incoming"
+                            aria-selected="@(Model.ActiveTab == "incoming")">
+                        Received Requests
+                        @if (Model.IncomingCount > 0)
+                        {
+                            <span class="badge bg-primary ms-1">@Model.IncomingCount</span>
+                        }
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link @(Model.ActiveTab == "outgoing" ? "active" : "")"
+                            id="outgoing-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#outgoing"
+                            type="button"
+                            role="tab"
+                            aria-controls="outgoing"
+                            aria-selected="@(Model.ActiveTab == "outgoing")">
+                        Sent Requests
+                        @if (Model.OutgoingCount > 0)
+                        {
+                            <span class="badge bg-secondary ms-1">@Model.OutgoingCount</span>
+                        }
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-4" id="requestsTabContent">
+                <!-- Incoming Requests Tab -->
+                <div class="tab-pane fade @(Model.ActiveTab == "incoming" ? "show active" : "")"
+                     id="incoming"
+                     role="tabpanel"
+                     aria-labelledby="incoming-tab">
+                    @if (Model.IsIncomingEmpty)
+                    {
+                        <div class="text-center py-5">
+                            <i class="bi bi-inbox" style="font-size: 3rem; color: var(--color-text-muted);"></i>
+                            <h5 class="mt-3 text-muted">No incoming requests</h5>
+                            <p class="text-muted">When someone requests your books, they'll appear here.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row g-4">
+                            @foreach (var request in Model.IncomingRequests)
+                            {
+                                <div class="col-md-6 col-lg-4">
+                                    <partial name="~/Views/Shared/_RequestCard.cshtml" model="request" />
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- Outgoing Requests Tab -->
+                <div class="tab-pane fade @(Model.ActiveTab == "outgoing" ? "show active" : "")"
+                     id="outgoing"
+                     role="tabpanel"
+                     aria-labelledby="outgoing-tab">
+                    @if (Model.IsOutgoingEmpty)
+                    {
+                        <div class="text-center py-5">
+                            <i class="bi bi-send" style="font-size: 3rem; color: var(--color-text-muted);"></i>
+                            <h5 class="mt-3 text-muted">No outgoing requests</h5>
+                            <p class="text-muted">Requests you've sent to other users will appear here.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row g-4">
+                            @foreach (var request in Model.OutgoingRequests)
+                            {
+                                <div class="col-md-6 col-lg-4">
+                                    <partial name="~/Views/Shared/_RequestCard.cshtml" model="request" />
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Handle tab switching with URL updates
+        document.querySelectorAll('#requestsTab .nav-link').forEach(tab => {
+            tab.addEventListener('shown.bs.tab', function (e) {
+                const target = e.target.getAttribute('data-bs-target').substring(1);
+                const url = new URL(window.location);
+                url.searchParams.set('tab', target);
+                window.history.pushState({}, '', url);
+            });
+        });
+    </script>
+}

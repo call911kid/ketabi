@@ -51,6 +51,13 @@ public class EditBookViewModel
     [Display(Name = "Cover Image (leave blank to keep current)")]
     public IFormFile? CoverImage { get; set; }
 
+    [Url]
+    public string ExistingImageUrl { get; set; } = string.Empty;
+
+    [Range(1, 365, ErrorMessage = "Sharing duration must be between 1 and 365 days.")]
+    [Display(Name = "Sharing duration (days)")]
+    public int? SharingDurationInDays { get; set; }
+
     [MaxLength(120)]
     [Display(Name = "Pickup area")]
     public string? LocationNote { get; set; }
