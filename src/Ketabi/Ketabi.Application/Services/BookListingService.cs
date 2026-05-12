@@ -1,4 +1,5 @@
-﻿using Ketabi.Application.Common;
+﻿using System;
+using Ketabi.Application.Common;
 using Ketabi.Application.DTOs.Books;
 using Ketabi.Application.DTOs.Users;
 using Ketabi.Application.Interfaces;
@@ -116,7 +117,13 @@ namespace Ketabi.Application.Services
 
         public async Task<IEnumerable<BookSummaryDto>> SearchBooksAsync(string query, int pageNumber, int pageSize)
         {
-            var paged = await _uow.Listings.FindPagedWithIncludesAsync(b => b.Title.Contains(query) || b.Author.Contains(query) || (b.ISBN != null && b.ISBN.Contains(query)), pageNumber, pageSize);
+            var normalizedQuery = query?.Trim().ToLowerInvariant() ?? string.Empty;
+            var paged = await _uow.Listings.FindPagedWithIncludesAsync(b =>
+                (b.Title != null && b.Title.ToLowerInvariant().Contains(normalizedQuery)) ||
+                (b.Author != null && b.Author.ToLowerInvariant().Contains(normalizedQuery)) ||
+                (b.ISBN != null && b.ISBN.ToLowerInvariant().Contains(normalizedQuery)),
+                pageNumber,
+                pageSize);
             return paged.Items.Select(b => _mapper.Map<BookSummaryDto>(b));
         }
 
@@ -127,7 +134,12 @@ namespace Ketabi.Application.Services
 
             if (!string.IsNullOrWhiteSpace(filter.Query))
             {
-                query = query.Where(b => b.Title.Contains(filter.Query) || b.Author.Contains(filter.Query) || (b.ISBN != null && b.ISBN.Contains(filter.Query)) || (b.Description != null && b.Description.Contains(filter.Query)));
+                var normalizedQuery = filter.Query.Trim().ToLowerInvariant();
+                query = query.Where(b =>
+                    (b.Title != null && b.Title.ToLowerInvariant().Contains(normalizedQuery)) ||
+                    (b.Author != null && b.Author.ToLowerInvariant().Contains(normalizedQuery)) ||
+                    (b.ISBN != null && b.ISBN.ToLowerInvariant().Contains(normalizedQuery)) ||
+                    (b.Description != null && b.Description.ToLowerInvariant().Contains(normalizedQuery)));
             }
 
             if (filter.CategoryId.HasValue)

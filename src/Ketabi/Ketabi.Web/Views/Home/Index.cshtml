@@ -34,13 +34,12 @@
             Free. Simple. Community-powered.
         </p>
 
-        @* ── Search bar (GET form — preserves other active filters) ── *@
-        <form method="get"
-              asp-controller="Home"
-              asp-action="Index"
+        @* ── Search bar (AJAX form — no page refresh) ── *@
+        <form id="explorer-search-form"
               class="explorer-search"
               role="search"
-              aria-label="Search books">
+              aria-label="Search books"
+              onsubmit="return false;">
 
             <i class="bi bi-search explorer-search__icon" aria-hidden="true"></i>
 
@@ -53,17 +52,7 @@
                    autocomplete="off"
                    aria-label="Search books" />
 
-            @* Preserve active category / mode filters when the user searches *@
-            @if (Model.Filter.CategoryId.HasValue)
-            {
-                <input type="hidden" name="categoryId" value="@Model.Filter.CategoryId" />
-            }
-            @if (Model.Filter.SharingMode.HasValue)
-            {
-                <input type="hidden" name="mode" value="@((int)Model.Filter.SharingMode.Value)" />
-            }
-
-            <button type="submit" class="explorer-search__btn" aria-label="Search">
+            <button type="button" class="explorer-search__btn" aria-label="Search">
                 <i class="bi bi-sliders" aria-hidden="true"></i>
                 Filters
             </button>
@@ -75,4 +64,10 @@
 @await Html.PartialAsync("_FilterBar", Model)
 
 @* ── Book Grid + CTA ── *@
-@await Html.PartialAsync("_BookGrid", Model)
+<div id="explorer-grid-container">
+    @await Html.PartialAsync("_BookGrid", Model)
+</div>
+
+@section Scripts {
+    <script src="~/js/explorer-filter.js"></script>
+}
