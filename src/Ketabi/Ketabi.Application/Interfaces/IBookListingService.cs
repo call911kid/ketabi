@@ -15,7 +15,7 @@ namespace Ketabi.Application.Interfaces
 
         Task<IEnumerable<BookSummaryDto>> GetBooksByUserIdAsync(Guid userId, int pageNumber, int pageSize);
 
-        Task<IEnumerable<RelatedBooksDto>> GetRelatedBooksAsync(Guid bookId, int pageNumber, int pageSize);
+        Task<IEnumerable<BookSummaryDto>> GetRelatedBooksAsync(Guid bookId, int pageNumber, int pageSize);
 
         Task<IEnumerable<BookSummaryDto>> GetBooksByCategoryAsync(string category, int pageNumber, int pageSize);
 

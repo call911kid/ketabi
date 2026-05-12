@@ -135,15 +135,23 @@ public class BooksController : BaseController
             };
 
             // Fetch related books
-            var relatedBooksDto = await _bookListingService.GetRelatedBooksAsync(id, 1, 4);
-            viewModel.RelatedBooks = relatedBooksDto
+            var relatedBooks = await _bookListingService.GetRelatedBooksAsync(id, 1, 4);
+            viewModel.RelatedBooks = relatedBooks
                 .Select(rb => new BookCardViewModel
                 {
                     BookId = rb.Id,
                     Title = rb.Title,
                     Author = rb.Author ?? string.Empty,
+                    Category = rb.Category,
                     ImageUrl = rb.ImageUrl ?? string.Empty,
-                    IsAvailable = true
+                    Condition = rb.Condition,
+                    SharingMode = Enum.TryParse<SharingMode>(rb.SharingMode, out var sharingMode) ? sharingMode : SharingMode.Both,
+                    IsAvailable = true,
+                    DistanceInKm = rb.DistanceInKm,
+                    OwnerId = rb.OwnerId,
+                    OwnerName = rb.OwnerName,
+                    OwnerAvatarUrl = rb.OwnerAvatarUrl ?? string.Empty,
+                    OwnerReputation = rb.OwnerReputation
                 })
                 .ToList();
 

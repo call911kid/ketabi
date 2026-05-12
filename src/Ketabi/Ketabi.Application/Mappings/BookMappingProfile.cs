@@ -13,8 +13,12 @@ public class BookMappingProfile : Profile
         CreateMap<BookListing, BookSummaryDto>()
             .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
             .ForMember(d => d.SharingMode, o => o.MapFrom(s => s.SharingMode.ToString()))
+            .ForMember(d => d.Category, o => o.MapFrom(s => s.Category != null ? s.Category.Name : string.Empty))
+            .ForMember(d => d.OwnerId, o => o.MapFrom(s => s.User != null ? s.User.Id : Guid.Empty))
             .ForMember(d => d.OwnerName, o => o.MapFrom(s => s.User != null ? $"{s.User.FirstName} {s.User.LastName}" : string.Empty))
             .ForMember(d => d.OwnerImageUrl, o => o.MapFrom(s => s.User != null ? s.User.ProfilePictureUrl : null))
+            .ForMember(d => d.OwnerAvatarUrl, o => o.MapFrom(s => s.User != null ? s.User.ProfilePictureUrl : null))
+            .ForMember(d => d.OwnerReputation, o => o.MapFrom(s => s.User != null ? s.User.ReputationScore : 0.0))
             .ForMember(d => d.OwnerRating, o => o.MapFrom(s => s.User != null ? s.User.ReputationScore : 0.0));
 
         CreateMap<BookListing, BookDetailDto>()
