@@ -83,46 +83,46 @@ namespace Ketabi.Application.Services
 
         public async Task<IEnumerable<BookSummaryDto>> GetAllBooksAsync(int pageNumber, int pageSize)
         {
-            var paged = await _uow.Listings.GetPagedAsync(pageNumber, pageSize);
+            var paged = await _uow.Listings.GetPagedWithIncludesAsync(pageNumber, pageSize);
             return paged.Items.Select(b => _mapper.Map<BookSummaryDto>(b));
         }
 
         public async Task<IEnumerable<BookSummaryDto>> GetBooksByAuthorAsync(string author, int pageNumber, int pageSize)
         {
-            var paged = await _uow.Listings.FindPagedAsync(b => b.Author.Contains(author), pageNumber, pageSize);
+            var paged = await _uow.Listings.FindPagedWithIncludesAsync(b => b.Author.Contains(author), pageNumber, pageSize);
             return paged.Items.Select(b => _mapper.Map<BookSummaryDto>(b));
         }
 
         public async Task<IEnumerable<BookSummaryDto>> GetBooksByCategoryAsync(string category, int pageNumber, int pageSize)
         {
-            var paged = await _uow.Listings.FindPagedAsync(b => b.Category != null && b.Category.Name == category, pageNumber, pageSize);
+            var paged = await _uow.Listings.FindPagedWithIncludesAsync(b => b.Category != null && b.Category.Name == category, pageNumber, pageSize);
             return paged.Items.Select(b => _mapper.Map<BookSummaryDto>(b));
         }
 
-        public async Task<IEnumerable<RelatedBooksDto>> GetRelatedBooksAsync(Guid bookId, int pageNumber, int pageSize)
+        public async Task<IEnumerable<BookSummaryDto>> GetRelatedBooksAsync(Guid bookId, int pageNumber, int pageSize)
         {
             var book = await _uow.Listings.GetByIdAsync(bookId);
-            if (book == null) return Enumerable.Empty<RelatedBooksDto>();
+            if (book == null) return Enumerable.Empty<BookSummaryDto>();
 
-            var paged = await _uow.Listings.FindPagedAsync(b => b.CategoryId == book.CategoryId && b.Id != bookId, pageNumber, pageSize);
-            return paged.Items.Select(b => _mapper.Map<RelatedBooksDto>(b));
+            var paged = await _uow.Listings.FindPagedWithIncludesAsync(b => b.CategoryId == book.CategoryId && b.Id != bookId, pageNumber, pageSize);
+            return paged.Items.Select(b => _mapper.Map<BookSummaryDto>(b));
         }
 
         public async Task<IEnumerable<BookSummaryDto>> GetBooksByUserIdAsync(Guid userId, int pageNumber, int pageSize)
         {
-            var paged = await _uow.Listings.FindPagedAsync(b => b.UserId == userId, pageNumber, pageSize);
+            var paged = await _uow.Listings.FindPagedWithIncludesAsync(b => b.UserId == userId, pageNumber, pageSize);
             return paged.Items.Select(b => _mapper.Map<BookSummaryDto>(b));
         }
 
         public async Task<IEnumerable<BookSummaryDto>> SearchBooksAsync(string query, int pageNumber, int pageSize)
         {
-            var paged = await _uow.Listings.FindPagedAsync(b => b.Title.Contains(query) || b.Author.Contains(query) || (b.ISBN != null && b.ISBN.Contains(query)), pageNumber, pageSize);
+            var paged = await _uow.Listings.FindPagedWithIncludesAsync(b => b.Title.Contains(query) || b.Author.Contains(query) || (b.ISBN != null && b.ISBN.Contains(query)), pageNumber, pageSize);
             return paged.Items.Select(b => _mapper.Map<BookSummaryDto>(b));
         }
 
         public async Task<IEnumerable<BookSummaryDto>> GetFilteredBooksAsync(BookFilterDto filter)
         {
-            var listings = await _uow.Listings.GetAllAsync();
+            var listings = await _uow.Listings.GetAllWithIncludesAsync();
             IEnumerable<BookListing> query = listings;
 
             if (!string.IsNullOrWhiteSpace(filter.Query))
@@ -164,7 +164,7 @@ namespace Ketabi.Application.Services
 
         public async Task<BookDetailDto> GetBookByIdAsync(Guid bookId)
         {
-            var listing = await _uow.Listings.GetByIdAsync(bookId);
+            var listing = await _uow.Listings.GetByIdWithIncludesAsync(bookId);
             if (listing == null) throw new KeyNotFoundException("Book not found");
 
             var book = new BookDetailDto

@@ -17,8 +17,12 @@ public class BookSummaryDto
     public  string? Description { get; set; }
     public ListingCondition Condition { get; set; }
     public string SharingMode { get; set; } = string.Empty;
+    public string Category { get; set; } = string.Empty;
+    public Guid OwnerId { get; set; }
     public string OwnerName { get; set; } = string.Empty;
     public string? OwnerImageUrl { get; set; }
+    public string? OwnerAvatarUrl { get; set; }
     public double OwnerRating { get; set; }
+    public double OwnerReputation { get; set; }
     public double DistanceInKm { get; set; }
 }

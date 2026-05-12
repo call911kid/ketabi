@@ -5,8 +5,17 @@
         <span class="badge" style="background-color: var(--color-indigo-light); color: var(--color-indigo); padding: 6px 16px; border-radius: var(--radius-full); font-size: var(--text-sm-pill); font-weight: var(--weight-medium);">
             @Model.Category
         </span>
-        <span class="badge" style="background-color: var(--color-surface); color: var(--color-text-muted); border: 1px solid var(--color-border); padding: 6px 16px; border-radius: var(--radius-full); font-size: var(--text-sm-pill);">
-            @Model.Language
+        @if (!string.IsNullOrWhiteSpace(Model.Language))
+        {
+            <span class="badge" style="background-color: var(--color-surface); color: var(--color-text-muted); border: 1px solid var(--color-border); padding: 6px 16px; border-radius: var(--radius-full); font-size: var(--text-sm-pill);">
+                @Model.Language
+            </span>
+        }
+        <span class="badge @Model.SharingModeBadgeCss" style="padding: 6px 16px; border-radius: var(--radius-full); font-size: var(--text-sm-pill); font-weight: var(--weight-medium);">
+            @Model.SharingMode
+        </span>
+        <span class="badge" style="background-color: @(Model.IsAvailable ? "var(--color-success-bg)" : "var(--color-danger-bg)"); color: @(Model.IsAvailable ? "var(--color-success)" : "var(--color-danger)"); padding: 6px 16px; border-radius: var(--radius-full); font-size: var(--text-sm-pill); font-weight: var(--weight-medium);">
+            @(Model.IsAvailable ? "Available" : "Not available")
         </span>
     </div>
 
@@ -17,12 +26,30 @@
         by <span style="color: var(--color-text);">@Model.Author</span>
     </p>
 
-    <div class="mb-4">
-        <span class="d-inline-flex align-items-center gap-2 px-3 py-1"
-              style="background-color: var(--color-info-bg); color: var(--color-info); border-radius: var(--radius-full); font-size: var(--text-xs-badge); font-weight: var(--weight-bold);">
-            <span style="width: 6px; height: 6px; background-color: var(--color-info); border-radius: 50%;"></span>
-            @Model.Condition Condition
-        </span>
+    <div class="detail-grid mb-4" style="display:grid; gap:1rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+        @if (!string.IsNullOrWhiteSpace(Model.ISBN))
+        {
+            <div>
+                <p class="text-uppercase mb-1" style="font-size: var(--text-xs-label); color: var(--color-text-muted); letter-spacing: .08em;">ISBN</p>
+                <p style="font-weight: var(--weight-semibold); color: var(--color-text);">@Model.ISBN</p>
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Publisher))
+        {
+            <div>
+                <p class="text-uppercase mb-1" style="font-size: var(--text-xs-label); color: var(--color-text-muted); letter-spacing: .08em;">Publisher</p>
+                <p style="font-weight: var(--weight-semibold); color: var(--color-text);">@Model.Publisher</p>
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.LocationNote))
+        {
+            <div>
+                <p class="text-uppercase mb-1" style="font-size: var(--text-xs-label); color: var(--color-text-muted); letter-spacing: .08em;">Location</p>
+                <p style="font-weight: var(--weight-semibold); color: var(--color-text);">@Model.LocationNote</p>
+            </div>
+        }
     </div>
 
     <div class="description-section">
