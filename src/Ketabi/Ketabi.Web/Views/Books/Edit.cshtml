@@ -4,128 +4,359 @@
     ViewData["Title"] = "Edit Book";
 }
 
-<div class="container my-5 max-w-3xl mx-auto" style="max-width: 800px;">
-    <div class="text-center mb-5">
-        <h1 class="fw-bold mb-2">Edit Book Listing</h1>
-        <p class="text-muted">Update the book details and save your changes.</p>
-    </div>
+<style>
+    .edit-page {
+        min-height: calc(100vh - 96px);
+        background: radial-gradient(circle at top left, rgba(91, 91, 214, 0.14), transparent 24%),
+                    radial-gradient(circle at bottom right, rgba(91, 91, 214, 0.08), transparent 20%),
+                    var(--color-surface-soft);
+        padding-bottom: 3rem;
+    }
 
-    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5" style="background-color: var(--color-surface);">
-        <form asp-action="Edit" asp-controller="Books" method="post" enctype="multipart/form-data">
-            @Html.AntiForgeryToken()
-            <input asp-for="BookId" type="hidden" />
-            <input asp-for="ExistingImageUrl" type="hidden" />
+    .edit-hero {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, rgba(91, 91, 214, 0.12), rgba(239, 242, 255, 0.95));
+        border: 1px solid rgba(91, 91, 214, 0.18);
+        border-radius: 32px;
+        padding: 2.5rem 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 28px 80px rgba(27, 36, 80, 0.08);
+        animation: floatIn 0.9s ease both;
+    }
 
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    .edit-hero::before,
+    .edit-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.35;
+    }
 
-            <div class="mb-4">
-                <label asp-for="Title" class="form-label fw-bold">Title</label>
-                <input asp-for="Title" class="form-control bg-light border-0 py-2 rounded-3" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
+    .edit-hero::before {
+        width: 180px;
+        height: 180px;
+        top: -40px;
+        right: -60px;
+        background: radial-gradient(circle, rgba(91, 91, 214, 0.44), transparent 62%);
+    }
 
-            <div class="mb-4">
-                <label asp-for="Author" class="form-label fw-bold">Author</label>
-                <input asp-for="Author" class="form-control bg-light border-0 py-2 rounded-3" />
-                <span asp-validation-for="Author" class="text-danger"></span>
-            </div>
+    .edit-hero::after {
+        width: 120px;
+        height: 120px;
+        bottom: -30px;
+        left: -20px;
+        background: radial-gradient(circle, rgba(75, 75, 191, 0.28), transparent 60%);
+    }
 
-            <div class="mb-4">
-                <label asp-for="ISBN" class="form-label fw-bold">ISBN</label>
-                <input asp-for="ISBN" class="form-control bg-light border-0 py-2 rounded-3" />
-                <span asp-validation-for="ISBN" class="text-danger"></span>
-            </div>
+    .edit-card,
+    .preview-panel {
+        animation: slideUpFade 0.9s ease both;
+    }
 
-            <div class="mb-4">
-                <label asp-for="Description" class="form-label fw-bold">Description</label>
-                <textarea asp-for="Description" class="form-control bg-light border-0 rounded-3 p-3" rows="4"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
+    .section-panel {
+        border: 1px solid rgba(91, 91, 214, 0.12);
+        background: var(--color-surface);
+        border-radius: 28px;
+        box-shadow: 0 20px 40px rgba(34, 44, 90, 0.06);
+        padding: 2rem;
+        transition: transform 0.24s ease, box-shadow 0.24s ease;
+    }
 
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <label asp-for="Language" class="form-label fw-bold">Language</label>
-                    <input asp-for="Language" class="form-control bg-light border-0 py-2 rounded-3" />
-                    <span asp-validation-for="Language" class="text-danger"></span>
+    .section-panel:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 28px 60px rgba(34, 44, 90, 0.09);
+    }
+
+    .section-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        font-size: 1.15rem;
+        letter-spacing: 0.02em;
+    }
+
+    .section-title .badge {
+        background: linear-gradient(135deg, var(--color-indigo), var(--color-indigo-dark));
+        color: white;
+        border-radius: 999px;
+        padding: 0.45rem 0.85rem;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        box-shadow: 0 12px 30px rgba(91, 91, 214, 0.14);
+    }
+
+    .input-group-soft .form-control,
+    .input-group-soft .form-select,
+    .input-group-soft .form-control-file {
+        background: var(--color-surface-muted);
+        border: 1px solid rgba(91, 91, 214, 0.12);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus,
+    .form-control-file:focus {
+        border-color: var(--color-indigo);
+        box-shadow: 0 0 0 0.25rem rgba(91, 91, 214, 0.14);
+    }
+
+    .preview-panel {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), var(--color-surface-soft));
+        border: 1px solid rgba(91, 91, 214, 0.12);
+        border-radius: 32px;
+        overflow: hidden;
+    }
+
+    .preview-image {
+        min-height: 260px;
+        width: 100%;
+        object-fit: cover;
+        border-bottom-left-radius: 32px;
+        border-bottom-right-radius: 32px;
+        filter: drop-shadow(0 20px 40px rgba(91, 91, 214, 0.12));
+    }
+
+    .preview-meta {
+        padding: 1.8rem 1.8rem 2rem;
+    }
+
+    .preview-meta h5 {
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+        color: var(--color-text);
+    }
+
+    .preview-meta p {
+        color: var(--color-text-muted);
+        margin-bottom: 1.1rem;
+    }
+
+    .tag-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: rgba(91, 91, 214, 0.08);
+        color: var(--color-indigo);
+        border-radius: 999px;
+        padding: 0.55rem 0.85rem;
+        font-size: 0.85rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, var(--color-indigo), var(--color-indigo-dark));
+        border: none;
+        box-shadow: 0 18px 40px rgba(91, 91, 214, 0.24);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    .btn-save:hover,
+    .btn-save:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 22px 44px rgba(91, 91, 214, 0.28);
+    }
+
+    .btn-cancel {
+        color: var(--color-text);
+        border: 1px solid rgba(91, 91, 214, 0.16);
+        background: rgba(255, 255, 255, 0.92);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .btn-cancel:hover {
+        transform: translateY(-1px);
+        border-color: var(--color-indigo);
+    }
+
+    @@keyframes slideUpFade {
+        from { opacity: 0; transform: translateY(18px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @@keyframes floatIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="edit-page container-fluid px-3 px-lg-5 py-5">
+    <div class="container">
+        <div class="edit-hero">
+            <span class="badge bg-indigo text-white mb-3" style="width: fit-content;">Listing Studio</span>
+            <h1 class="fw-bold mb-3" style="letter-spacing: -0.04em;">Fine-tune your book listing</h1>
+            <p class="mb-0 text-muted" style="max-width: 680px; line-height: 1.75;">Refresh the book details, keep the current cover, or add a new image. The editor is designed for fast updates with elegant, calm motion.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="section-panel edit-card">
+                    <form asp-action="Edit" asp-controller="Books" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <input asp-for="BookId" type="hidden" />
+                        <input asp-for="ExistingImageUrl" type="hidden" />
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+
+                        <div class="section-title">
+                            <span class="badge">01</span>
+                            <strong>Core Book Details</strong>
+                        </div>
+
+                        <div class="mb-4 input-group-soft">
+                            <label asp-for="Title" class="form-label fw-semibold">Title</label>
+                            <input asp-for="Title" class="form-control rounded-3" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4 input-group-soft">
+                            <label asp-for="Author" class="form-label fw-semibold">Author</label>
+                            <input asp-for="Author" class="form-control rounded-3" />
+                            <span asp-validation-for="Author" class="text-danger"></span>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6 input-group-soft">
+                                <label asp-for="ISBN" class="form-label fw-semibold">ISBN</label>
+                                <input asp-for="ISBN" class="form-control rounded-3" />
+                                <span asp-validation-for="ISBN" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 input-group-soft">
+                                <label asp-for="Language" class="form-label fw-semibold">Language</label>
+                                <input asp-for="Language" class="form-control rounded-3" />
+                                <span asp-validation-for="Language" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 input-group-soft">
+                            <label asp-for="Description" class="form-label fw-semibold">Description</label>
+                            <textarea asp-for="Description" class="form-control rounded-3" rows="5"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6 input-group-soft">
+                                <label asp-for="Publisher" class="form-label fw-semibold">Publisher</label>
+                                <input asp-for="Publisher" class="form-control rounded-3" />
+                                <span asp-validation-for="Publisher" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 input-group-soft">
+                                <label asp-for="CategoryId" class="form-label fw-semibold">Category</label>
+                                <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="form-select rounded-3"></select>
+                                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="section-title mt-4">
+                            <span class="badge">02</span>
+                            <strong>Availability & Condition</strong>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6 input-group-soft">
+                                <label asp-for="Condition" class="form-label fw-semibold">Condition</label>
+                                <select asp-for="Condition" class="form-select rounded-3">
+                                    @foreach (var condition in Enum.GetValues(typeof(Ketabi.Core.Domain.Enums.ListingCondition)).Cast<Ketabi.Core.Domain.Enums.ListingCondition>())
+                                    {
+                                        <option value="@condition">@condition</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="Condition" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 input-group-soft">
+                                <label asp-for="SharingMode" class="form-label fw-semibold">Available For</label>
+                                <select asp-for="SharingMode" class="form-select rounded-3">
+                                    @foreach (var mode in Enum.GetValues(typeof(Ketabi.Core.Domain.Enums.SharingMode)).Cast<Ketabi.Core.Domain.Enums.SharingMode>())
+                                    {
+                                        <option value="@mode">@mode</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="SharingMode" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6 input-group-soft">
+                                <label asp-for="SharingDurationInDays" class="form-label fw-semibold">Duration (days)</label>
+                                <input asp-for="SharingDurationInDays" type="number" min="1" max="365" class="form-control rounded-3" />
+                                <span asp-validation-for="SharingDurationInDays" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 align-self-end mt-2">
+                                <div class="form-check form-check-inline align-items-center">
+                                    <input asp-for="IsAvailable" class="form-check-input" />
+                                    <label asp-for="IsAvailable" class="form-check-label ms-2">Available</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-title mt-4">
+                            <span class="badge">03</span>
+                            <strong>Final touches</strong>
+                        </div>
+
+                        <div class="mb-4 input-group-soft">
+                            <label asp-for="LocationNote" class="form-label fw-semibold">Pickup Area</label>
+                            <input asp-for="LocationNote" class="form-control rounded-3" />
+                            <span asp-validation-for="LocationNote" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4 input-group-soft">
+                            <label asp-for="CoverImage" class="form-label fw-semibold">Cover Image</label>
+                            <input asp-for="CoverImage" type="file" class="form-control rounded-3" />
+                            <div class="form-text">Leave blank to keep the current cover image.</div>
+                            <span asp-validation-for="CoverImage" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center gap-3 flex-column flex-sm-row mt-4">
+                            <a asp-action="Details" asp-route-id="@Model.BookId" class="btn btn-cancel rounded-pill px-4 py-2">Cancel</a>
+                            <button type="submit" class="btn btn-save rounded-pill px-5 py-2">Save Changes</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="col-md-6">
-                    <label asp-for="Publisher" class="form-label fw-bold">Publisher</label>
-                    <input asp-for="Publisher" class="form-control bg-light border-0 py-2 rounded-3" />
-                    <span asp-validation-for="Publisher" class="text-danger"></span>
-                </div>
             </div>
 
-            <div class="mb-4">
-                <label asp-for="CategoryId" class="form-label fw-bold">Category</label>
-                <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="form-select bg-light border-0 py-2 rounded-3"></select>
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
-            </div>
+            <div class="col-lg-4">
+                <div class="preview-panel">
+                    @if (!string.IsNullOrWhiteSpace(Model.ExistingImageUrl))
+                    {
+                        <img src="@Model.ExistingImageUrl" alt="Current cover" class="preview-image" />
+                    }
+                    else
+                    {
+                        <div class="d-flex align-items-center justify-content-center" style="min-height: 260px; background: var(--color-surface-muted);">
+                            <span class="text-muted">No current cover available</span>
+                        </div>
+                    }
 
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <label asp-for="Condition" class="form-label fw-bold">Condition</label>
-                    <select asp-for="Condition" class="form-select bg-light border-0 py-2 rounded-3">
-                        @foreach (var condition in Enum.GetValues(typeof(Ketabi.Core.Domain.Enums.ListingCondition)).Cast<Ketabi.Core.Domain.Enums.ListingCondition>())
-                        {
-                            <option value="@condition">@condition</option>
-                        }
-                    </select>
-                    <span asp-validation-for="Condition" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="SharingMode" class="form-label fw-bold">Available For</label>
-                    <select asp-for="SharingMode" class="form-select bg-light border-0 py-2 rounded-3">
-                        @foreach (var mode in Enum.GetValues(typeof(Ketabi.Core.Domain.Enums.SharingMode)).Cast<Ketabi.Core.Domain.Enums.SharingMode>())
-                        {
-                            <option value="@mode">@mode</option>
-                        }
-                    </select>
-                    <span asp-validation-for="SharingMode" class="text-danger"></span>
-                </div>
-            </div>
+                    <div class="preview-meta">
+                        <h5>Quick preview</h5>
+                        <p class="text-muted">Your current listing snapshot updates automatically when you save the form.</p>
 
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <label asp-for="SharingDurationInDays" class="form-label fw-bold">Sharing Duration (days)</label>
-                    <input asp-for="SharingDurationInDays" type="number" min="1" max="365" class="form-control bg-light border-0 py-2 rounded-3" />
-                    <span asp-validation-for="SharingDurationInDays" class="text-danger"></span>
-                </div>
-                <div class="col-md-6 align-self-end">
-                    <div class="form-check mt-2">
-                        <input asp-for="IsAvailable" class="form-check-input" />
-                        <label asp-for="IsAvailable" class="form-check-label">Available</label>
+                        <div class="mb-3">
+                            <span class="tag-pill">Condition: @Model.Condition</span>
+                            <span class="tag-pill">Mode: @Model.SharingMode</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <p class="mb-1 text-muted">Current title</p>
+                            <strong>@(string.IsNullOrWhiteSpace(Model.Title) ? "Untitled book" : Model.Title)</strong>
+                        </div>
+
+                        <div class="mb-3">
+                            <p class="mb-1 text-muted">Current author</p>
+                            <strong>@(string.IsNullOrWhiteSpace(Model.Author) ? "Unknown author" : Model.Author)</strong>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2 pt-2 border-top" style="border-color: rgba(91,91,214,0.1);">
+                            <span class="tag-pill">Action: keep current cover</span>
+                            <span class="tag-pill">Tip: don’t re-upload unless needed</span>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <div class="mb-4">
-                <label asp-for="LocationNote" class="form-label fw-bold">Pickup Area</label>
-                <input asp-for="LocationNote" class="form-control bg-light border-0 py-2 rounded-3" />
-                <span asp-validation-for="LocationNote" class="text-danger"></span>
-            </div>
-
-            <div class="mb-4">
-                <label asp-for="CoverImage" class="form-label fw-bold">Cover Image</label>
-                <input asp-for="CoverImage" type="file" class="form-control form-control-sm" />
-                <div class="form-text">Leave blank to keep the current cover image.</div>
-                <span asp-validation-for="CoverImage" class="text-danger"></span>
-            </div>
-
-            @if (!string.IsNullOrWhiteSpace(Model.ExistingImageUrl))
-            {
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Current Cover</label>
-                    <div>
-                        <img src="@Model.ExistingImageUrl" alt="Current cover" class="img-fluid rounded-3" style="max-height: 260px;" />
-                    </div>
-                </div>
-            }
-
-            <div class="d-flex justify-content-between align-items-center mt-4">
-                <a asp-action="Details" asp-route-id="@Model.BookId" class="btn btn-light rounded-pill px-4">Cancel</a>
-                <button type="submit" class="btn btn-primary rounded-pill px-4">Save Changes</button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
