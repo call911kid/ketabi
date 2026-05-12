@@ -11,6 +11,7 @@ namespace Ketabi.Application.Interfaces
     {
         Task<CreatedUserDto> CreateUserAsync(CreateUserDto createUserDto);
         Task<UserSummaryDto> GetUserByIdAsync(Guid userId);
+        Task<UserProfileDto> GetUserProfileAsync(Guid userId, Guid? currentUserId = null);
         Task<UserProfileDto> UpdateUserProfileAsync(Guid userId, UpdateUserProfileDto updateUserProfileDto);
     }
 }

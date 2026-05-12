@@ -1,0 +1,41 @@
+@* ─────────────────────────────────────────────────────────────────────────
+   Views/Profile/_ProfileStats.cshtml
+   Model: ProfileViewModel
+   Reputation (with stars), Listings Count, Trades Count
+───────────────────────────────────────────────────────────────────────── *@
+@model Ketabi.Web.ViewModels.Profile.ProfileViewModel
+
+<div class="profile-stats">
+
+    @* ── Reputation Score ── *@
+    <div class="profile-stat">
+        <span class="profile-stat__value profile-stat__value--accent">@Model.FormattedRating</span>
+        <div class="profile-stat__stars">
+            @for (int i = 1; i <= 5; i++)
+            {
+                <i class="bi bi-star-fill profile-stat__star @(i <= Math.Round(Model.ReputationScore) ? "" : "profile-stat__star--empty")"
+                   aria-hidden="true"></i>
+            }
+        </div>
+        <span class="profile-stat__label">Reputation</span>
+    </div>
+
+    @* ── Reviews ── *@
+    <div class="profile-stat">
+        <span class="profile-stat__value">@Model.ReviewCount</span>
+        <span class="profile-stat__label">Reviews</span>
+    </div>
+
+    @* ── Books Listed ── *@
+    <div class="profile-stat">
+        <span class="profile-stat__value">@Model.BooksListed</span>
+        <span class="profile-stat__label">Listings</span>
+    </div>
+
+    @* ── Completed Trades ── *@
+    <div class="profile-stat">
+        <span class="profile-stat__value">@Model.TotalCompleted</span>
+        <span class="profile-stat__label">Trades</span>
+    </div>
+
+</div>

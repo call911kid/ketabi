@@ -1,0 +1,70 @@
+@* ─────────────────────────────────────────────────────────────────────────
+   Views/Profile/_ListingsTab.cshtml
+   Model: ProfileViewModel
+   Responsive grid of BookCardViewModel with pagination controls
+───────────────────────────────────────────────────────────────────────── *@
+@model Ketabi.Web.ViewModels.Profile.ProfileViewModel
+
+@if (Model.Books.Any())
+{
+    <div class="profile-books-grid">
+        @foreach (var book in Model.Books)
+        {
+            @await Html.PartialAsync("~/Views/Shared/_BookCard.cshtml", book)
+        }
+    </div>
+
+    @* ── Pagination ── *@
+    @if (Model.BooksPager.TotalPages > 1)
+    {
+        <nav class="profile-pager" aria-label="Books pagination">
+            <a class="profile-pager__btn @(!Model.BooksPager.HasPrev ? "profile-pager__btn--disabled" : "")"
+               asp-action="Index"
+               asp-route-id="@Model.UserId"
+               asp-route-booksPage="@Model.BooksPager.PrevPage"
+               asp-route-reviewsPage="@Model.ReviewsPager.CurrentPage"
+               aria-label="Previous page">
+                <i class="bi bi-chevron-left" aria-hidden="true"></i> Prev
+            </a>
+
+            <span class="profile-pager__info">
+                Page @Model.BooksPager.CurrentPage of @Model.BooksPager.TotalPages
+            </span>
+
+            <a class="profile-pager__btn @(!Model.BooksPager.HasNext ? "profile-pager__btn--disabled" : "")"
+               asp-action="Index"
+               asp-route-id="@Model.UserId"
+               asp-route-booksPage="@Model.BooksPager.NextPage"
+               asp-route-reviewsPage="@Model.ReviewsPager.CurrentPage"
+               aria-label="Next page">
+                Next <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </a>
+        </nav>
+    }
+}
+else
+{
+    <div class="profile-empty">
+        <div class="profile-empty__icon">
+            <i class="bi bi-book" aria-hidden="true"></i>
+        </div>
+        <p class="profile-empty__title">No books listed yet</p>
+        <p class="profile-empty__sub">
+            @if (Model.IsOwnProfile)
+            {
+                <text>Share your first book with the community!</text>
+            }
+            else
+            {
+                <text>This user hasn't listed any books yet.</text>
+            }
+        </p>
+        @if (Model.IsOwnProfile)
+        {
+            <a asp-controller="Books" asp-action="Create" class="ketabi-btn-primary" id="btn-add-first-book"
+               style="margin-top: 1rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                <i class="bi bi-plus-lg" aria-hidden="true"></i> Add a Book
+            </a>
+        }
+    </div>
+}

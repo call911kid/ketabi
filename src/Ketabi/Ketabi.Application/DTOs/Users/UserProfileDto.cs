@@ -6,25 +6,20 @@ namespace Ketabi.Application.DTOs.Users;
 /// </summary>
 public class UserProfileDto
 {
-    public Guid UserId { get; init; }
-    public string UserName { get; init; } = string.Empty;
-    public string FirstName { get; init; } = string.Empty;
-    public string LastName { get; init; } = string.Empty;
-    public string? Bio { get; init; }
-    public string AvatarUrl { get; init; } = string.Empty;
-    public string Location { get; init; } = string.Empty;
+    public Guid UserId { get; set; }
+    public string Email { get; set; } = string.Empty;
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string? Bio { get; set; }
+    public string AvatarUrl { get; set; } = string.Empty;
+    public string Location { get; set; } = string.Empty;
 
     /// <summary>Human-readable join date, e.g. "Member since January 2024".</summary>
-    public string MemberSince { get; init; } = string.Empty;
+    public string MemberSince { get; set; } = string.Empty;
 
-    // Reputation & Stats
-    public double ReputationScore { get; init; }
-    public int ReviewCount { get; init; }
-    public int BooksListed { get; init; }
-    public int ActiveListings { get; init; }
-    public int CompletedBorrows { get; init; }
-    public int CompletedExchanges { get; init; }
+    // Reputation & Stats grouped under UserStatsDto for reusability
+    public UserStatsDto Stats { get; set; } = new UserStatsDto();
 
     /// <summary>True when the profile belongs to the currently authenticated user.</summary>
-    public bool IsOwnProfile { get; init; }
+    public bool IsOwnProfile { get; set; }
 }

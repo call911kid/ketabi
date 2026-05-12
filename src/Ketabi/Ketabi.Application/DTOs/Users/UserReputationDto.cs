@@ -6,10 +6,22 @@ namespace Ketabi.Application.DTOs.Users;
 /// </summary>
 public class UserReputationDto
 {
-    public Guid UserId { get; init; }
-    public double ReputationScore { get; init; }
-    public int ReviewCount { get; init; }
-    public int BooksListed { get; init; }
-    public int CompletedTransactions { get; init; }
-    public int UnreadNotifications { get; init; }
+    public Guid UserId { get; set; }
+    public double ReputationScore { get; set; }
+    public int ReviewCount { get; set; }
+    public int BooksListed { get; set; }
+    public int CompletedTransactions { get; set; }
+    public int UnreadNotifications { get; set; }
 }
+
+// Consolidated DTO for commonly used user statistics. Use this where a compact stats
+// payload is required (e.g., navbar, profile summary).
+public sealed class UserStatsDto
+{
+    public double ReputationScore { get; set; }
+    public int ReviewCount { get; set; }
+    public int BooksListed { get; set; }
+    public int CompletedTransactions { get; set; }
+    public int UnreadNotifications { get; set; }
+}
+

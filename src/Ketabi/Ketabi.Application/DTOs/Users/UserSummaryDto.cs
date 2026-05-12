@@ -7,16 +7,13 @@ namespace Ketabi.Application.DTOs.Users;
 /// </summary>
 public class UserSummaryDto
 {
-    public Guid UserId { get; init; }
-    public string FullName { get; init; } = string.Empty;
-    public string UserName { get; init; } = string.Empty;
-    public string AvatarUrl { get; init; } = string.Empty;
-
-    /// <summary>City + Governorate combined, e.g. "Cairo, Giza".</summary>
-    public string Location { get; init; } = string.Empty;
-
-    /// <summary>Aggregate reputation score (0.0 – 5.0).</summary>
-    public double ReputationScore { get; init; }
-    public int ReviewCount { get; init; }
-    public int TradesCount { get; init; }
+    public Guid UserId { get; set; }
+    public string FullName { get; set; } = string.Empty;
+    public string UserName { get; set; } = string.Empty;
+    public string AvatarUrl { get; set; } = string.Empty;
+    public string Location { get; set; } = string.Empty;
+    // Basic stats — kept minimal for embedding in other DTOs
+    public double ReputationScore { get; set; }
+    public int ReviewCount { get; set; }
+    public int TradesCount { get; set; }
 }

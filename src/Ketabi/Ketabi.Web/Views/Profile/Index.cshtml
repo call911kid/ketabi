@@ -1,0 +1,144 @@
+@* ─────────────────────────────────────────────────────────────────────────
+   Views/Profile/Index.cshtml
+   Model: ProfileViewModel
+   Composed of Partial Views: _ProfileHeader, _ProfileStats,
+   _ListingsTab, _ReviewsTab, _EditProfileModal
+───────────────────────────────────────────────────────────────────────── *@
+@model Ketabi.Web.ViewModels.Profile.ProfileViewModel
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/ketabi-profile.css" asp-append-version="true" />
+}
+
+<div class="profile-page">
+
+    @* ── Success / Error Toast (from TempData) ── *@
+    @if (TempData[Ketabi.Application.Common.AppConstants.SuccessMessageKey] is string successMsg)
+    {
+        <div class="profile-toast profile-toast--success" id="profileToast">
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i> @successMsg
+        </div>
+    }
+    @if (TempData[Ketabi.Application.Common.AppConstants.ErrorMessageKey] is string errorMsg)
+    {
+        <div class="profile-toast profile-toast--error" id="profileToast">
+            <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i> @errorMsg
+        </div>
+    }
+
+    @* ── Header Card ── *@
+    <section class="ketabi-card profile-animate" style="animation-delay: 0.05s;">
+        @await Html.PartialAsync("_ProfileHeader", Model)
+    </section>
+
+    @* ── Stats Bar ── *@
+    <section class="ketabi-card profile-animate" style="animation-delay: 0.1s;">
+        @await Html.PartialAsync("_ProfileStats", Model)
+    </section>
+
+    @* ── Tabbed Content: Listings + Reviews ── *@
+    <section class="profile-tabs profile-animate" style="animation-delay: 0.15s;">
+
+        <div class="profile-tabs__nav" role="tablist">
+            <button class="profile-tab-btn active" data-bs-toggle="tab" data-bs-target="#tab-listings"
+                    type="button" role="tab" aria-selected="true" id="btn-tab-listings">
+                <i class="bi bi-book" aria-hidden="true"></i> Listings
+                <span class="profile-tab-btn__count">@Model.BooksListed</span>
+            </button>
+            <button class="profile-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-reviews"
+                    type="button" role="tab" aria-selected="false" id="btn-tab-reviews">
+                <i class="bi bi-star" aria-hidden="true"></i> Reviews
+                <span class="profile-tab-btn__count">@Model.ReviewCount</span>
+            </button>
+        </div>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="tab-listings" role="tabpanel">
+                @await Html.PartialAsync("_ListingsTab", Model)
+            </div>
+            <div class="tab-pane fade" id="tab-reviews" role="tabpanel">
+                @await Html.PartialAsync("_ReviewsTab", Model)
+            </div>
+        </div>
+
+    </section>
+
+    @* ── Edit Profile Modal (own profile only) ── *@
+    @if (Model.IsOwnProfile && Model.EditForm != null)
+    {
+        @await Html.PartialAsync("_EditProfileModal", Model.EditForm)
+    }
+
+</div>
+
+@section Scripts {
+    <script>
+        // ── Auto-dismiss toast after 4s ──
+        (function () {
+            const toast = document.getElementById('profileToast');
+            if (toast) {
+                setTimeout(() => {
+                    toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateY(1rem)';
+                    setTimeout(() => toast.remove(), 300);
+                }, 4000);
+            }
+        })();
+
+        // ── AJAX Avatar Upload ──
+        (function () {
+            const fileInput = document.getElementById('avatarFileInput');
+            if (!fileInput) return;
+
+            fileInput.addEventListener('change', async function () {
+                const file = this.files[0];
+                if (!file) return;
+
+                // Validate client-side
+                const maxSize = 10 * 1024 * 1024; // 10MB
+                if (file.size > maxSize) {
+                    alert('Image must be less than 10MB.');
+                    return;
+                }
+                const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please upload a valid image file (JPEG, PNG, WebP, GIF).');
+                    return;
+                }
+
+                const spinner = document.getElementById('avatarSpinner');
+                const avatarImg = document.getElementById('profileAvatarImg');
+                if (spinner) spinner.classList.add('active');
+
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+                    const response = await fetch('@Url.Action("UploadAvatar", "Profile")', {
+                        method: 'POST',
+                        headers: token ? { 'RequestVerificationToken': token } : {},
+                        body: formData
+                    });
+
+                    const result = await response.json();
+                    if (result.success && result.newImageUrl) {
+                        if (avatarImg) avatarImg.src = result.newImageUrl;
+                        // Also update navbar avatar if present
+                        const navAvatar = document.querySelector('.nav-avatar-img');
+                        if (navAvatar) navAvatar.src = result.newImageUrl;
+                    } else {
+                        alert(result.error || 'Upload failed. Please try again.');
+                    }
+                } catch (err) {
+                    console.error('Avatar upload error:', err);
+                    alert('An error occurred during upload.');
+                } finally {
+                    if (spinner) spinner.classList.remove('active');
+                    fileInput.value = '';
+                }
+            });
+        })();
+    </script>
+}

@@ -1,23 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Ketabi.Application.DTOs.Users;
 
-namespace Ketabi.Application.DTOs.Users
+// Use CreatedUserDto to express a created user response. It reuses UserDto fields and
+// adds server-generated values when necessary.
+public sealed class CreatedUserDto : UserDto
 {
-    public class CreatedUserDto
-    {
-        public Guid Id { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string? Bio { get; set; }
-        public string? City { get; set; }
-        public string? Governorate { get; set; }
-        public double ReputationScore { get; set; }
-        public string? ProfilePictureUrl { get; set; }
-
-
-    }
+    // include server-side properties if any (e.g., default reputation)
+    public double ReputationScore { get; init; }
 }

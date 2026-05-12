@@ -1,0 +1,78 @@
+@* ─────────────────────────────────────────────────────────────────────────
+   Views/Profile/_ProfileHeader.cshtml
+   Model: ProfileViewModel
+   144×144 avatar with floating camera button + AJAX file upload
+───────────────────────────────────────────────────────────────────────── *@
+@model Ketabi.Web.ViewModels.Profile.ProfileViewModel
+
+<div class="profile-header">
+
+    @* ── Avatar ── *@
+    <div class="profile-avatar-wrap">
+        <img src="~/uploads/users/@Model.AvatarUrl"
+             alt="@Model.FirstName @Model.LastName"
+             class="profile-avatar"
+             id="profileAvatarImg" />
+
+        @if (Model.IsOwnProfile)
+        {
+            @* Hidden file input *@
+            <input type="file" id="avatarFileInput" accept="image/*" hidden />
+            @Html.AntiForgeryToken()
+
+            @* Camera button triggers the file input *@
+            <label for="avatarFileInput" class="profile-avatar-upload" title="Change profile photo">
+                <i class="bi bi-camera-fill" aria-hidden="true"></i>
+            </label>
+
+            @* Spinner overlay during upload *@
+            <div class="profile-avatar-spinner" id="avatarSpinner">
+                <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Uploading...</span>
+                </div>
+            </div>
+        }
+    </div>
+
+    @* ── Identity Info ── *@
+    <div class="profile-header__info">
+        <h1 class="profile-header__name">@Model.FirstName @Model.LastName</h1>
+
+        @if (!string.IsNullOrEmpty(Model.UserName))
+        {
+            <p class="profile-header__username">@@@Model.UserName</p>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.Bio))
+        {
+            <p class="profile-header__bio">@Model.Bio</p>
+        }
+
+        <div class="profile-header__meta">
+            @if (!string.IsNullOrEmpty(Model.Location))
+            {
+                <span class="profile-header__meta-item">
+                    <i class="bi bi-geo-alt profile-header__meta-icon" aria-hidden="true"></i>
+                    @Model.Location
+                </span>
+            }
+            @if (!string.IsNullOrEmpty(Model.MemberSince))
+            {
+                <span class="profile-header__meta-item">
+                    <i class="bi bi-calendar3 profile-header__meta-icon" aria-hidden="true"></i>
+                    @Model.MemberSince
+                </span>
+            }
+        </div>
+
+        @if (Model.IsOwnProfile)
+        {
+            <button class="profile-edit-btn"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editProfileModal"
+                    id="btn-edit-profile">
+                <i class="bi bi-pencil" aria-hidden="true"></i> Edit Profile
+            </button>
+        }
+    </div>
+</div>

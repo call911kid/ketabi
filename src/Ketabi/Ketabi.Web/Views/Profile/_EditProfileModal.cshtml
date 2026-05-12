@@ -1,0 +1,213 @@
+@* ─────────────────────────────────────────────────────────────────────────
+   Views/Profile/_EditProfileModal.cshtml
+   Model: EditProfileViewModel
+   Bootstrap 5 Modal with 3 Nav-Tabs: Identity, Location, Interests
+───────────────────────────────────────────────────────────────────────── *@
+@model Ketabi.Web.ViewModels.Profile.EditProfileViewModel
+
+<div class="modal fade profile-modal" id="editProfileModal" tabindex="-1"
+     aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+
+            @* ── Header ── *@
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProfileModalLabel">
+                    <i class="bi bi-person-gear" aria-hidden="true"></i> Edit Profile
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form asp-action="EditProfile" asp-controller="Profile" method="post">
+                <input type="hidden" asp-for="UserId" />
+
+                <div class="modal-body">
+
+                    @* ── Tab Navigation ── *@
+                    <ul class="nav nav-tabs profile-modal__tabs" role="tablist" id="editProfileTabs">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="tab-identity-btn"
+                                    data-bs-toggle="tab" data-bs-target="#tab-identity"
+                                    type="button" role="tab" aria-selected="true">
+                                <i class="bi bi-person" aria-hidden="true"></i> Identity
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="tab-location-btn"
+                                    data-bs-toggle="tab" data-bs-target="#tab-location"
+                                    type="button" role="tab" aria-selected="false">
+                                <i class="bi bi-geo-alt" aria-hidden="true"></i> Location
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="tab-interests-btn"
+                                    data-bs-toggle="tab" data-bs-target="#tab-interests"
+                                    type="button" role="tab" aria-selected="false">
+                                <i class="bi bi-tags" aria-hidden="true"></i> Interests
+                            </button>
+                        </li>
+                    </ul>
+
+                    @* ── Tab Panes ── *@
+                    <div class="tab-content mt-3">
+
+                        @* ── Tab 1: Identity ── *@
+                        <div class="tab-pane fade show active" id="tab-identity" role="tabpanel">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="FirstName" class="profile-form__label"></label>
+                                    <input asp-for="FirstName" class="ketabi-input" placeholder="Your first name" />
+                                    <span asp-validation-for="FirstName" class="text-danger profile-form__hint"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="LastName" class="profile-form__label"></label>
+                                    <input asp-for="LastName" class="ketabi-input" placeholder="Your last name" />
+                                    <span asp-validation-for="LastName" class="text-danger profile-form__hint"></span>
+                                </div>
+                                <div class="col-12">
+                                    <label asp-for="UserName" class="profile-form__label"></label>
+                                    <input asp-for="UserName" class="ketabi-input" placeholder="username" />
+                                    <span class="profile-form__hint">Letters, numbers, and underscores only.</span>
+                                    <span asp-validation-for="UserName" class="text-danger profile-form__hint"></span>
+                                </div>
+                                <div class="col-12">
+                                    <label asp-for="Bio" class="profile-form__label"></label>
+                                    <textarea asp-for="Bio" class="ketabi-input" rows="3"
+                                              placeholder="Tell the community about yourself..."
+                                              maxlength="200"></textarea>
+                                    <span class="profile-form__hint">
+                                        <span id="bioCharCount">@(Model.Bio?.Length ?? 0)</span>/200 characters
+                                    </span>
+                                    <span asp-validation-for="Bio" class="text-danger profile-form__hint"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* ── Tab 2: Location ── *@
+                        <div class="tab-pane fade" id="tab-location" role="tabpanel">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="City" class="profile-form__label"></label>
+                                    <select asp-for="City" class="ketabi-input" id="citySelect">
+                                        <option value="">Select city</option>
+                                        <option value="Cairo">Cairo</option>
+                                        <option value="Alexandria">Alexandria</option>
+                                        <option value="Giza">Giza</option>
+                                        <option value="Luxor">Luxor</option>
+                                        <option value="Aswan">Aswan</option>
+                                        <option value="Minya">Minya</option>
+                                        <option value="Mansoura">Mansoura</option>
+                                        <option value="Tanta">Tanta</option>
+                                        <option value="Ismailia">Ismailia</option>
+                                        <option value="Port Said">Port Said</option>
+                                        <option value="Suez">Suez</option>
+                                        <option value="Fayoum">Fayoum</option>
+                                        <option value="Zagazig">Zagazig</option>
+                                        <option value="Damietta">Damietta</option>
+                                        <option value="Sohag">Sohag</option>
+                                        <option value="Asyut">Asyut</option>
+                                        <option value="Beni Suef">Beni Suef</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Governorate" class="profile-form__label"></label>
+                                    <select asp-for="Governorate" class="ketabi-input" id="governorateSelect">
+                                        <option value="">Select governorate</option>
+                                        <option value="Cairo">Cairo</option>
+                                        <option value="Alexandria">Alexandria</option>
+                                        <option value="Giza">Giza</option>
+                                        <option value="Qalyubia">Qalyubia</option>
+                                        <option value="Dakahlia">Dakahlia</option>
+                                        <option value="Sharqia">Sharqia</option>
+                                        <option value="Gharbia">Gharbia</option>
+                                        <option value="Monufia">Monufia</option>
+                                        <option value="Beheira">Beheira</option>
+                                        <option value="Kafr El Sheikh">Kafr El Sheikh</option>
+                                        <option value="Damietta">Damietta</option>
+                                        <option value="Port Said">Port Said</option>
+                                        <option value="Ismailia">Ismailia</option>
+                                        <option value="Suez">Suez</option>
+                                        <option value="North Sinai">North Sinai</option>
+                                        <option value="South Sinai">South Sinai</option>
+                                        <option value="Red Sea">Red Sea</option>
+                                        <option value="Beni Suef">Beni Suef</option>
+                                        <option value="Fayoum">Fayoum</option>
+                                        <option value="Minya">Minya</option>
+                                        <option value="Asyut">Asyut</option>
+                                        <option value="Sohag">Sohag</option>
+                                        <option value="Qena">Qena</option>
+                                        <option value="Luxor">Luxor</option>
+                                        <option value="Aswan">Aswan</option>
+                                        <option value="New Valley">New Valley</option>
+                                        <option value="Matruh">Matruh</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* ── Tab 3: Interests ── *@
+                        <div class="tab-pane fade" id="tab-interests" role="tabpanel">
+                            <p class="profile-form__hint" style="margin-bottom: 0.75rem;">
+                                Select your reading interests to get better recommendations.
+                            </p>
+                            <div class="profile-interests-grid" id="interestsGrid">
+                                @{
+                                    var genres = new[] {
+                                        "Fiction", "Non-Fiction", "Science Fiction", "Fantasy", "Mystery",
+                                        "Romance", "Thriller", "Horror", "Biography", "History",
+                                        "Science", "Philosophy", "Psychology", "Self-Help", "Poetry",
+                                        "Art", "Technology", "Business", "Travel", "Religion",
+                                        "Children's", "Young Adult", "Comics", "Cooking"
+                                    };
+                                }
+                                @foreach (var genre in genres)
+                                {
+                                    <button type="button" class="profile-interest-tag"
+                                            data-genre="@genre"
+                                            onclick="this.classList.toggle('selected')">
+                                        @genre
+                                    </button>
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                @* ── Footer ── *@
+                <div class="modal-footer">
+                    <button type="button" class="profile-edit-btn" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="ketabi-btn-primary" id="btn-save-profile">
+                        <i class="bi bi-check-lg" aria-hidden="true"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@* ── Bio character counter script ── *@
+<script>
+    (function () {
+        const bioInput = document.getElementById('Bio');
+        const counter = document.getElementById('bioCharCount');
+        if (bioInput && counter) {
+            bioInput.addEventListener('input', function () {
+                counter.textContent = this.value.length;
+            });
+        }
+
+        // Pre-select city/governorate dropdown values
+        const citySelect = document.getElementById('citySelect');
+        const govSelect = document.getElementById('governorateSelect');
+        if (citySelect && citySelect.dataset.val) {
+            citySelect.value = citySelect.dataset.val;
+        }
+        if (govSelect && govSelect.dataset.val) {
+            govSelect.value = govSelect.dataset.val;
+        }
+    })();
+</script>

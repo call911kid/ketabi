@@ -1,0 +1,108 @@
+@* ─────────────────────────────────────────────────────────────────────────
+   Views/Profile/_ReviewsTab.cshtml
+   Model: ProfileViewModel
+   Vertical list of reviews with star ratings and time-ago formatting
+───────────────────────────────────────────────────────────────────────── *@
+@model Ketabi.Web.ViewModels.Profile.ProfileViewModel
+
+@if (Model.Reviews.Any())
+{
+    <div class="ketabi-card">
+        @foreach (var review in Model.Reviews)
+        {
+            <div class="profile-review">
+                @* ── Reviewer Avatar ── *@
+                @if (!string.IsNullOrEmpty(review.ReviewerAvatar))
+                {
+                    <img src="@review.ReviewerAvatar"
+                         alt="@review.ReviewerName"
+                         class="profile-review__avatar"
+                         loading="lazy" />
+                }
+                else
+                {
+                    <span class="profile-review__avatar-fallback" aria-hidden="true">
+                        @(review.ReviewerName.Length > 0 ? review.ReviewerName[0].ToString().ToUpperInvariant() : "?")
+                    </span>
+                }
+
+                @* ── Review Body ── *@
+                <div class="profile-review__body">
+                    <div class="profile-review__top">
+                        <span class="profile-review__name">@review.ReviewerName</span>
+                        <span class="profile-review__time">@review.TimeAgo</span>
+                    </div>
+
+                    @* Star rating *@
+                    <div class="profile-review__stars" aria-label="Rating: @review.Rating out of 5">
+                        @foreach (var filled in review.Stars)
+                        {
+                            <i class="bi bi-star-fill profile-review__star @(!filled ? "profile-review__star--empty" : "")"
+                               aria-hidden="true"></i>
+                        }
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(review.Comment))
+                    {
+                        <p class="profile-review__comment">@review.Comment</p>
+                    }
+
+                    @if (!string.IsNullOrEmpty(review.RelatedBookTitle))
+                    {
+                        <span class="profile-review__book">
+                            <i class="bi bi-book" aria-hidden="true"></i>
+                            @review.RelatedBookTitle
+                        </span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    @* ── Pagination ── *@
+    @if (Model.ReviewsPager.TotalPages > 1)
+    {
+        <nav class="profile-pager" aria-label="Reviews pagination">
+            <a class="profile-pager__btn @(!Model.ReviewsPager.HasPrev ? "profile-pager__btn--disabled" : "")"
+               asp-action="Index"
+               asp-route-id="@Model.UserId"
+               asp-route-booksPage="@Model.BooksPager.CurrentPage"
+               asp-route-reviewsPage="@Model.ReviewsPager.PrevPage"
+               aria-label="Previous page">
+                <i class="bi bi-chevron-left" aria-hidden="true"></i> Prev
+            </a>
+
+            <span class="profile-pager__info">
+                Page @Model.ReviewsPager.CurrentPage of @Model.ReviewsPager.TotalPages
+            </span>
+
+            <a class="profile-pager__btn @(!Model.ReviewsPager.HasNext ? "profile-pager__btn--disabled" : "")"
+               asp-action="Index"
+               asp-route-id="@Model.UserId"
+               asp-route-booksPage="@Model.BooksPager.CurrentPage"
+               asp-route-reviewsPage="@Model.ReviewsPager.NextPage"
+               aria-label="Next page">
+                Next <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </a>
+        </nav>
+    }
+}
+else
+{
+    <div class="profile-empty">
+        <div class="profile-empty__icon">
+            <i class="bi bi-star" aria-hidden="true"></i>
+        </div>
+        <p class="profile-empty__title">No reviews yet</p>
+        <p class="profile-empty__sub">
+            @if (Model.IsOwnProfile)
+            {
+                <text>Complete a trade to start receiving reviews!</text>
+            }
+            else
+            {
+                <text>This user hasn't received any reviews yet.</text>
+            }
+        </p>
+    </div>
+}
