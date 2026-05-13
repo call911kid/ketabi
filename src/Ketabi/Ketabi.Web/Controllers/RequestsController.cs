@@ -53,7 +53,7 @@ public class RequestsController : BaseController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> UpdateStatus(Guid requestId, RequestStatus status, string? note)
+    public async Task<IActionResult> UpdateStatus(Guid requestId, string status, string? note)
     {
         var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
@@ -61,17 +61,27 @@ public class RequestsController : BaseController
             return Json(new { success = false, message = "User not authenticated." });
         }
 
+        if (status.Equals("Accepted", StringComparison.OrdinalIgnoreCase))
+        {
+            status = RequestStatus.Approved.ToString();
+        }
+
+        if (!Enum.TryParse<RequestStatus>(status, true, out var parsedStatus))
+        {
+            return Json(new { success = false, message = "Invalid request status." });
+        }
+
         try
         {
             var dto = new Ketabi.Application.DTOs.Requests.UpdateRequestStatusDto
             {
-                Status = status,
+                Status = parsedStatus,
                 Note = note
             };
 
             await _requestService.UpdateRequestStatusAsync(userId, requestId, dto);
 
-            return Json(new { success = true, message = $"Request {status.ToString().ToLower()} successfully." });
+            return Json(new { success = true, message = $"Request {parsedStatus.ToString().ToLower()} successfully." });
         }
         catch (Exception ex)
         {
