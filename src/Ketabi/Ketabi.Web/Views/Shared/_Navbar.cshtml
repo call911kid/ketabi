@@ -5,345 +5,609 @@
     bool isExplorer = currentPath == "/" || currentPath.StartsWithSegments("/Home");
     bool isLibrary = currentPath.StartsWithSegments("/Profile") || currentPath.StartsWithSegments("/Library");
     bool isRequests = currentPath.StartsWithSegments("/Requests");
-    bool isActivity = currentPath.StartsWithSegments("/Activity") || currentPath.StartsWithSegments("/Chat"); 
+    bool isActivity = currentPath.StartsWithSegments("/Activity") || currentPath.StartsWithSegments("/Chat");
+    bool isAdmin = User.IsInRole("Admin") || User.IsInRole("Moderator") || User.IsInRole("User");
 }
 
-<nav class="navbar navbar-expand-md fixed-top border-bottom ketabi-glass p-0 ketabi-navbar" role="navigation">
-    <div class="container-fluid px-3 px-lg-5 h-100 d-flex align-items-center">
-        <!-- Brand -->
-        <a asp-controller="Home" asp-action="Index" class="navbar-brand d-flex align-items-center gap-2 me-4">
-            <div class="navbar-brand-icon d-flex align-items-center justify-content-center">
+<nav class="navbar navbar-expand-lg fixed-top border-bottom ketabi-glass p-0 ketabi-navbar" role="navigation">
+    <div class="container-fluid px-3 px-lg-4 px-xl-5 h-100 d-flex align-items-center justify-content-between">
+        
+        <!-- Left: Brand -->
+        <a asp-controller="Home" asp-action="Index" class="navbar-brand d-flex align-items-center gap-2 m-0 p-0 ketabi-brand-group">
+            <div class="ketabi-brand-icon d-flex align-items-center justify-content-center">
+                <!-- BookOpen Icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
             </div>
-            <span class="navbar-brand-text d-none d-sm-inline fw-bolder">ketabi</span>
+            <span class="d-none d-sm-block ketabi-brand-text">ketabi</span>
         </a>
 
-        <!-- Desktop Nav Links -->
-        <div class="collapse navbar-collapse d-none d-md-flex" id="ketabiNavbarDesktop">
-            <ul class="navbar-nav me-auto mb-2 mb-md-0 d-flex align-items-center gap-1">
-                <li class="nav-item">
-                    <a asp-controller="Home" asp-action="Index" class="nav-link nav-btn d-flex align-items-center gap-2 rounded-3 @(isExplorer ? "active" : "")">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                        <span class="nav-btn-text">Explore</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a asp-controller="Profile" asp-action="Index" class="nav-link nav-btn d-flex align-items-center gap-2 rounded-3 @(isLibrary ? "active" : "")">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg>
-                        <span class="nav-btn-text">My Library</span>
-                    </a>
-                </li>
-                
-                @if (Model?.IsAuthenticated == true)
-                {
-                    <li class="nav-item">
-                        <a asp-controller="Requests" asp-action="Index" class="nav-link nav-btn d-flex align-items-center gap-2 rounded-3 @(isRequests ? "active" : "")">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
-                            <span class="nav-btn-text">Requests</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a asp-controller="Activity" asp-action="Index" class="nav-link nav-btn d-flex align-items-center gap-2 rounded-3 @(isActivity ? "active" : "")">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>
-                            <span class="nav-btn-text">Activity</span>
-                        </a>
-                    </li>
-                }
-            </ul>
-        </div>
+        <!-- Center: Desktop Nav Links -->
+        <div class="d-none d-lg-flex align-items-center gap-1 mx-auto" id="ketabiNavbarDesktop">
+            <a asp-controller="Home" asp-action="Index" class="ketabi-nav-link @(isExplorer ? "active" : "")">
+                <!-- Search Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <span>Explore</span>
+                @if (isExplorer) { <span class="nav-indicator"></span> }
+            </a>
+            
+            <a asp-controller="Profile" asp-action="Index" class="ketabi-nav-link @(isLibrary ? "active" : "")">
+                <!-- Library Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg>
+                <span>My Library</span>
+                @if (isLibrary) { <span class="nav-indicator"></span> }
+            </a>
 
-        <!-- Right actions -->
-        <div class="d-flex align-items-center gap-2 gap-sm-3 ms-auto">
             @if (Model?.IsAuthenticated == true)
             {
-                <a asp-controller="Books" asp-action="Create" class="navbar-btn-primary d-none d-sm-inline-flex align-items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+                <a asp-controller="Requests" asp-action="Index" class="ketabi-nav-link position-relative @(isRequests ? "active" : "")">
+                    <!-- Inbox Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+                    <span>Requests</span>
+                    @if (isRequests) { <span class="nav-indicator"></span> }
+                </a>
+
+                <a asp-controller="Chat" asp-action="Index" class="ketabi-nav-link position-relative @(isActivity ? "active" : "")">
+                    <!-- Zap Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <span>Activity</span>
+                    @if (isActivity) { <span class="nav-indicator"></span> }
+                </a>
+            }
+        </div>
+
+        <!-- Right: Actions -->
+        <div class="d-flex align-items-center gap-2">
+            @if (!isExplorer)
+            {
+                <div class="d-none d-xl-flex position-relative me-2 ketabi-nav-search">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); color: var(--color-text-muted);"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    <form asp-controller="Home" asp-action="Index" method="get" class="m-0">
+                        <input type="text" name="q" class="form-control py-1" style="padding-left: 32px; border-radius: 12px; font-size: 0.85rem; width: 200px; background: rgba(0,0,0,0.03); border: 1px solid transparent; transition: all 0.2s;" placeholder="Search books..." onfocus="this.style.background='white'; this.style.borderColor='var(--color-indigo)';" onblur="this.style.background='rgba(0,0,0,0.03)'; this.style.borderColor='transparent';" />
+                    </form>
+                </div>
+            }
+            @if (Model?.IsAuthenticated == true)
+            {
+                <a asp-controller="Books" asp-action="Create" class="btn ketabi-btn-add d-none d-sm-flex align-items-center gap-2">
+                    <!-- Plus Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                     <span>Add Book</span>
                 </a>
 
-                <!-- Message / Chat Icon -->
-                <a asp-controller="Chat" asp-action="Index" class="text-decoration-none d-none d-sm-flex align-items-center justify-content-center nav-icon-btn" title="Messages">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <a asp-controller="Chat" asp-action="Index" class="ketabi-icon-action position-relative d-none d-sm-flex" title="Messages">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 </a>
 
-                <!-- Notification Bell -->
-                <button class="btn position-relative d-none d-sm-flex align-items-center justify-content-center p-0 border-0 nav-icon-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                <button class="ketabi-icon-action position-relative d-none d-sm-flex border-0 bg-transparent">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
                     @if (Model.UnreadNotifications > 0)
                     {
-                        <span class="position-absolute top-0 start-100 translate-middle p-1 rounded-circle navbar-notification-dot">
-                            <span class="visually-hidden">New alerts</span>
-                        </span>
+                        <span class="ketabi-notification-dot"></span>
                     }
                 </button>
 
-                <!-- Extremely Simplified Dropdown -->
-                <div class="dropdown">
-                    <button class="btn p-0 border-0 d-flex align-items-center dropdown-toggle-no-caret navbar-avatar-btn" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="~/uploads/users/@(string.IsNullOrEmpty(Model?.AvatarUrl) ? "profile-picture.png" : Model.AvatarUrl)" alt="Avatar" class="navbar-avatar" />
+                <!-- Avatar Dropdown -->
+                <div class="dropdown ketabi-avatar-dropdown ms-1">
+                    <button class="btn border-0 p-0 d-flex align-items-center gap-2 ketabi-avatar-trigger" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="0,8">
+                        <div class="position-relative">
+                            <img src="@(string.IsNullOrEmpty(Model.AvatarUrl) ? "/uploads/users/default-avatar.png" : $"/uploads/users/{Model.AvatarUrl}")" alt="Avatar" class="ketabi-avatar-img" />
+                            <span class="ketabi-online-dot"></span>
+                        </div>
+                        <span class="ketabi-avatar-name d-none d-sm-block text-truncate">@(Model.FullName?.Split(' ').FirstOrDefault() ?? "User")</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ketabi-avatar-chevron"><path d="m6 9 6 6 6-6"/></svg>
                     </button>
 
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2 navbar-dropdown-menu" aria-labelledby="profileDropdown">
-                        <li>
-                            <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2" asp-controller="Profile" asp-action="Index">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                <span class="navbar-dropdown-text">My Profile</span>
+                    <div class="dropdown-menu dropdown-menu-end ketabi-dropdown-menu" aria-labelledby="profileDropdown">
+                        <!-- Header -->
+                        <div class="ketabi-dropdown-header">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="position-relative">
+                                    <img src="@(string.IsNullOrEmpty(Model.AvatarUrl) ? "/uploads/users/default-avatar.png" : $"/uploads/users/{Model.AvatarUrl}")" alt="Avatar" class="ketabi-dropdown-avatar" />
+                                    <span class="ketabi-dropdown-online-dot"></span>
+                                </div>
+                                <div class="flex-grow-1 overflow-hidden">
+                                    <h6 class="mb-0 text-truncate fw-bold">@Model.FullName</h6>
+                                    <!-- Reputation -->
+                                    <div class="d-flex align-items-center gap-1 mt-1">
+                                        <div class="d-flex align-items-center gap-0">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                var isFilled = i <= Math.Round((double)(Model.ReputationScore > 0 ? Model.ReputationScore : 0));
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="@(isFilled ? "#F59E0B" : "none")" stroke="@(isFilled ? "#F59E0B" : "#E5E7EB")" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                            }
+                                        </div>
+                                        <span class="ketabi-reputation-text">@(Model.ReputationScore > 0 ? Model.ReputationScore.ToString("0.0") : "New")</span>
+                                        <span class="ketabi-review-count">· @Model.ReviewCount reviews</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Menu Items -->
+                        <div class="py-1">
+                            <a class="dropdown-item ketabi-dropdown-item group" asp-controller="Profile" asp-action="Index">
+                                <div class="ketabi-dropdown-icon-wrapper">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                </div>
+                                <div>
+                                    <p class="mb-0 fw-semibold">My Profile</p>
+                                    <p class="mb-0 ketabi-dropdown-sub">View your page</p>
+                                </div>
                             </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2" asp-controller="Profile" asp-action="Index">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted"><path d="M10 2v8l3-3 3 3V2"/><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg>
-                                <span class="navbar-dropdown-text">My Library</span>
+                            <a class="dropdown-item ketabi-dropdown-item group" asp-controller="Profile" asp-action="Index">
+                                <div class="ketabi-dropdown-icon-wrapper">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                                </div>
+                                <div>
+                                    <p class="mb-0 fw-semibold">My Library</p>
+                                    <p class="mb-0 ketabi-dropdown-sub">Your listed books</p>
+                                </div>
                             </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2" asp-controller="Settings" asp-action="Index">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-                                <span class="navbar-dropdown-text">Settings</span>
+                            <a class="dropdown-item ketabi-dropdown-item group" asp-controller="Settings" asp-action="Index">
+                                <div class="ketabi-dropdown-icon-wrapper">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </div>
+                                <div>
+                                    <p class="mb-0 fw-semibold">Settings</p>
+                                    <p class="mb-0 ketabi-dropdown-sub">Preferences</p>
+                                </div>
                             </a>
-                        </li>
-                        <li><hr class="dropdown-divider mx-3 my-1" /></li>
-                        <li>
-                            <form asp-controller="Account" asp-action="Logout" method="post" class="m-0 p-0 w-100">
-                                <button type="submit" class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 text-danger bg-transparent w-100 border-0">
+                        </div>
+
+                        <!-- Stats Bar -->
+                        <div class="ketabi-dropdown-stats">
+                            <div class="text-center">
+                                <p class="ketabi-stat-val">-</p>
+                                <p class="ketabi-stat-lbl">Books</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="ketabi-stat-val">@Model.CompletedTransactions</p>
+                                <p class="ketabi-stat-lbl">Trades</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="ketabi-stat-val">@Model.ReviewCount</p>
+                                <p class="ketabi-stat-lbl">Reviews</p>
+                            </div>
+                        </div>
+
+                        <div class="px-3"><hr class="dropdown-divider my-2" /></div>
+
+                        @if (isAdmin)
+                        {
+                            <a class="dropdown-item ketabi-dropdown-item ketabi-admin-item group" asp-controller="Admin" asp-action="Index">
+                                <div class="ketabi-dropdown-icon-wrapper admin-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                </div>
+                                <div>
+                                    <p class="mb-0 fw-semibold">Admin Console</p>
+                                    <p class="mb-0 ketabi-dropdown-sub">Manage platform</p>
+                                </div>
+                            </a>
+                            <div class="px-3"><hr class="dropdown-divider my-2" /></div>
+                        }
+
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0 p-0 w-100 mb-1">
+                            <button type="submit" class="dropdown-item ketabi-dropdown-item ketabi-logout-item group">
+                                <div class="ketabi-dropdown-icon-wrapper logout-icon">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
-                                    <span class="navbar-dropdown-text text-danger">Logout</span>
-                                </button>
-                            </form>
-                        </li>
-                    </ul>
+                                </div>
+                                <div>
+                                    <p class="mb-0 fw-semibold">Sign Out</p>
+                                    <p class="mb-0 ketabi-dropdown-sub">End your session</p>
+                                </div>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             }
             else
             {
-                <a asp-controller="Account" asp-action="Login" class="navbar-login-btn">
+                <a asp-controller="Account" asp-action="Login" class="btn ketabi-btn-signin">
                     Sign in
                 </a>
             }
 
-            <!-- Mobile Toggler -->
-            <button class="navbar-toggler border-0 p-1 ms-1 d-md-none navbar-toggler-btn" type="button" data-bs-toggle="collapse" data-bs-target="#ketabiMobileNav" aria-controls="ketabiMobileNav" aria-expanded="false" aria-label="Toggle navigation">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="navbar-toggler-icon-svg"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+            <!-- Mobile Hamburger -->
+            <button class="navbar-toggler border-0 p-2 ms-1 d-lg-none ketabi-mobile-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#ketabiMobileNav" aria-controls="ketabiMobileNav" aria-expanded="false" aria-label="Toggle navigation">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="menu-icon"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
             </button>
         </div>
     </div>
 
-    
+    <!-- Mobile Navigation Drawer is intentionally placed outside the main navbar to allow full-viewport positioning. -->
+
 </nav>
 
+<!-- Mobile drawer markup placed after nav so it can be fixed to viewport -->
+<!-- keep Bootstrap collapse behavior by keeping the collapse class; menu is fixed to viewport when shown -->
+<div class="collapse ketabi-mobile-menu" id="ketabiMobileNav">
+    <div class="p-3 d-flex flex-column gap-2">
+        <a asp-controller="Home" asp-action="Index" class="ketabi-mobile-link @(isExplorer ? "active" : "")">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <span>Explore</span>
+        </a>
+        <a asp-controller="Profile" asp-action="Index" class="ketabi-mobile-link @(isLibrary ? "active" : "")">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg>
+            <span>My Library</span>
+        </a>
+        @if (Model?.IsAuthenticated == true)
+        {
+            <a asp-controller="Requests" asp-action="Index" class="ketabi-mobile-link @(isRequests ? "active" : "")">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+                <span>Requests</span>
+            </a>
+            <a asp-controller="Chat" asp-action="Index" class="ketabi-mobile-link @(isActivity ? "active" : "")">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span>Activity</span>
+            </a>
+            @if (isAdmin)
+            {
+                <a asp-controller="Admin" asp-action="Index" class="ketabi-mobile-link text-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span>Admin Console</span>
+                </a>
+            }
+
+            <a asp-controller="Books" asp-action="Create" class="btn ketabi-btn-add w-100 mt-2 d-flex align-items-center justify-content-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                <span>Add Book</span>
+            </a>
+        }
+    </div>
+</div>
+
 <style>
-    /* Lightweight Scoped Navbar Overrides */
-    
+    /* Scoped Navbar CSS directly based on Layout.tsx */
     .ketabi-navbar {
-        height: var(--navbar-height);
-        z-index: var(--z-navbar);
+        height: 64px; /* h-16 */
+        z-index: 50;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+        border-bottom: none !important;
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
-    
-    .ketabi-glass {
-        background: rgba(255, 255, 255, 0.90);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+
+    .ketabi-brand-group {
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
     }
-    
-    .navbar-brand-icon {
+    .ketabi-brand-group:hover {
+        transform: scale(1.05);
+    }
+    .ketabi-brand-icon {
         width: 32px;
         height: 32px;
-        border-radius: var(--radius-md);
-        background: linear-gradient(135deg, var(--color-indigo), var(--color-indigo-dark));
+        border-radius: 8px;
+        background: linear-gradient(135deg, #5B5BD6, #4747C2);
     }
-    
-    .navbar-brand-text {
+    .ketabi-brand-text {
         font-size: 1.1rem;
-        color: var(--color-text);
-        letter-spacing: var(--tracking-tight);
+        font-weight: 800;
+        color: var(--color-text, #0C0C14);
+        letter-spacing: -0.02em;
     }
-    
-    .nav-btn {
-        color: var(--color-text-muted);
-        transition: background-color var(--duration-normal), color var(--duration-normal);
-        padding: 0.5rem 1rem;
-    }
-    
-    .nav-btn-text {
-        font-size: var(--text-sm-nav);
-        font-weight: var(--weight-medium);
-    }
-    
-    .nav-btn:hover {
-        background-color: var(--color-surface-muted);
-        color: var(--color-text);
-    }
-    
-    .nav-btn.active {
-        background-color: var(--color-indigo-light);
-        color: var(--color-indigo);
-    }
-    
-    .nav-btn.active .nav-btn-text {
-        font-weight: var(--weight-bold);
-    }
-    
-    .navbar-btn-primary {
-        /* ??????? ?????? */
-        background-color: var(--color-indigo);
-        color: #ffffff !important; /* ???? ????? ?????? ?????? */
-        /* ??????? ??????? */
-        padding: 8px 20px;
-        border-radius: var(--radius-xl);
-        font-size: var(--text-sm-nav);
-        font-weight: var(--weight-semibold);
-        text-decoration: none;
-        border: none;
-        /* ???????? */
-        display: inline-flex;
+
+    .ketabi-nav-link {
+        position: relative;
+        display: flex;
         align-items: center;
-        justify-content: center;
-        /* ??????? ????????? */
-        transition: all var(--duration-fast) var(--ease-default);
-        cursor: pointer;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 12px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        color: var(--color-text-muted, #6B7080);
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-decoration: none;
+        background: transparent;
+    }
+    .ketabi-nav-link:hover:not(.active) {
+        background: rgba(0,0,0,0.04);
+        color: var(--color-text-muted, #6B7080);
+    }
+    .ketabi-nav-link .nav-icon {
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .ketabi-nav-link:hover .nav-icon {
+        transform: scale(1.1);
+    }
+    .ketabi-nav-link.active {
+        color: var(--color-indigo, #5B5BD6);
+        background: var(--color-indigo-light, #EEEEFF);
+        font-weight: 700;
+    }
+    .ketabi-nav-link.active .nav-icon {
+        color: var(--color-indigo, #5B5BD6);
+    }
+    .nav-indicator {
+        position: absolute;
+        bottom: 0;
+        left: 12px;
+        right: 12px;
+        height: 2px;
+        border-radius: 9999px;
+        background: var(--color-indigo, #5B5BD6);
     }
 
-        .navbar-btn-primary:hover {
-            /* ??? ??????????? ?????? ??? ???? ?????? ????? ???? ????? */
-            background-color: var(--color-indigo-dark);
-            color: #ffffff !important;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25); /* ?? ???? ???????? */
-        }
+    .ketabi-btn-add {
+        background: linear-gradient(135deg, #5B5BD6, #4747C2);
+        font-size: 0.84rem;
+        font-weight: 700;
+        padding: 8px 16px;
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 12px rgba(91,91,214,0.3);
+        transition: all 0.15s ease-in-out;
+        color: white;
+    }
+    .ketabi-btn-add:hover {
+        opacity: 0.9;
+        @* transform: translateY(-1px); *@
+        color: white;
+    }
+    .ketabi-btn-signin {
+        background: var(--color-indigo, #5B5BD6);
+        font-size: 0.875rem;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 12px;
+        border: none;
+        color: white;
+    }
+    .ketabi-btn-signin:hover {
+        opacity: 0.9;
+        color: white;
+    }
 
-        .navbar-btn-primary:active {
-            transform: translateY(0);
-        }
-    
-    .nav-icon-btn {
+    .ketabi-icon-action {
         width: 36px;
         height: 36px;
-        border-radius: var(--radius-lg);
-        color: var(--color-text-muted);
-        transition: background-color var(--duration-normal), color var(--duration-normal);
-    }
-    
-    .nav-icon-btn:hover {
-        background-color: var(--color-surface-muted);
-        color: var(--color-text);
-    }
-    
-    .navbar-notification-dot {
-        background-color: var(--color-error);
-        margin-top: 8px;
-        margin-left: -8px;
-        width: 8px;
-        height: 8px;
-    }
-    
-    .navbar-avatar-btn {
-        border-radius: var(--radius-md);
-    }
-    
-    .navbar-avatar {
-        width: 32px;
-        height: 32px;
-        object-fit: cover;
-        border-radius: var(--radius-md);
-    }
-    
-    .navbar-dropdown-menu {
-        border-radius: var(--radius-xl);
-        min-width: 180px;
-    }
-    
-    .navbar-dropdown-text {
-        font-size: var(--text-sm-nav);
-        font-weight: var(--weight-medium);
-        color: var(--color-text);
-    }
-    
-    .dropdown-divider {
-        border-color: var(--border);
-    }
-    
-    .dropdown-toggle-no-caret::after {
-        display: none !important;
-    }
-    
-/* ??????? ?????? ??? Dropdown Items */
-    .dropdown-item {
-        margin: 4px 8px; /* ?????? ????? ??????? ??????? */
-        width: calc(100% - 16px);
-        border-radius: var(--radius-md);
-        transition: all var(--duration-fast) var(--ease-default);
-        color: var(--color-text);
-    }
-    
-    .dropdown-item:hover {
-        background-color: var(--color-indigo-light); /* ????? ?????? ????? ???? */
-        color: var(--color-indigo) !important; /* ????? ??? ???? */
-        padding-left: 1.25rem !important; /* ????? ????? ?????? ???? ??? "????" */
-    }
-
-    /* ????? ??? ???????? ????? ??? ?????? */
-    .dropdown-item:hover svg {
-        color: var(--color-indigo) !important;
-        transform: scale(1.1);
-        transition: all var(--duration-fast);
-    }
-
-    /* ????? ??? ??? ????? ?????? */
-    .dropdown-item.text-danger:hover {
-        background-color: #FFF5F5; /* ????? ????? ????? ???? */
-        color: #E53E3E !important;
-        padding-left: 1.25rem !important;
-    }
-
-    .dropdown-item.text-danger:hover svg {
-        color: #E53E3E !important;
-    }
-    
-    .navbar-login-btn {
-        background-color: var(--color-indigo);
-        color: #ffffff !important; 
-        font-size: var(--text-base);
-        font-weight: var(--weight-semibold);
-        border-radius: var(--radius-xl);
-        padding: 8px 24px;
-        text-decoration: none;
-
-        display: inline-flex;
+        border-radius: 12px;
+        display: flex;
         align-items: center;
         justify-content: center;
-
-        transition: all var(--duration-fast) var(--ease-default);
-        border: none;
-        cursor: pointer;
+        color: var(--color-text-muted, #6B7080);
+        transition: background-color 0.2s, color 0.2s;
+        text-decoration: none;
+    }
+    .ketabi-icon-action:hover {
+        background-color: #F5F5F5;
+        color: var(--color-text, #0C0C14);
+    }
+    .ketabi-notification-dot {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #EF4444;
     }
 
-    .navbar-login-btn:hover {
-        background-color: var(--color-indigo-dark); 
-        color: #ffffff !important;
-        transform: translateY(-1px); 
-        box-shadow: var(--shadow-btn-hover); 
+    .ketabi-avatar-trigger {
+        padding: 6px 10px 6px 6px;
+        border-radius: 12px;
+        transition: background-color 0.2s;
+        background: transparent;
+    }
+    .ketabi-avatar-trigger:hover, .ketabi-avatar-dropdown.show .ketabi-avatar-trigger {
+        background-color: #F5F5F5;
+    }
+    .ketabi-avatar-img {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        object-fit: cover;
+        box-shadow: 0 0 0 2px var(--color-indigo, #5B5BD6);
+    }
+    .ketabi-online-dot {
+        position: absolute;
+        bottom: -2px;
+        right: -2px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #22C55E;
+        border: 2px solid white;
+    }
+    .ketabi-avatar-name {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--color-text, #0C0C14);
+        max-width: 72px;
+    }
+    .ketabi-avatar-chevron {
+        color: var(--color-text-muted, #6B7080);
+        transition: transform 0.2s;
+    }
+    .ketabi-avatar-dropdown.show .ketabi-avatar-chevron {
+        transform: rotate(180deg);
     }
 
-    .navbar-login-btn:active {
-        transform: translateY(0);
+    /* Dropdown Menu */
+    .ketabi-dropdown-menu {
+        width: 256px;
+        border-radius: 24px;
+        padding: 0;
+        overflow: hidden;
+        border: 1px solid var(--bs-border-color, rgba(0,0,0,0.08));
+        box-shadow: var(--shadow-float, 0 12px 48px rgba(0,0,0,0.14));
+        margin-top: 8px !important;
+        animation: dropFadeIn 0.15s ease-out;
+        transform-origin: top right;
     }
-    
-    .navbar-toggler-icon-svg {
-        color: var(--color-text);
+    @@keyframes dropFadeIn {
+        from { opacity: 0; transform: scale(0.95) translateY(-6px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
     }
-    
-    .navbar-mobile-menu {
-        border-bottom: 1px solid var(--border);
+    .ketabi-dropdown-header {
+        padding: 16px;
+        background: linear-gradient(135deg, #EEEEFF 0%, #F5F5FF 100%);
+        border-bottom: 1px solid var(--bs-border-color, rgba(0,0,0,0.08));
     }
-    
-    .mobile-nav-btn {
-        color: var(--color-text);
-        font-weight: var(--weight-medium);
-        transition: background-color var(--duration-normal), color var(--duration-normal);
+    .ketabi-dropdown-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        object-fit: cover;
+        box-shadow: 0 2px 8px rgba(91,91,214,0.2);
+        border: 2px solid white;
     }
-    
-    .mobile-nav-btn.active {
-        color: var(--color-indigo);
-        font-weight: var(--weight-bold);
+    .ketabi-dropdown-online-dot {
+        position: absolute;
+        bottom: -2px;
+        right: -2px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #22C55E;
+        border: 2px solid white;
+    }
+    .ketabi-reputation-text {
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: #F59E0B;
+    }
+    .ketabi-review-count {
+        font-size: 0.65rem;
+        color: var(--color-text-muted, #6B7080);
+    }
+
+    .ketabi-dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        transition: background-color 0.2s;
+        text-decoration: none;
+        color: var(--color-text, #0C0C14);
+    }
+    .ketabi-dropdown-item:hover, .ketabi-dropdown-item:focus {
+        background-color: #F9F9FC;
+        color: var(--color-text, #0C0C14);
+    }
+    .ketabi-dropdown-icon-wrapper {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--color-indigo-light, #EEEEFF);
+        color: var(--color-indigo, #5B5BD6);
+        flex-shrink: 0;
+    }
+    .ketabi-dropdown-sub {
+        font-size: 0.68rem;
+        color: var(--color-text-muted, #6B7080);
+    }
+    .ketabi-dropdown-item p.fw-semibold {
+        font-size: 0.82rem;
+    }
+    /* Stats Bar */
+    .ketabi-dropdown-stats {
+        margin: 0 12px 8px;
+        padding: 10px;
+        border-radius: 12px;
+        background: #F5F5F8;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+    .ketabi-stat-val {
+        margin: 0;
+        font-weight: 800;
+        font-size: 0.9rem;
+        color: var(--color-indigo, #5B5BD6);
+        line-height: 1;
+    }
+    .ketabi-stat-lbl {
+        margin: 4px 0 0;
+        font-size: 0.62rem;
+        font-weight: 500;
+        color: var(--color-text-muted, #6B7080);
+    }
+
+    /* Admin / Logout colors */
+    .ketabi-admin-item { color: #10B981; }
+    .ketabi-admin-item:hover { background-color: #F0FDF4; color: #10B981; }
+    .ketabi-admin-item .admin-icon { background: #D1FAE5; color: #10B981; }
+
+    .ketabi-logout-item { color: #EF4444; }
+    .ketabi-logout-item:hover { background-color: #FFF5F5; color: #EF4444; }
+    .ketabi-logout-item .logout-icon { background: #FFF1F2; color: #EF4444; }
+
+    /* ==========================================
+       Mobile Styles (Screens smaller than 992px)
+       ========================================== */
+
+    @@media (max-width: 991.98px) {
+        .ketabi-mobile-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: #F8F9FA;
+            color: var(--color-text, #0C0C14);
+        }
+
+        /* Floating mobile menu: fixed to viewport with side margins */
+        .ketabi-mobile-menu {
+            position: fixed !important;
+            top: calc(var(--navbar-height, 64px) + 8px) !important; /* drop below the navbar */
+            left: 15px !important;
+            right: 15px !important;
+            width: auto !important; /* allow left/right to define size */
+            max-width: calc(100% - 30px) !important;
+            background: var(--color-surface, rgba(255,255,255,0.98));
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid var(--bs-border-color, rgba(0,0,0,0.08));
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            border-radius: var(--radius-xl, 18px);
+            padding: 10px;
+            z-index: 2000 !important; /* ensure sits above content but below modals */
+            display: none; /* hidden until collapse adds .show */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* When Bootstrap collapse toggles the menu, .show should make it visible */
+        .ketabi-mobile-menu.collapse.show {
+            display: block !important;
+        }
+
+        /* Content inside the mobile menu */
+        .ketabi-mobile-menu .ketabi-mobile-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            color: var(--color-text, #0C0C14);
+            font-size: 0.95rem;
+            text-decoration: none;
+            margin-bottom: 6px;
+            transition: background-color 0.15s ease;
+        }
+
+        .ketabi-mobile-menu .ketabi-mobile-link:hover {
+            background-color: rgba(0,0,0,0.04);
+        }
+
+        .ketabi-mobile-menu .ketabi-mobile-link.active {
+            background-color: var(--color-indigo-light, #EEEEFF) !important;
+            color: var(--color-indigo, #5B5BD6) !important;
+            font-weight: 700;
+        }
+    }
+
+    /* Desktop: hide floating mobile menu (the original collapse behavior remains inside navbar) */
+    @@media (min-width: 992px) {
+        .ketabi-mobile-menu { display: none !important; }
     }
 </style>
