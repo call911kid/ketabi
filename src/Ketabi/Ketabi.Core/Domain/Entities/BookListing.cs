@@ -19,6 +19,7 @@ public sealed class BookListing : BaseEntity
 
     public ListingCondition Condition { get; set; }
     public SharingMode SharingMode { get; set; }
+    public ListingStatus? ListingStatus { get; set; } // nullable bc database has old data
     public bool IsAvailable { get; set; } = true;
     public string? ImageUrl { get; set; }
     public string? LocationNote { get; set; }
