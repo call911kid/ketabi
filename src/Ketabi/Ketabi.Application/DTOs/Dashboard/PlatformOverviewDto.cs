@@ -9,18 +9,18 @@ namespace Ketabi.Application.DTOs.Dashboard
 {
     public class PlatformOverviewDto
     {
-        public int NumberOfUsers { get; init; }
-        public int NumberOfListings { get; init; }
-        public int NumberOfTrades { get; init; }
-        public int NumberOfActiveTrades { get; init; }
-        public int NumberOfPendingListings { get; init; }
+        public int NumberOfUsers { get; set; }
+        public int NumberOfListings { get; set; }
+        public int NumberOfTrades { get; set; }
+        public int NumberOfActiveTrades { get; set; }
+        public int NumberOfPendingListings { get; set; }
 
 
-        public int NumberOfUserThisMonth { get; init; }
-        public int NumberOfTradesThisWeek { get; init; }
+        public int NumberOfUserThisMonth { get; set; }
+        public int NumberOfTradesThisWeek { get; set; }
 
-        public IEnumerable<UserGrowthDto> UserGrowth { get; init; }
-        public IEnumerable<CategoryDistributionDto> CategoryDistribution { get; init; }
+        public IEnumerable<UserGrowthDto> UserGrowth { get; set; }
+        public IEnumerable<CategoryDistributionDto> CategoryDistribution { get; set; }
 
         public PlatformOverviewDto()
         {
