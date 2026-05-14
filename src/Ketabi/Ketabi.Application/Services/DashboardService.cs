@@ -6,14 +6,16 @@ using System.Threading.Tasks;
 using Ketabi.Application.Common;
 using Ketabi.Application.DTOs.Common;
 using Ketabi.Application.DTOs.Dashboard;
+using Ketabi.Application.DTOs.Requests;
 using Ketabi.Application.DTOs.Users;
 using Ketabi.Application.Interfaces;
+using Ketabi.Core.Domain.Entities;
 using Ketabi.Core.Domain.Enums;
 using Ketabi.Core.Interfaces;
 
 namespace Ketabi.Application.Services
 {
-    internal class DashboardService:IDashboardService
+    internal class DashboardService : IDashboardService
     {
         private readonly IUnitOfWork _unitOfWork;
         public DashboardService(IUnitOfWork unitOfWork)
@@ -76,6 +78,45 @@ namespace Ketabi.Application.Services
                     Page = pagedUsers.PageNumber,
                     PageSize = pagedUsers.PageSize
                 }
+            };
+        }
+
+        public async Task<RequestsOverviewDto> GetRequestsOverviewAsync(PagedRequestDto pagination)
+        {
+            var pagedRequests=await _unitOfWork.Requests.GetPagedAsync(pagination.Page, pagination.PageSize);
+
+            var requests = pagedRequests.Items.Select(r => new RequestSummaryDto
+            {
+                RequestId = r.Id,
+                Type = r.Type,
+                Status = r.Status,
+                RequestDate = r.RequestDate,
+
+                ListingId = r.ListingId,
+                ListingTitle = r.Listing.Title,
+                ListingAuthor = r.Listing.Author,
+                ListingImageUrl = r.Listing.ImageUrl,
+
+                RequesterId = r.SenderId,
+                RequesterFullName = r.Sender.FirstName + ' ' + r.Sender.LastName,
+                RequsterEmail = r.Sender.Email,
+
+
+                OwnerId = r.Receiver.Id,
+                OwnerFullName = r.Receiver.FirstName + ' ' + r.Receiver.LastName,
+                OwnerEmail = r.Receiver.Email
+
+            });
+
+            return new RequestsOverviewDto
+            {
+                NumberOfPendingRequests = await _unitOfWork.Requests.CountAsync(r => r.Status == RequestStatus.Pending),
+                NumberOfApprovedRequests = await _unitOfWork.Requests.CountAsync(r => r.Status == RequestStatus.Approved),
+                NumberOfCompletedRequest = await _unitOfWork.Requests.CountAsync(r => r.Status == RequestStatus.Completed),
+                NumberOfRejectedRequests = await _unitOfWork.Requests.CountAsync(r => r.Status == RequestStatus.Rejected),
+
+                Requests=requests
+                
             };
         }
 
