@@ -11,7 +11,7 @@ namespace Ketabi.Application.Interfaces
     public interface IDashboardService
     {
         Task<PlatformOverviewDto> GetPlatformOverviewAsync();
-        Task<UserOverviewDto> GetUserOverviewAsync(PagedRequestDto pagination);
+        Task<UserOverviewDto> GetUserOverviewAsync(PagedRequestDto pagination, string? search = null);
 
     }
 }

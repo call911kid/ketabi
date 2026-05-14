@@ -46,7 +46,7 @@
             <div><i class="bi bi-grid-1x2"></i> Overview</div>
         </a>
         
-        <a href="#" class="admin-nav-item @(activePage == "UserManagement" ? "active" : "")">
+        <a asp-controller="UserManagement" asp-action="Index" class="admin-nav-item @(activePage == "UserManagement" ? "active" : "")">
             <div><i class="bi bi-people"></i> User Management</div>
         </a>
         

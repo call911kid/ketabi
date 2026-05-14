@@ -1,0 +1,144 @@
+﻿@model Ketabi.Application.DTOs.Dashboard.UserOverviewDto
+@{
+    Layout = "_AdminLayout";
+    ViewData["ActiveAdminPage"] = "UserManagement";
+    ViewData["AdminBreadcrumbTitle"] = "User Management";
+    var search = ViewData["Search"]?.ToString();
+}
+
+<style>
+    /* Header buttons */
+    .btn-dark { background: #111827; border: none; border-radius: 10px; padding: 8px 20px; font-size: 14px; font-weight: 600; }
+    .btn-outline-secondary { border-radius: 10px; padding: 8px 20px; font-size: 14px; font-weight: 500; color: #374151; border-color: #e5e7eb; }
+
+    /* Search bar */
+    .input-group .input-group-text { border-radius: 10px 0 0 10px; border-color: #e5e7eb; }
+    .input-group .form-control { border-radius: 0 10px 10px 0; border-color: #e5e7eb; font-size: 14px; padding: 10px 16px; }
+    .input-group .form-control:focus { box-shadow: none; border-color: #6366f1; }
+    .btn-primary { border-radius: 10px; padding: 10px 22px; font-size: 14px; font-weight: 600; }
+
+    /* Table wrapper */
+    .table { background: #fff; border-radius: 16px; overflow: hidden; }
+
+    /* Table head */
+    .table thead th { font-size: 11px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: .06em; border-bottom: 1.5px solid #f3f4f6; padding: 12px 16px; background: #fff; }
+
+    /* Table rows */
+    .table tbody tr { border-bottom: 1px solid #f3f4f6; }
+    /* .table tbody tr:last-child { border-bottom: none; } */
+    .table tbody td { padding: 14px 16px; font-size: 14px; color: #111827; }
+
+    /* Avatar */
+    .rounded-circle { flex-shrink: 0; }
+
+    /* Status badge */
+    .status-active    { background: #dcfce7; color: #16a34a; border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 500; display: inline-block; }
+    .status-suspended { background: #fef9c3; color: #b45309; border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 500; display: inline-block; }
+    .status-banned    { background: #fee2e2; color: #dc2626; border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 500; display: inline-block; }
+
+    /* Actions button */
+    .btn-sm.btn-light { border: 1.5px solid #e5e7eb; border-radius: 8px; background: #fff; padding: 4px 8px; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <div>
+        <h2 class="fw-bold mb-0">User Management</h2>
+        <p class="text-muted">@Model.NumberOfUsers active members across the platform.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-dark">All Users</button>
+        <button class="btn btn-outline-secondary">Archived <span class="badge bg-danger">1</span></button>
+    </div>
+</div>
+
+<!-- Search + Filter bar -->
+<form method="get" asp-action="Index" class="d-flex gap-2 mb-4">
+    <div class="input-group">
+        <span class="input-group-text bg-white border-end-0">
+            <i class="bi bi-search text-muted"></i>
+        </span>
+        <input type="text"
+               name="search"
+               value="@search"
+               class="form-control border-start-0"
+               placeholder="Search by name or email..." />
+    </div>
+    @* <button type="submit" class="btn btn-primary">Search</button> *@
+</form>
+
+<!-- Users Table -->
+<table class="table align-middle">
+    <thead>
+        <tr>
+            <th>User</th><th>Status</th>
+            <th>Books</th><th>Trades</th><th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model.Users.Items)
+        {
+            <tr>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                             style="width:38px;height:38px;font-size:13px;font-weight:600;">
+                            @(user.FullName.Length >= 2
+                                ? $"{user.FullName[0]}{user.FullName.Split(' ').Last()[0]}"
+                                : user.FullName.Substring(0, 1))
+                        </div>
+                        <div>
+                            <div class="fw-semibold">@user.FullName</div>
+                            <small class="text-muted">@user.UserName</small>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="status-active">Active</span>
+                </td>
+                <td>@user.ListingCount</td>
+                <td>@user.TradesCount</td>
+                <td>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">View Profile</a></li>
+                            <li><a class="dropdown-item text-warning" href="#">Suspend</a></li>
+                            <li><a class="dropdown-item text-danger" href="#">Ban</a></li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        const searchInput = document.querySelector('input[name="search"]');
+        const form = searchInput.closest('form');
+        let debounceTimer;
+
+        searchInput.addEventListener('input', function () {
+    clearTimeout(debounceTimer);
+
+    if (this.value.length === 1) return;
+
+    debounceTimer = setTimeout(() => {
+        form.submit();
+    }, 800);
+});
+
+        // Submit on Enter immediately without waiting for debounce
+        searchInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                clearTimeout(debounceTimer);
+                form.submit();
+            }
+        });
+
+        // Restore opacity on page load (in case browser cached it)
+        searchInput.style.opacity = '1';
+    </script>
+}

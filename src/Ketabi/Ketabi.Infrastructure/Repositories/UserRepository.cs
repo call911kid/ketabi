@@ -1,4 +1,5 @@
 ﻿using Ketabi.Core.Domain.Entities;
+using Ketabi.Core.Domain.Models;
 using Ketabi.Core.Interfaces.Repositories;
 using Ketabi.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +45,25 @@ namespace Ketabi.Infrastructure.Repositories
             {
                 throw new KeyNotFoundException($"User with ID {userId} not found.");
             }
+        }
+        public async Task<PagedResult<User>> GetPagedAsync(int pageNumber, int pageSize, string? search = null)
+        {
+            var query = _dbSet.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(u => u.Email.Contains(search)
+                                      || u.FirstName.Contains(search)
+                                      || u.LastName.Contains(search));
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<User>(items, totalCount, pageNumber, pageSize);
         }
     }
 }

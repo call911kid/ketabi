@@ -44,10 +44,10 @@ namespace Ketabi.Application.Services
             return pOverview;
         }
 
-        public async Task<UserOverviewDto> GetUserOverviewAsync(PagedRequestDto pagination)
+        public async Task<UserOverviewDto> GetUserOverviewAsync(PagedRequestDto pagination, string? search = null)
         {
             //n+1 :(
-            var pagedUsers = await _unitOfWork.Users.GetPagedAsync(pagination.Page, pagination.PageSize);
+            var pagedUsers = await _unitOfWork.Users.GetPagedAsync(pagination.Page, pagination.PageSize, search);
             var users = new List<UserSummaryDto>();
 
             foreach (var user in pagedUsers.Items)
