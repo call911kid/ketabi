@@ -1,20 +1,31 @@
+@using Ketabi.Application.Interfaces
+@using System.Security.Claims
+@inject IUserService UserService
 @{
     var activePage = ViewData["ActiveAdminPage"]?.ToString() ?? "";
-    var userName = User.Identity?.Name ?? "Admin User";
+    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    
+    string userName = "Admin User";
+    string avatarUrl = "";
+    
+    if (Guid.TryParse(userIdClaim, out var userId))
+    {
+        var userSummary = await UserService.GetUserByIdAsync(userId);
+        if (userSummary != null)
+        {
+            userName = string.IsNullOrWhiteSpace(userSummary.FullName) ? userSummary.UserName : userSummary.FullName;
+            avatarUrl = userSummary.AvatarUrl;
+        }
+    }
+
     var nameParts = userName.Split(new[] { ' ', '.', '@' }, StringSplitOptions.RemoveEmptyEntries);
     var initials = "AU";
     if (nameParts.Length >= 2)
-    {
         initials = $"{nameParts[0][0]}{nameParts[1][0]}".ToUpper();
-    }
     else if (nameParts.Length == 1 && nameParts[0].Length >= 2)
-    {
         initials = nameParts[0].Substring(0, 2).ToUpper();
-    }
     else if (nameParts.Length == 1)
-    {
         initials = nameParts[0].ToUpper();
-    }
 }
 
 <aside class="admin-sidebar">
@@ -68,7 +79,14 @@
 
     <div class="admin-sidebar-footer">
         <div class="admin-user-profile">
-            <div class="admin-user-avatar">@initials</div>
+            @if (!string.IsNullOrEmpty(avatarUrl))
+            {
+                <img src="/uploads/users/@avatarUrl" alt="@userName" class="admin-user-avatar" style="object-fit:cover;border-radius:50%;" />
+            }
+            else
+            {
+                <div class="admin-user-avatar">@initials</div>
+            }
             <div class="admin-user-info">
                 <h4>@userName</h4>
                 <span>Super Admin</span>

@@ -20,7 +20,9 @@
     height: 100vh;
     position: sticky;
     top: 0;
+    overflow-x: hidden;
 }
+
 
 .admin-sidebar-header {
     padding: 24px;
@@ -29,6 +31,8 @@
     gap: 12px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
+
+
 
 .admin-sidebar-logo-icon {
     width: 32px;
@@ -59,10 +63,18 @@
 }
 
 .admin-sidebar-nav {
-    padding: 24px 16px;
+    padding: 24px 12px;
     flex-grow: 1;
     overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
 }
+
+
+.admin-sidebar-nav::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
 
 .admin-sidebar-nav-title {
     font-size: 0.7rem;
@@ -128,12 +140,17 @@
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+
+
 .admin-user-profile {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 16px;
+    width: 100%;
+    overflow: hidden;
 }
+
 
 .admin-user-avatar {
     width: 36px;
@@ -148,17 +165,30 @@
     font-size: 0.9rem;
 }
 
+.admin-user-info {
+    min-width: 0;
+    flex: 1;
+}
+
 .admin-user-info h4 {
     color: white;
     font-size: 0.9rem;
     margin: 0;
     font-weight: var(--weight-semibold);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .admin-user-info span {
     color: #64748B;
     font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
 }
+
 
 .admin-back-link {
     display: flex;

@@ -1,4 +1,4 @@
-﻿using Ketabi.Web.ViewModels.Shared;
+using Ketabi.Web.ViewModels.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;

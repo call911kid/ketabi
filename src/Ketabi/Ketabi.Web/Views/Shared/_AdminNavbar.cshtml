@@ -1,20 +1,31 @@
+@using Ketabi.Application.Interfaces
+@using System.Security.Claims
+@inject IUserService UserService
 @{
     var breadcrumbTitle = ViewData["AdminBreadcrumbTitle"]?.ToString() ?? "Dashboard";
-    var userName = User.Identity?.Name ?? "Admin User";
+    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    
+    string userName = "Admin User";
+    string avatarUrl = "";
+    
+    if (Guid.TryParse(userIdClaim, out var userId))
+    {
+        var userSummary = await UserService.GetUserByIdAsync(userId);
+        if (userSummary != null)
+        {
+            userName = string.IsNullOrWhiteSpace(userSummary.FullName) ? userSummary.UserName : userSummary.FullName;
+            avatarUrl = userSummary.AvatarUrl;
+        }
+    }
+
     var nameParts = userName.Split(new[] { ' ', '.', '@' }, StringSplitOptions.RemoveEmptyEntries);
     var initials = "AU";
     if (nameParts.Length >= 2)
-    {
         initials = $"{nameParts[0][0]}{nameParts[1][0]}".ToUpper();
-    }
     else if (nameParts.Length == 1 && nameParts[0].Length >= 2)
-    {
         initials = nameParts[0].Substring(0, 2).ToUpper();
-    }
     else if (nameParts.Length == 1)
-    {
         initials = nameParts[0].ToUpper();
-    }
 }
 
 <header class="admin-navbar">
@@ -36,9 +47,16 @@
                 <i class="bi bi-bell"></i>
                 <span class="badge">4</span>
             </button>
-            <div class="admin-top-avatar" title="@userName">
-                @initials
-            </div>
+            @if (!string.IsNullOrEmpty(avatarUrl))
+            {
+                <img src="/uploads/users/@avatarUrl" alt="@userName" class="admin-top-avatar" style="width:36px;height:36px;object-fit:cover;border-radius:50%;cursor:pointer;" title="@userName" />
+            }
+            else
+            {
+                <div class="admin-top-avatar" title="@userName">
+                    @initials
+                </div>
+            }
         </div>
     </div>
 </header>
