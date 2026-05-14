@@ -16,6 +16,9 @@ public interface IGenericRepository<T> where T : BaseEntity
     Task<PagedResult<T>> FindPagedAsync(Expression<Func<T, bool>> predicate, int pageNumber, int pageSize);
 
     Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
+    Task<int> CountAsync();
+    Task<int>CountAsync(Expression<Func<T, bool>> predicate);
+
 
     Task AddAsync(T entity);
 

@@ -53,6 +53,15 @@ internal class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         return await _dbSet.Where(predicate).ToListAsync();
     }
 
+    public async Task<int> CountAsync()
+    {
+        return await _dbSet.CountAsync();
+    }
+    public async Task<int> CountAsync(Expression<Func<T,bool>> expression)
+    {
+        return await _dbSet.CountAsync(expression);
+    }
+
     public async Task AddAsync(T entity)
     {
         await _dbSet.AddAsync(entity);
