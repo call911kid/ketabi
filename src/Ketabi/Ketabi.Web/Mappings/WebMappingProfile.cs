@@ -11,7 +11,7 @@ public class WebMappingProfile : Profile
     {
         CreateMap<UserProfileDto, ProfileViewModel>()
             .ForMember(d => d.UserId, o => o.MapFrom(s => s.UserId))
-            .ForMember(d => d.UserName, o => o.MapFrom(s => s.Email))
+            .ForMember(d => d.Email, o => o.MapFrom(s => s.Email))
             .ForMember(d => d.FullName, o => o.MapFrom(s => string.Join(' ', new[] { s.FirstName, s.LastName }.Where(x => !string.IsNullOrWhiteSpace(x)))))
             .ForMember(d => d.AvatarUrl, o => o.MapFrom(s => s.AvatarUrl))
             .ForMember(d => d.Location, o => o.MapFrom(s => s.Location))
