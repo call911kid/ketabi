@@ -13,6 +13,18 @@ internal class RequestRepository : GenericRepository<Request>, IRequestRepositor
     {
     }
 
+    public override async Task<PagedResult<Request>> GetPagedAsync(int pageNumber, int pageSize)
+    {
+        var totalCount = await _dbSet.CountAsync();
+        var items = await _dbSet.
+             Include(r=>r.Sender)
+            .Include(r=>r.Receiver)
+            .Include(r=>r.Listing)
+            .Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+        return new PagedResult<Request>(items, totalCount, pageNumber, pageSize);
+    }
+
     public async Task<Request?> GetDetailsAsync(Guid requestId)
     {
         return await WithDetails()

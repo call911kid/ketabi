@@ -33,14 +33,14 @@ internal class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
         return await _dbSet.ToListAsync();
     }
 
-    public async Task<PagedResult<T>> GetPagedAsync(int pageNumber, int pageSize)
+    public virtual async Task<PagedResult<T>> GetPagedAsync(int pageNumber, int pageSize)
     {
         var totalCount = await _dbSet.CountAsync();
         var items = await _dbSet.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
         return new PagedResult<T>(items, totalCount, pageNumber, pageSize);
     }
 
-    public async Task<PagedResult<T>> FindPagedAsync(Expression<Func<T, bool>> predicate, int pageNumber, int pageSize)
+    public virtual async Task<PagedResult<T>> FindPagedAsync(Expression<Func<T, bool>> predicate, int pageNumber, int pageSize)
     {
         var query = _dbSet.Where(predicate);
         var totalCount = await query.CountAsync();
