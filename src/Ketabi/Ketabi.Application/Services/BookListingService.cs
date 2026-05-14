@@ -6,6 +6,7 @@ using Ketabi.Application.Interfaces;
 using Ketabi.Core.Domain.Entities;
 using Ketabi.Core.Domain.Enums;
 using Ketabi.Core.Interfaces;
+using static Ketabi.Application.Common.Messages;
 
 namespace Ketabi.Application.Services
 {
@@ -267,10 +268,14 @@ namespace Ketabi.Application.Services
             
         public async Task RestoreToPendingAsync(Guid listingId) => await ChangeListingStatus(listingId, ListingStatus.Pending);
         
+        public async Task<IEnumerable<BookSummaryDto>> GetListingsByStatusAsync(ListingStatus listingStatus, int pageNumber, int pageSize)
+        {
+            var paged = await _uow.Listings.FindPagedWithIncludesAsync(l=>l.ListingStatus==listingStatus, pageNumber,pageSize);
+            return paged.Items.Select(b => _mapper.Map<BookSummaryDto>(b));
+        }
 
-        
-            
-        
+
+
         private async Task ChangeListingStatus(Guid listingId, ListingStatus listingStatus, string reasonForRejection=null!)
         {
             var listing = await _uow.Listings.GetByIdAsync(listingId);
@@ -285,5 +290,6 @@ namespace Ketabi.Application.Services
             await _uow.SaveChangesAsync();
 
         }
+
     }
 }

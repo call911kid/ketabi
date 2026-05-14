@@ -1,5 +1,6 @@
 ﻿using Ketabi.Application.DTOs.Books;
 using Ketabi.Application.DTOs.Users;
+using Ketabi.Core.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace Ketabi.Application.Interfaces
     public interface IBookListingService
     { 
         Task<IEnumerable<BookSummaryDto>> GetAllBooksAsync(int pageNumber, int pageSize);
+        Task<IEnumerable<BookSummaryDto>> GetListingsByStatusAsync(ListingStatus listingStatus, int pageNumber, int pageSize);
 
         Task<IEnumerable<BookSummaryDto>> SearchBooksAsync(string query, int pageNumber, int pageSize);
 

@@ -25,4 +25,5 @@ public class BookSummaryDto
     public double OwnerRating { get; set; }
     public double OwnerReputation { get; set; }
     public double DistanceInKm { get; set; }
+    public ListingStatus ListingStatus { get; set; }
 }
