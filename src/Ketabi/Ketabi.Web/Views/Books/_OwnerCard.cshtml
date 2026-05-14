@@ -2,18 +2,30 @@
 
 <div class="card border-0 p-4"
      style="background-color: var(--color-surface); border-radius: var(--radius-2xl); box-shadow: var(--shadow-card);">
-    <div class="d-flex align-items-center gap-3 mb-4">
-        <img src="~/uploads/users/@(string.IsNullOrEmpty(Model?.Owner?.AvatarUrl) ? "profile-picture.png" : Model.Owner.AvatarUrl)"
-             style="width: var(--avatar-md); height: var(--avatar-md); border-radius: 50%; object-fit: cover;">
-        <div>
-            <h6 class="mb-0" style="font-weight: var(--weight-bold); color: var(--color-text);">@Model.Owner.FullName
-            </h6>
-            <div class="d-flex align-items-center gap-1"
-                 style="font-size: var(--text-xs-loc); color: var(--color-text-muted);">
-                <i class="bi bi-geo-alt" style="font-size: var(--icon-xs);"></i>
-                @Model.Owner.Location
+    <div class="d-flex align-items-center gap-3 mb-4" style="overflow: hidden;">
+        <a asp-controller="Profile" asp-action="Index" asp-route-id="@Model.Owner.UserId"
+               class="text-decoration-none d-flex align-items-center gap-3 w-100"
+               style="min-width: 0;">
+            <img src="~/uploads/users/@(string.IsNullOrEmpty(Model?.Owner?.AvatarUrl) ? "profile-picture.png" : Model.Owner.AvatarUrl)"
+                 style="width: var(--avatar-md); height: var(--avatar-md); border-radius: 50%; object-fit: cover; flex-shrink: 0;">
+                <div style="min-width: 0; flex: 1;">
+                    <h6 class="mb-0" style="
+                        font-weight: var(--weight-bold);
+                        color: var(--color-text);
+                        white-space: nowrap;    
+                        overflow: hidden;      
+                        text-overflow: ellipsis;
+                        display: block;
+                        ">
+                        @Model.Owner.FullName
+                </h6>
+                <div class="d-flex align-items-center gap-1"
+                     style="font-size: var(--text-xs-loc); color: var(--color-text-muted);">
+                    <i class="bi bi-geo-alt" style="font-size: var(--icon-xs);"></i>
+                    @Model.Owner.Location
+                </div>
             </div>
-        </div>
+        </a>
     </div>
 
     <div class="d-flex justify-content-between mb-4 p-3"
