@@ -66,10 +66,10 @@
                                     <span asp-validation-for="LastName" class="text-danger profile-form__hint"></span>
                                 </div>
                                 <div class="col-12">
-                                    <label asp-for="UserName" class="profile-form__label"></label>
-                                    <input asp-for="UserName" class="ketabi-input" placeholder="username" />
+                                    <label asp-for="Email" class="profile-form__label"></label>
+                                    <input asp-for="Email" class="ketabi-input" readonly placeholder="email" />
                                     <span class="profile-form__hint">Letters, numbers, and underscores only.</span>
-                                    <span asp-validation-for="UserName" class="text-danger profile-form__hint"></span>
+                                    @* <span asp-validation-for="Email" class="text-danger profile-form__hint"></span> *@
                                 </div>
                                 <div class="col-12">
                                     <label asp-for="Bio" class="profile-form__label"></label>

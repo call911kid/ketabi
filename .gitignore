@@ -26,3 +26,6 @@ docs/web-docs
 src/Ketabi/Ketabi.Web/appsettings.json
 src/Ketabi/Ketabi.Web/appsettings.Development.json
 src/Ketabi/Ketabi.Web/appsettings.Production.json
+
+src/Ketabi/Ketabi.Web/wwwroot/uploads/
+

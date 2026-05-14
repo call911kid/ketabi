@@ -1,3 +1,5 @@
+using Ketabi.Application.Common;
+using Ketabi.Application.Interfaces;
 using Ketabi.Web.ViewModels.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -7,10 +9,11 @@ namespace Ketabi.Web.Controllers
 {
     public abstract class BaseController : Controller
     {
+        protected IUserService UserService => HttpContext.RequestServices.GetService<IUserService>();
         // Populate NavbarViewModel before each action executes.
-        public override void OnActionExecuting(ActionExecutingContext context)
+        public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            base.OnActionExecuting(context);
+            await base.OnActionExecutionAsync(context, next);
             // Skip navbar population for certain controllers (e.g., Account) so auth pages
             // don't receive or attempt to render the shared navbar. This allows controllers
             // to continue inheriting BaseController but opt-out by controller name.
@@ -30,37 +33,29 @@ namespace Ketabi.Web.Controllers
 
                 if (navbar.IsAuthenticated)
                 {
-                    // Claims-based population with null-conditional fallbacks
-                    navbar.FullName = user?.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
-                    navbar.UserName = user?.FindFirst("username")?.Value
-                                      ?? user?.FindFirst("preferred_username")?.Value
-                                      ?? user?.Identity?.Name
-                                      ?? string.Empty;
+                    var userIdClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-                    var idClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                    if (Guid.TryParse(idClaim, out var parsedId))
+                    if (Guid.TryParse(userIdClaim, out Guid userId))
                     {
-                        navbar.CurrentUserId = parsedId;
+
+                        var summary = await UserService.GetUserByIdAsync(userId);
+
+                        navbar.FullName = summary.FullName;
+                        navbar.AvatarUrl = summary.AvatarUrl ?? AppConstants.DefaultProfilePic;
+                        navbar.ReputationScore = (int)summary.ReputationScore;
+                        navbar.ReviewCount = summary.ReviewCount;
+                        //navbar.BooksListed = summary.BooksListed;
+                        navbar.CompletedTransactions = summary.TradesCount;
+
                     }
-
-                    // Avatar if provided in claims (optional)
-                    navbar.AvatarUrl = user?.FindFirst("AvatarUrl")?.Value ?? string.Empty;
-
-                    // Placeholder stats; replace with real service calls when available
-                    navbar.ReputationScore = int.Parse(user?.FindFirst("ReputationScore")?.Value ?? "0");
-                    navbar.ReviewCount = int.Parse(user?.FindFirst("ReviewCount")?.Value ?? "0");
-                    navbar.BooksListed = int.Parse(user?.FindFirst("BooksListed")?.Value ?? "0");
-                    navbar.CompletedTransactions = int.Parse(user?.FindFirst("CompletedTransactions")?.Value ?? "0");
-                    navbar.UnreadNotifications = int.Parse(user?.FindFirst("UnreadNotifications")?.Value ?? "0");
                 }
+                // Place into ViewData so _Layout can pass it explicitly to the partial
+                ViewData["NavbarModel"] = navbar;
 
                 var controller = context?.RouteData?.Values["controller"]?.ToString() ?? string.Empty;
                 var action = context?.RouteData?.Values["action"]?.ToString() ?? string.Empty;
                 navbar.IsExplorerPage = string.Equals(controller, "Home", StringComparison.OrdinalIgnoreCase)
                                          && string.Equals(action, "Index", StringComparison.OrdinalIgnoreCase);
-
-                // Place into ViewData so _Layout can pass it explicitly to the partial
-                ViewData["NavbarModel"] = navbar;
             }
             catch
             {
