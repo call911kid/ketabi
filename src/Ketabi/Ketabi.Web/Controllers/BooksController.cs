@@ -434,7 +434,7 @@ public class BooksController : BaseController
         var options = categories.Select(c => new SelectListItem
         {
             Value = c.Id.ToString(),
-            Text = c.Name
+            Text = string.IsNullOrEmpty(c.IconUrl) ? c.Name : $"{c.IconUrl} {c.Name}"
         }).ToList();
 
         if (!options.Any())
@@ -476,7 +476,7 @@ public class BooksController : BaseController
         model.CategoryOptions = categories.Select(c => new SelectListItem
         {
             Value = c.Id.ToString(),
-            Text = c.Name
+            Text = string.IsNullOrEmpty(c.IconUrl) ? c.Name : $"{c.IconUrl} {c.Name}"
         }).ToList();
 
         

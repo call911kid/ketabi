@@ -8,6 +8,8 @@ public sealed class Category : BaseEntity
     public required string Name { get; set; }
     public string? Description { get; set; }
     public string? IconUrl { get; set; }
+    public string Emoji { get; set; } = string.Empty;
+    public string Color { get; set; } = string.Empty;
 
     public ICollection<BookListing> BookListings { get; set; } = new List<BookListing>();
 }

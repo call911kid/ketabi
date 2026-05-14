@@ -1,0 +1,81 @@
+@{
+    var activePage = ViewData["ActiveAdminPage"]?.ToString() ?? "";
+    var userName = User.Identity?.Name ?? "Admin User";
+    var nameParts = userName.Split(new[] { ' ', '.', '@' }, StringSplitOptions.RemoveEmptyEntries);
+    var initials = "AU";
+    if (nameParts.Length >= 2)
+    {
+        initials = $"{nameParts[0][0]}{nameParts[1][0]}".ToUpper();
+    }
+    else if (nameParts.Length == 1 && nameParts[0].Length >= 2)
+    {
+        initials = nameParts[0].Substring(0, 2).ToUpper();
+    }
+    else if (nameParts.Length == 1)
+    {
+        initials = nameParts[0].ToUpper();
+    }
+}
+
+<aside class="admin-sidebar">
+    <div class="admin-sidebar-header">
+        <div class="admin-sidebar-logo-icon">
+            <i class="bi bi-book-half"></i>
+        </div>
+        <div class="admin-sidebar-brand">
+            <h2>Ketabi</h2>
+            <span>Admin Console</span>
+        </div>
+    </div>
+
+    <div class="admin-sidebar-nav">
+        <div class="admin-sidebar-nav-title">Navigation</div>
+        
+        <a href="#" class="admin-nav-item @(activePage == "Overview" ? "active" : "")">
+            <div><i class="bi bi-grid-1x2"></i> Overview</div>
+        </a>
+        
+        <a href="#" class="admin-nav-item @(activePage == "UserManagement" ? "active" : "")">
+            <div><i class="bi bi-people"></i> User Management</div>
+        </a>
+        
+        <a href="#" class="admin-nav-item @(activePage == "BookModeration" ? "active" : "")">
+            <div><i class="bi bi-journal-check"></i> Book Moderation</div>
+            <span class="admin-nav-badge">5</span>
+        </a>
+        
+        <a href="#" class="admin-nav-item @(activePage == "TradeRequests" ? "active" : "")">
+            <div><i class="bi bi-arrow-left-right"></i> Trade Requests</div>
+        </a>
+        
+        <a asp-controller="Categories" asp-action="Index" class="admin-nav-item @(activePage == "Categories" ? "active" : "")">
+            <div><i class="bi bi-tags"></i> Categories</div>
+        </a>
+        
+        <a href="#" class="admin-nav-item @(activePage == "Reports" ? "active" : "")">
+            <div><i class="bi bi-flag"></i> Reports</div>
+            <span class="admin-nav-badge">4</span>
+        </a>
+        
+        <a href="#" class="admin-nav-item @(activePage == "AuditLogs" ? "active" : "")">
+            <div><i class="bi bi-shield-check"></i> Audit Logs</div>
+        </a>
+        
+        <a href="#" class="admin-nav-item @(activePage == "Notifications" ? "active" : "")">
+            <div><i class="bi bi-bell"></i> Notifications</div>
+        </a>
+    </div>
+
+    <div class="admin-sidebar-footer">
+        <div class="admin-user-profile">
+            <div class="admin-user-avatar">@initials</div>
+            <div class="admin-user-info">
+                <h4>@userName</h4>
+                <span>Super Admin</span>
+            </div>
+        </div>
+        <a href="/" class="admin-back-link">
+            <i class="bi bi-box-arrow-left"></i> Back to App
+        </a>
+    </div>
+</aside>

@@ -1,0 +1,379 @@
+@using Ketabi.Application.DTOs.Category
+@model IEnumerable<CategoryDto>
+@{
+    Layout = "_AdminLayout";
+    ViewData["ActiveAdminPage"] = "Categories";
+    ViewData["AdminBreadcrumbTitle"] = "Categories";
+    
+    var totalBooks = Model.Sum(c => c.BookCount);
+}
+
+<!-- Category Page Styles -->
+<style>
+    .category-page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .category-page-title h1 {
+        font-size: 1.5rem;
+        font-weight: var(--weight-bold);
+        color: var(--color-text);
+        margin: 0;
+    }
+
+    .category-page-title p {
+        color: var(--color-text-muted);
+        font-size: 0.9rem;
+        margin: 4px 0 0 0;
+    }
+
+    .add-category-form-container {
+        background-color: white;
+        border: 2px dashed var(--color-success);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        margin-bottom: 32px;
+        display: none; /* Hidden by default */
+    }
+
+    .color-picker-container {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .color-option {
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        display: inline-block;
+    }
+    
+    .color-option.selected {
+        border-color: var(--color-text);
+        transform: scale(1.1);
+    }
+
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .category-card {
+        background-color: white;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        transition: box-shadow var(--duration-normal);
+    }
+
+    .category-card:hover {
+        box-shadow: var(--shadow-card);
+    }
+
+    .category-card-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    .category-icon-wrapper {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        background-color: var(--color-surface-muted);
+    }
+
+    .category-info {
+        flex-grow: 1;
+        margin-left: 12px;
+    }
+
+    .category-info h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: var(--weight-bold);
+    }
+
+    .category-info p {
+        margin: 4px 0 0 0;
+        font-size: 0.8rem;
+        color: var(--color-text-muted);
+    }
+
+    .category-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-btn {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--color-text-muted);
+        border-radius: var(--radius-sm);
+        padding: 4px 8px;
+        cursor: pointer;
+        transition: all var(--duration-fast);
+    }
+
+    .action-btn:hover {
+        background-color: var(--color-surface-muted);
+        color: var(--color-text);
+    }
+
+    .action-btn.delete:hover {
+        background-color: var(--color-error-bg);
+        color: var(--color-error);
+        border-color: var(--color-error-border);
+    }
+
+    .category-description {
+        font-size: 0.85rem;
+        color: var(--color-text-muted);
+        margin-bottom: 24px;
+        line-height: 1.5;
+        flex-grow: 1;
+    }
+
+    .category-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.75rem;
+        color: #94A3B8;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+    }
+
+    .category-color-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 4px;
+    }
+</style>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="category-page-header">
+    <div class="category-page-title">
+        <h1>Category Management</h1>
+        <p>@Model.Count() categories · @totalBooks total books</p>
+    </div>
+    <button class="btn btn-success" id="toggleAddCategoryBtn">
+        <i class="bi bi-plus-lg"></i> Add Category
+    </button>
+</div>
+
+<!-- Add Category Form -->
+<div class="add-category-form-container" id="addCategoryContainer">
+    <h5 class="mb-4" style="font-weight: 600; color: var(--color-text);">New Category</h5>
+    <form asp-action="Create" method="post">
+        <div class="row g-3">
+            <div class="col-12">
+                <label class="form-label text-muted small">Name *</label>
+                <input type="text" name="Name" class="form-control" placeholder="e.g. Philosophy" required />
+            </div>
+            <div class="col-12">
+                <label class="form-label text-muted small">Color</label>
+                <input type="hidden" name="Color" id="selectedColor" value="#5B5BD6" />
+                <div class="color-picker-container">
+                    <!-- Standard UI colors to choose from -->
+                    <span class="color-option selected" style="background-color: #5B5BD6;" data-color="#5B5BD6" onclick="selectColor(this, '#5B5BD6')"></span>
+                    <span class="color-option" style="background-color: #16A34A;" data-color="#16A34A" onclick="selectColor(this, '#16A34A')"></span>
+                    <span class="color-option" style="background-color: #F59E0B;" data-color="#F59E0B" onclick="selectColor(this, '#F59E0B')"></span>
+                    <span class="color-option" style="background-color: #EF4444;" data-color="#EF4444" onclick="selectColor(this, '#EF4444')"></span>
+                    <span class="color-option" style="background-color: #D946EF;" data-color="#D946EF" onclick="selectColor(this, '#D946EF')"></span>
+                    <span class="color-option" style="background-color: #3B82F6;" data-color="#3B82F6" onclick="selectColor(this, '#3B82F6')"></span>
+                    <span class="color-option" style="background-color: #06B6D4;" data-color="#06B6D4" onclick="selectColor(this, '#06B6D4')"></span>
+                    <span class="color-option" style="background-color: #14B8A6;" data-color="#14B8A6" onclick="selectColor(this, '#14B8A6')"></span>
+                </div>
+            </div>
+            <div class="col-12">
+                <label class="form-label text-muted small">Description</label>
+                <input type="text" name="Description" class="form-control" placeholder="Short description of this category..." />
+            </div>
+        </div>
+        <div class="d-flex justify-content-between mt-4">
+            <button type="button" class="btn btn-light border w-100 me-2" id="cancelAddCategoryBtn">Cancel</button>
+            <button type="submit" class="btn btn-success w-100 ms-2"><i class="bi bi-check2"></i> Create Category</button>
+        </div>
+    </form>
+</div>
+
+<!-- Categories Grid -->
+<div class="categories-grid">
+    @foreach (var category in Model)
+    {
+        <div class="category-card" style="border-top: 4px solid @(string.IsNullOrEmpty(category.Color) ? "#5B5BD6" : category.Color);">
+            <div class="category-card-header">
+                <div class="d-flex align-items-center">
+                    <div class="category-icon-wrapper" style="background-color: @(string.IsNullOrEmpty(category.Color) ? "#5B5BD6" : category.Color)1A; color: @(string.IsNullOrEmpty(category.Color) ? "#5B5BD6" : category.Color);">
+                        <i class="bi bi-folder2-open"></i>
+                    </div>
+                    <div class="category-info">
+                        <h3>@category.Name</h3>
+                    </div>
+                </div>
+                <div class="category-actions">
+                    <!-- Edit Button triggers modal -->
+                    <button class="action-btn" onclick="openEditModal('@category.Id', '@category.Name', '@category.Color', '@category.Description')">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <!-- Delete Form -->
+                    <form asp-action="Delete" asp-route-id="@category.Id" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete @category.Name?');">
+                        <button type="submit" class="action-btn delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="category-description">
+                @(string.IsNullOrEmpty(category.Description) ? "No description provided." : category.Description)
+            </div>
+            
+            <div class="category-card-footer">
+                <span>Created @category.CreatedAt.ToString("yyyy-MM-dd")</span>
+                <span class="category-color-dot" style="background-color: @(string.IsNullOrEmpty(category.Color) ? "#5B5BD6" : category.Color);"></span>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border: none; border-radius: var(--radius-lg); box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+      <form asp-action="Edit" method="post">
+          <div class="modal-header" style="border-bottom: 1px solid var(--border); padding: 20px 24px;">
+            <h5 class="modal-title" id="editCategoryModalLabel" style="font-weight: 700; color: var(--color-text);">
+                <i class="bi bi-pencil-square me-2 text-primary"></i>Edit Category
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" style="padding: 24px;">
+            <input type="hidden" name="Id" id="editId" />
+            
+            <div class="mb-4">
+                <label class="form-label text-muted small fw-bold">Name *</label>
+                <input type="text" name="Name" id="editName" class="form-control form-control-lg" required style="font-size: 1rem;" />
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label text-muted small fw-bold">Color</label>
+                <input type="hidden" name="Color" id="editColor" value="#5B5BD6" />
+                <div class="color-picker-container" id="editColorPicker">
+                    <!-- Standard UI colors to choose from -->
+                    <span class="color-option selected" style="background-color: #5B5BD6;" data-color="#5B5BD6" onclick="selectEditColor(this, '#5B5BD6')"></span>
+                    <span class="color-option" style="background-color: #16A34A;" data-color="#16A34A" onclick="selectEditColor(this, '#16A34A')"></span>
+                    <span class="color-option" style="background-color: #F59E0B;" data-color="#F59E0B" onclick="selectEditColor(this, '#F59E0B')"></span>
+                    <span class="color-option" style="background-color: #EF4444;" data-color="#EF4444" onclick="selectEditColor(this, '#EF4444')"></span>
+                    <span class="color-option" style="background-color: #D946EF;" data-color="#D946EF" onclick="selectEditColor(this, '#D946EF')"></span>
+                    <span class="color-option" style="background-color: #3B82F6;" data-color="#3B82F6" onclick="selectEditColor(this, '#3B82F6')"></span>
+                    <span class="color-option" style="background-color: #06B6D4;" data-color="#06B6D4" onclick="selectEditColor(this, '#06B6D4')"></span>
+                    <span class="color-option" style="background-color: #14B8A6;" data-color="#14B8A6" onclick="selectEditColor(this, '#14B8A6')"></span>
+                </div>
+            </div>
+            
+            <div class="mb-2">
+                <label class="form-label text-muted small fw-bold">Description</label>
+                <textarea name="Description" id="editDescription" class="form-control" rows="3" style="resize: none;" placeholder="Provide a brief description..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer" style="border-top: 1px solid var(--border); padding: 16px 24px;">
+            <button type="button" class="btn btn-light border px-4" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check2"></i> Save Changes</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Toggle Add Category Form
+        const toggleBtn = document.getElementById('toggleAddCategoryBtn');
+        const cancelBtn = document.getElementById('cancelAddCategoryBtn');
+        const addContainer = document.getElementById('addCategoryContainer');
+
+        toggleBtn.addEventListener('click', () => {
+            addContainer.style.display = addContainer.style.display === 'block' ? 'none' : 'block';
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            addContainer.style.display = 'none';
+        });
+
+        // Color selection logic for Add form
+        function selectColor(element, colorHex) {
+            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            document.getElementById('selectedColor').value = colorHex;
+        }
+
+        // Color selection logic for Edit form
+        function selectEditColor(element, colorHex) {
+            document.getElementById('editColorPicker').querySelectorAll('.color-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            document.getElementById('editColor').value = colorHex;
+        }
+
+        // Open Edit Modal and populate data
+        function openEditModal(id, name, color, description) {
+            document.getElementById('editId').value = id;
+            document.getElementById('editName').value = name;
+            document.getElementById('editDescription').value = description;
+            
+            // Set Color
+            let targetColor = color || '#5B5BD6';
+            document.getElementById('editColor').value = targetColor;
+            
+            // Update color picker selection visually
+            let colorOptions = document.getElementById('editColorPicker').querySelectorAll('.color-option');
+            let colorFound = false;
+            colorOptions.forEach(el => {
+                el.classList.remove('selected');
+                if (el.getAttribute('data-color').toLowerCase() === targetColor.toLowerCase()) {
+                    el.classList.add('selected');
+                    colorFound = true;
+                }
+            });
+            
+            if(!colorFound && colorOptions.length > 0) {
+                 colorOptions[0].classList.add('selected');
+                 document.getElementById('editColor').value = '#5B5BD6';
+            }
+            
+            var editModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
+            editModal.show();
+        }
+    </script>
+}

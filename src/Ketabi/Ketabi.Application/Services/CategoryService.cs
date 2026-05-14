@@ -48,7 +48,9 @@ namespace Ketabi.Application.Services
             {
                 Name = createCategoryDto.Name,
                 Description = createCategoryDto.Description,
-                IconUrl = createCategoryDto.IconUrl
+                IconUrl = createCategoryDto.IconUrl,
+                Emoji = string.Empty,
+                Color = createCategoryDto.Color
             };
 
             await _unitOfWork.Categories.AddAsync(category);
@@ -73,6 +75,8 @@ namespace Ketabi.Application.Services
             category.Name = updateCategoryDto.Name;
             category.Description = updateCategoryDto.Description;
             category.IconUrl = updateCategoryDto.IconUrl;
+            category.Emoji = string.Empty;
+            category.Color = updateCategoryDto.Color;
 
             _unitOfWork.Categories.Update(category);
             await _unitOfWork.SaveChangesAsync();
@@ -100,7 +104,10 @@ namespace Ketabi.Application.Services
                 Id = category.Id,
                 Name = category.Name,
                 Description = category.Description,
-                IconUrl = category.IconUrl
+                IconUrl = category.IconUrl,
+                Color = category.Color,
+                BookCount = category.BookListings?.Count ?? 0,
+                CreatedAt = category.CreatedAt
             };
         }
     }

@@ -1,0 +1,44 @@
+@{
+    var breadcrumbTitle = ViewData["AdminBreadcrumbTitle"]?.ToString() ?? "Dashboard";
+    var userName = User.Identity?.Name ?? "Admin User";
+    var nameParts = userName.Split(new[] { ' ', '.', '@' }, StringSplitOptions.RemoveEmptyEntries);
+    var initials = "AU";
+    if (nameParts.Length >= 2)
+    {
+        initials = $"{nameParts[0][0]}{nameParts[1][0]}".ToUpper();
+    }
+    else if (nameParts.Length == 1 && nameParts[0].Length >= 2)
+    {
+        initials = nameParts[0].Substring(0, 2).ToUpper();
+    }
+    else if (nameParts.Length == 1)
+    {
+        initials = nameParts[0].ToUpper();
+    }
+}
+
+<header class="admin-navbar">
+    <div class="admin-navbar-left">
+        <button class="admin-sidebar-toggle" id="adminSidebarToggle">
+            <i class="bi bi-list"></i>
+        </button>
+        <div class="admin-breadcrumbs">
+            <span>Admin</span>
+            <span class="separator">/</span>
+            <span class="current">@breadcrumbTitle</span>
+        </div>
+    </div>
+
+    <div class="admin-navbar-right">
+
+        <div class="admin-nav-actions">
+            <button class="admin-nav-btn">
+                <i class="bi bi-bell"></i>
+                <span class="badge">4</span>
+            </button>
+            <div class="admin-top-avatar" title="@userName">
+                @initials
+            </div>
+        </div>
+    </div>
+</header>
