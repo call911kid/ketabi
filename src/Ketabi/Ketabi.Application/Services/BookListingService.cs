@@ -262,17 +262,28 @@ namespace Ketabi.Application.Services
         }
 
         public async Task ApproveListingAsync(Guid listingId) => await ChangeListingStatus(listingId, ListingStatus.Approved);
-        public async Task RejectListingAsync(Guid listingId) => await ChangeListingStatus(listingId, ListingStatus.Rejected);
+        
+        public async Task RejectListingAsync(Guid listingId, string reasonForRejection)=> await ChangeListingStatus(listingId, ListingStatus.Rejected);
+            
+        public async Task RestoreToPendingAsync(Guid listingId) => await ChangeListingStatus(listingId, ListingStatus.Pending);
+        
+
         
             
         
-        private async Task ChangeListingStatus(Guid listingId, ListingStatus listingStatus)
+        private async Task ChangeListingStatus(Guid listingId, ListingStatus listingStatus, string reasonForRejection=null!)
         {
             var listing = await _uow.Listings.GetByIdAsync(listingId);
             if (listing == null) return;
 
             listing.ListingStatus = listingStatus;
+            if(listingStatus==ListingStatus.Rejected||listingStatus== ListingStatus.Pending)
+            {
+                listing.ReasonForRejection = reasonForRejection;
+            }
+
             await _uow.SaveChangesAsync();
+
         }
     }
 }

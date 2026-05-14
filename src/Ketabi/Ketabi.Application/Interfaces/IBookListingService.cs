@@ -31,7 +31,8 @@ namespace Ketabi.Application.Interfaces
 
         Task<UserSummaryDto> GetOwnerProfileAsync(Guid userId);
         Task ApproveListingAsync(Guid listingId);
-        Task RejectListingAsync(Guid listingId);
+        Task RejectListingAsync(Guid listingId, string reasonForRejection);
+        Task RestoreToPendingAsync(Guid listingId);
 
         Task DeleteBookAsync(Guid bookId, Guid userId);
 
