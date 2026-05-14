@@ -30,6 +30,8 @@ namespace Ketabi.Application.Interfaces
         Task<BookDetailDto> UpdateBookAsync(Guid bookId, UpdateBookDto updateDto, Guid userId);
 
         Task<UserSummaryDto> GetOwnerProfileAsync(Guid userId);
+        Task ApproveListingAsync(Guid listingId);
+        Task RejectListingAsync(Guid listingId);
 
         Task DeleteBookAsync(Guid bookId, Guid userId);
 

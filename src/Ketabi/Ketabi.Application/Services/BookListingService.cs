@@ -4,6 +4,7 @@ using Ketabi.Application.DTOs.Books;
 using Ketabi.Application.DTOs.Users;
 using Ketabi.Application.Interfaces;
 using Ketabi.Core.Domain.Entities;
+using Ketabi.Core.Domain.Enums;
 using Ketabi.Core.Interfaces;
 
 namespace Ketabi.Application.Services
@@ -36,6 +37,7 @@ namespace Ketabi.Application.Services
                 ImageUrl = createDto.ImageUrl,
                 LocationNote = createDto.LocationNote,
                 UserId = userId,
+                ListingStatus=ListingStatus.Pending
             };
 
             if (createDto.Tags != null && createDto.Tags.Any())
@@ -257,6 +259,20 @@ namespace Ketabi.Application.Services
             await _uow.SaveChangesAsync();
 
             return await GetBookByIdAsync(bookId);
+        }
+
+        public async Task ApproveListingAsync(Guid listingId) => await ChangeListingStatus(listingId, ListingStatus.Approved);
+        public async Task RejectListingAsync(Guid listingId) => await ChangeListingStatus(listingId, ListingStatus.Rejected);
+        
+            
+        
+        private async Task ChangeListingStatus(Guid listingId, ListingStatus listingStatus)
+        {
+            var listing = await _uow.Listings.GetByIdAsync(listingId);
+            if (listing == null) return;
+
+            listing.ListingStatus = listingStatus;
+            await _uow.SaveChangesAsync();
         }
     }
 }
