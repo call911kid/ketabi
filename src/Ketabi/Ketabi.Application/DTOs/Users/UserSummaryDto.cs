@@ -16,4 +16,5 @@ public class UserSummaryDto
     public double ReputationScore { get; set; }
     public int ReviewCount { get; set; }
     public int TradesCount { get; set; }
+    public int ListingCount { get; set; }
 }

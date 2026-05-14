@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Ketabi.Application.Common;
+using Ketabi.Application.DTOs.Common;
 using Ketabi.Application.DTOs.Dashboard;
+using Ketabi.Application.DTOs.Users;
 using Ketabi.Application.Interfaces;
 using Ketabi.Core.Domain.Enums;
 using Ketabi.Core.Interfaces;
@@ -39,6 +42,41 @@ namespace Ketabi.Application.Services
 
 
             return pOverview;
+        }
+
+        public async Task<UserOverviewDto> GetUserOverviewAsync(PagedRequestDto pagination)
+        {
+            //n+1 :(
+            var pagedUsers = await _unitOfWork.Users.GetPagedAsync(pagination.Page, pagination.PageSize);
+            var users = new List<UserSummaryDto>();
+
+            foreach (var user in pagedUsers.Items)
+            {
+                users.Add(new UserSummaryDto
+                {
+                    UserId = user.Id,
+                    FullName = user.FirstName+' '+user.LastName,
+                    UserName = user.Email.Split('@')[0],
+                    AvatarUrl= user.ProfilePictureUrl,
+                    Location = user.City,
+                    ReputationScore = user.ReputationScore,
+                    ReviewCount = await _unitOfWork.Reviews.CountReviewsForUserAsync(user.Id),
+                    TradesCount = await _unitOfWork.Requests.CountCompletedTradesForUserAsync(user.Id),
+                    ListingCount = await _unitOfWork.Listings.CountAsync(l => l.UserId == user.Id)
+                });
+            }
+
+            return new UserOverviewDto
+            {
+                NumberOfUsers = pagedUsers.TotalCount,
+                Users = new PagedResponseDto<UserSummaryDto>
+                {
+                    Items = users,
+                    TotalCount = pagedUsers.TotalCount,
+                    Page = pagedUsers.PageNumber,
+                    PageSize = pagedUsers.PageSize
+                }
+            };
         }
 
         private async Task<IReadOnlyList<UserGrowthDto>> GetUserGrowthAsync(DateTime now)
