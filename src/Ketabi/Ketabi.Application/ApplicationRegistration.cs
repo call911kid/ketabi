@@ -17,6 +17,7 @@ public static class ApplicationRegistration
         services.AddScoped<IBookListingService, BookListingService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IDashboardService, DashboardService>();
         return services;
     }
 }
