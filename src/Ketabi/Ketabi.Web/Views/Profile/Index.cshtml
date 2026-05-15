@@ -26,15 +26,25 @@
         </div>
     }
 
-    @* ── Header Card ── *@
-    <section class="ketabi-card profile-animate" style="animation-delay: 0.05s;">
+    @* ── Gradient Hero Header (no card wrapper — header owns its background) ── *@
+    <section class="profile-hero profile-animate" style="animation-delay: 0.05s;">
         @await Html.PartialAsync("_ProfileHeader", Model)
     </section>
 
-    @* ── Stats Bar ── *@
-    <section class="ketabi-card profile-animate" style="animation-delay: 0.1s;">
-        @await Html.PartialAsync("_ProfileStats", Model)
-    </section>
+    @* ── Stats Card — overlaps the gradient via negative margin-top ── *@
+    <div class="profile-stats-outer">
+        <section class="ketabi-card profile-stats-card profile-animate" style="animation-delay: 0.1s;">
+            @await Html.PartialAsync("_ProfileStats", Model)
+        </section>
+    </div>
+
+    @* ── Bio Card (shown only when Bio is present) ── *@
+    @if (!string.IsNullOrEmpty(Model.Bio))
+    {
+        <section class="ketabi-card profile-bio-card profile-animate" style="animation-delay: 0.12s;">
+            <p class="profile-bio-text">@Model.Bio</p>
+        </section>
+    }
 
     @* ── Tabbed Content: Listings + Reviews ── *@
     <section class="profile-tabs profile-animate" style="animation-delay: 0.15s;">
@@ -144,15 +154,14 @@
             });
         })();
 
-                $(document).ready(function () {
+        $(document).ready(function () {
             $(document).on('submit', '#editProfileForm', async function (e) {
-                e.preventDefault(); // منع المتصفح من الـ Redirect
+                e.preventDefault();
 
                 const form = e.target;
                 const formData = new FormData(form);
                 const submitBtn = document.getElementById('btn-save-profile');
-        
-                // تغيير شكل الزرار أثناء الحفظ
+
                 const originalBtnContent = submitBtn.innerHTML;
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
@@ -166,22 +175,16 @@
                         }
                     });
 
-                    // لو السيرفر رجع JSON (حالة النجاح)
                     const contentType = response.headers.get("content-type");
                     if (contentType && contentType.indexOf("application/json") !== -1) {
                         const result = await response.json();
                         if (result.success) {
-                            // قفل المودال وعمل ريفريش عشان تظهر البيانات الجديدة
                             bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
                             window.location.href = result.redirectUrl;
                         }
                     } else {
-                        // لو السيرفر رجع HTML (حالة وجود أخطاء Validation)
                         const htmlResult = await response.text();
-                        // استبدال محتوى المودال بالـ HTML الجديد اللي فيه رسايل الخطأ
                         $('#editProfileModal').find('.modal-content').html($(htmlResult).find('.modal-content').html());
-                
-                        // إعادة تفعيل الـ Client-side validation (مهم جداً)
                         $.validator.unobtrusive.parse('#editProfileForm');
                     }
                 } catch (error) {

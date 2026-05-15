@@ -1,78 +1,143 @@
 @* ─────────────────────────────────────────────────────────────────────────
    Views/Profile/_ProfileHeader.cshtml
    Model: ProfileViewModel
-   144×144 avatar with floating camera button + AJAX file upload
+   Gradient hero header with back button, tier badge, avatar, meta row,
+   star rating, and glass Edit Profile button.
 ───────────────────────────────────────────────────────────────────────── *@
 @model Ketabi.Web.ViewModels.Profile.ProfileViewModel
 
-<div class="profile-header">
+@{
+    // ── Reputation Tier ──────────────────────────────────────────────────────
+    string tierLabel, tierIcon, tierColor;
+    if (Model.ReputationScore >= 4.8)
+    {
+        tierLabel = "Top Reader";
+        tierIcon  = "bi-award";
+        tierColor = "#F59E0B";
+    }
+    else if (Model.ReputationScore >= 4.0)
+    {
+        tierLabel = "Trusted";
+        tierIcon  = "bi-shield-check";
+        tierColor = "#A5B4FC";
+    }
+    else if (Model.ReputationScore > 0)
+    {
+        tierLabel = "Active";
+        tierIcon  = "bi-graph-up";
+        tierColor = "#6EE7B7";
+    }
+    else
+    {
+        tierLabel = "New Member";
+        tierIcon  = "bi-book";
+        tierColor = "rgba(255,255,255,0.60)";
+    }
+}
 
-    @* ── Avatar ── *@
-    <div class="profile-avatar-wrap">
-        <img src="~/uploads/users/@(string.IsNullOrEmpty(Model?.AvatarUrl) ? "profile-picture.png" : Model.AvatarUrl)"
-             alt="@Model.FirstName @Model.LastName"
-             class="profile-avatar"
-             id="profileAvatarImg" />
+<div class="profile-header-inner">
 
-        @if (Model.IsOwnProfile)
-        {
-            @* Hidden file input *@
-            <input type="file" id="avatarFileInput" accept="image/*" hidden />
-            @Html.AntiForgeryToken()
+    @* ── Back Button ── *@
+    <a href="javascript:history.back()" class="profile-back-btn" aria-label="Go back">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i> Back
+    </a>
 
-            @* Camera button triggers the file input *@
-            <label for="avatarFileInput" class="profile-avatar-upload" title="Change profile photo">
-                <i class="bi bi-camera-fill" aria-hidden="true"></i>
-            </label>
+    @* ── Avatar + Identity row ── *@
+    <div class="profile-header">
 
-            @* Spinner overlay during upload *@
-            <div class="profile-avatar-spinner" id="avatarSpinner">
-                <div class="spinner-border spinner-border-sm" role="status">
-                    <span class="visually-hidden">Uploading...</span>
-                </div>
-            </div>
-        }
-    </div>
+        @* Avatar *@
+        <div class="profile-avatar-wrap">
+            <img src="~/uploads/users/@(string.IsNullOrEmpty(Model?.AvatarUrl) ? "profile-picture.png" : Model.AvatarUrl)"
+                 alt="@Model.FirstName @Model.LastName"
+                 class="profile-avatar"
+                 id="profileAvatarImg" />
 
-    @* ── Identity Info ── *@
-    <div class="profile-header__info">
-        <h1 class="profile-header__name">@Model.FirstName @Model.LastName</h1>
-
-        @if (!string.IsNullOrEmpty(Model.UserName))
-        {
-            <p class="profile-header__username">@@@Model.UserName</p>
-        }
-
-        @if (!string.IsNullOrEmpty(Model.Bio))
-        {
-            <p class="profile-header__bio">@Model.Bio</p>
-        }
-
-        <div class="profile-header__meta">
-            @if (!string.IsNullOrEmpty(Model.Location))
+            @* Gold star badge for top-rated users *@
+            @if (Model.ReputationScore >= 4.9)
             {
-                <span class="profile-header__meta-item">
-                    <i class="bi bi-geo-alt profile-header__meta-icon" aria-hidden="true"></i>
-                    @Model.Location
+                <span class="profile-avatar-star-badge" aria-label="Top rated">
+                    <i class="bi bi-star-fill" aria-hidden="true"></i>
                 </span>
             }
-            @if (!string.IsNullOrEmpty(Model.MemberSince))
+
+            @if (Model.IsOwnProfile)
             {
-                <span class="profile-header__meta-item">
-                    <i class="bi bi-calendar3 profile-header__meta-icon" aria-hidden="true"></i>
-                    @Model.MemberSince
-                </span>
+                @* Hidden file input *@
+                <input type="file" id="avatarFileInput" accept="image/*" hidden />
+                @Html.AntiForgeryToken()
+
+                @* Camera button triggers the file input *@
+                <label for="avatarFileInput" class="profile-avatar-upload" title="Change profile photo">
+                    <i class="bi bi-camera-fill" aria-hidden="true"></i>
+                </label>
+
+                @* Spinner overlay during upload *@
+                <div class="profile-avatar-spinner" id="avatarSpinner">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="visually-hidden">Uploading...</span>
+                    </div>
+                </div>
             }
         </div>
 
-        @if (Model.IsOwnProfile)
-        {
-            <button class="profile-edit-btn"
-                    data-bs-toggle="modal"
-                    data-bs-target="#editProfileModal"
-                    id="btn-edit-profile">
-                <i class="bi bi-pencil" aria-hidden="true"></i> Edit Profile
-            </button>
-        }
+        @* ── Identity Info ── *@
+        <div class="profile-header__info">
+
+            @* Name row: full name + tier badge + edit button *@
+            <div class="profile-header__name-row">
+                <h1 class="profile-header__name">@Model.FirstName @Model.LastName</h1>
+
+                <span class="profile-tier-badge" style="color: @tierColor;">
+                    <i class="bi @tierIcon" aria-hidden="true"></i>
+                    @tierLabel
+                </span>
+
+                @if (Model.IsOwnProfile)
+                {
+                    <button class="profile-edit-btn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editProfileModal"
+                            id="btn-edit-profile">
+                        <i class="bi bi-pencil" aria-hidden="true"></i> Edit Profile
+                    </button>
+                }
+            </div>
+
+            @* Meta row: Location · Member Since *@
+            <div class="profile-header__meta">
+                @if (!string.IsNullOrEmpty(Model.Location))
+                {
+                    <span class="profile-header__meta-item">
+                        <i class="bi bi-geo-alt" aria-hidden="true"></i>
+                        @Model.Location
+                    </span>
+                }
+                @if (!string.IsNullOrEmpty(Model.MemberSince))
+                {
+                    @if (!string.IsNullOrEmpty(Model.Location))
+                    {
+                        <span class="profile-header__meta-dot" aria-hidden="true">&middot;</span>
+                    }
+                    <span class="profile-header__meta-item">
+                        <i class="bi bi-calendar3" aria-hidden="true"></i>
+                        Member since @Model.MemberSince
+                    </span>
+                }
+            </div>
+
+            @* Star rating row *@
+            @if (Model.ReputationScore > 0)
+            {
+                <div class="profile-header__stars" aria-label="Reputation @Model.FormattedRating out of 5">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <i class="bi bi-star-fill profile-header__star @(i <= Math.Round(Model.ReputationScore) ? "" : "profile-header__star--empty")"
+                           aria-hidden="true"></i>
+                    }
+                    <span class="profile-header__rating">@Model.FormattedRating</span>
+                    <span class="profile-header__review-count">(@Model.ReviewCount reviews)</span>
+                </div>
+            }
+        </div>
     </div>
 </div>

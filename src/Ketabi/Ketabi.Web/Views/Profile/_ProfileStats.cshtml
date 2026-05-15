@@ -1,9 +1,46 @@
 @* ─────────────────────────────────────────────────────────────────────────
    Views/Profile/_ProfileStats.cshtml
    Model: ProfileViewModel
-   Reputation (with stars), Listings Count, Trades Count
+   4-stat grid + animated reputation progress bar with tier pill
 ───────────────────────────────────────────────────────────────────────── *@
 @model Ketabi.Web.ViewModels.Profile.ProfileViewModel
+
+@{
+    // ── Reputation Tier — same thresholds as _ProfileHeader ──────────────────
+    string repTierLabel, repTierIcon, repTierColor, repTierBg;
+    if (Model.ReputationScore >= 4.8)
+    {
+        repTierLabel = "Top Reader";
+        repTierIcon  = "bi-award";
+        repTierColor = "#92400E";
+        repTierBg    = "#FEF3C7";
+    }
+    else if (Model.ReputationScore >= 4.0)
+    {
+        repTierLabel = "Trusted";
+        repTierIcon  = "bi-shield-check";
+        repTierColor = "#3730A3";
+        repTierBg    = "#EEF2FF";
+    }
+    else if (Model.ReputationScore > 0)
+    {
+        repTierLabel = "Active";
+        repTierIcon  = "bi-graph-up";
+        repTierColor = "#065F46";
+        repTierBg    = "#D1FAE5";
+    }
+    else
+    {
+        repTierLabel = "New Member";
+        repTierIcon  = "bi-book";
+        repTierColor = "#374151";
+        repTierBg    = "#F3F4F6";
+    }
+
+    var repBarWidth = Model.ReputationScore > 0
+        ? (Model.ReputationScore / 5.0 * 100).ToString("F1")
+        : "0";
+}
 
 <div class="profile-stats">
 
@@ -39,3 +76,34 @@
     </div>
 
 </div>
+
+@* ── Reputation Progress Bar (only when reputation exists) ── *@
+@if (Model.ReputationScore > 0)
+{
+    <div class="profile-rep-bar-section">
+        <div class="profile-rep-bar__header">
+            <span class="profile-rep-bar__title">Reputation Score</span>
+            <div class="profile-rep-bar__right">
+                <span class="profile-tier-pill"
+                      style="background: @repTierBg; color: @repTierColor;">
+                    <i class="bi @repTierIcon" aria-hidden="true"></i>
+                    @repTierLabel
+                </span>
+                <span class="profile-rep-bar__score" style="color: @repTierColor;">
+                    @Model.FormattedRating/5.0
+                </span>
+            </div>
+        </div>
+
+        <div class="profile-rep-bar__track" role="progressbar"
+             aria-valuenow="@((int)(Model.ReputationScore / 5.0 * 100))"
+             aria-valuemin="0" aria-valuemax="100"
+             aria-label="Reputation @Model.FormattedRating out of 5">
+            <div class="profile-rep-bar__fill" style="width: @repBarWidth%;"></div>
+        </div>
+
+        <div class="profile-rep-bar__scale" aria-hidden="true">
+            <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+        </div>
+    </div>
+}
