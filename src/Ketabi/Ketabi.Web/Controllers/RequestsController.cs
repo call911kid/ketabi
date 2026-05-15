@@ -175,6 +175,7 @@ public class RequestsController : BaseController
                 ReviewCount = dto.OwnerReviewCount,
                 TradesCount = dto.OwnerTradesCount
             },
+            IsIncoming = isIncoming,
             CanAcceptOrReject = isIncoming && dto.Status == RequestStatus.Pending,
             CanWithdraw = !isIncoming && dto.Status == RequestStatus.Pending
         };

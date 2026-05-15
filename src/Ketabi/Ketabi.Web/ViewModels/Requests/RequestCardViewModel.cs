@@ -57,6 +57,9 @@ public class RequestCardViewModel
         ? (int)(ReturnDate.Value - DateTime.UtcNow).TotalDays
         : null;
 
+    // True when the current user received this request (they own the requested listing).
+    public bool IsIncoming { get; set; }
+
     // Action Visibility Flags
 
     // Owner can Accept/Reject only when Pending.
@@ -64,4 +67,11 @@ public class RequestCardViewModel
 
     // Requester can withdraw only when Pending.
     public bool CanWithdraw        { get; set; }
+
+    // The other party shown on the card — requester for received, listing owner for sent.
+    public UserSummaryViewModel Counterparty => IsIncoming ? Requester : Owner;
+
+    public string CounterpartyRoleLabel => IsIncoming ? "Requester" : "Owner";
+
+    public string CounterpartySectionLabel => IsIncoming ? "From" : "To";
 }

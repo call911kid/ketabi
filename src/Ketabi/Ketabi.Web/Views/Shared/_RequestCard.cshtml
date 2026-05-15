@@ -2,8 +2,8 @@
 
 @{
     var requestCardStylesAdded = Context.Items.ContainsKey("RequestCardStylesAdded");
-    var party = Model.CanAcceptOrReject ? Model.Requester : Model.Owner;
-    var partyRole = Model.CanAcceptOrReject ? "Requester" : "Owner";
+    var party = Model.Counterparty;
+    var partyRole = Model.CounterpartyRoleLabel;
     var partyHasAvatar = !string.IsNullOrEmpty(party.AvatarUrl);
 }
 
@@ -301,14 +301,20 @@
         }
 
         .request-card__party {
-            display: grid;
-            grid-template-columns: 44px 1fr;
-            gap: 0.85rem;
-            align-items: center;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
             padding: 0.75rem 0.85rem;
             border-radius: 14px;
             background: rgba(248, 249, 255, 0.9);
             border: 1px solid rgba(91, 91, 214, 0.08);
+        }
+
+        .request-card__party-row {
+            display: grid;
+            grid-template-columns: 44px 1fr;
+            gap: 0.85rem;
+            align-items: center;
         }
 
         .request-card__avatar {
@@ -726,7 +732,12 @@
 
         <hr class="request-card__divider" />
 
-        <section class="request-card__party" aria-label="@partyRole information">
+        <section class="request-card__party" aria-label="@Model.CounterpartySectionLabel — @partyRole">
+            <p class="request-card__section-label">
+                <i class="bi bi-person" aria-hidden="true"></i>
+                @Model.CounterpartySectionLabel
+            </p>
+            <div class="request-card__party-row">
             <div class="request-card__avatar" title="@party.FullName">
                 @if (partyHasAvatar)
                 {
@@ -749,6 +760,7 @@
                         @(Model.IsBorrow ? "Borrow" : "Exchange") request
                     </span>
                 </div>
+            </div>
             </div>
         </section>
 
