@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using Ketabi.Application.Common;
 using Ketabi.Application.DTOs.Books;
 using Ketabi.Application.DTOs.Users;
+using Ketabi.Application.DTOs.Notifications;
 using Ketabi.Application.Interfaces;
 using Ketabi.Core.Domain.Entities;
 using Ketabi.Core.Domain.Enums;
@@ -14,10 +15,13 @@ namespace Ketabi.Application.Services
     {
         private readonly IUnitOfWork _uow;
         private readonly AutoMapper.IMapper _mapper;
-        public BookListingService(IUnitOfWork uow, AutoMapper.IMapper mapper)
+        private readonly INotificationService _notificationService;
+
+        public BookListingService(IUnitOfWork uow, AutoMapper.IMapper mapper, INotificationService notificationService)
         {
             _uow = uow;
             _mapper = mapper;
+            _notificationService = notificationService;
         }
 
         public async Task<BookDetailDto> CreateBookAsync(CreateBookDto createDto, Guid userId)
@@ -328,7 +332,40 @@ namespace Ketabi.Application.Services
 
             await _uow.SaveChangesAsync();
 
+            try
+            {
+                if (listingStatus == ListingStatus.Approved)
+                {
+                    await _notificationService.CreateNotificationAsync(new CreateNotificationDto
+                    {
+                        UserId = listing.UserId,
+                        Title = "Listing Approved",
+                        Content = $"Your book \"{Truncate(listing.Title, 80)}\" is now live and visible to readers.",
+                        NotificationType = NotificationType.System
+                    });
+                }
+                else if (listingStatus == ListingStatus.Rejected)
+                {
+                    var reason = string.IsNullOrWhiteSpace(reasonForRejection)
+                        ? "No reason provided."
+                        : reasonForRejection;
+
+                    await _notificationService.CreateNotificationAsync(new CreateNotificationDto
+                    {
+                        UserId = listing.UserId,
+                        Title = "Listing Not Approved",
+                        Content = $"Your book \"{Truncate(listing.Title, 80)}\" was not approved. Reason: {Truncate(reason, 100)}",
+                        NotificationType = NotificationType.System
+                    });
+                }
+            }
+            catch { }
         }
+
+        private static string Truncate(string? value, int maxLength)
+            => string.IsNullOrEmpty(value)
+                ? string.Empty
+                : value.Length <= maxLength ? value : value[..maxLength];
 
     }
 }

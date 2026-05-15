@@ -6,16 +6,19 @@ using Ketabi.Application.Interfaces;
 using Ketabi.Core.Domain.Entities;
 using Ketabi.Core.Domain.Enums;
 using Ketabi.Core.Interfaces;
+using Ketabi.Application.DTOs.Notifications;
 
 namespace Ketabi.Application.Services;
 
 internal class RequestService : IRequestService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly INotificationService _notificationService;
 
-    public RequestService(IUnitOfWork unitOfWork)
+    public RequestService(IUnitOfWork unitOfWork, INotificationService notificationService)
     {
         _unitOfWork = unitOfWork;
+        _notificationService = notificationService;
     }
 
     public async Task<RequestDto> CreateBorrowRequestAsync(Guid requesterId, CreateBorrowRequestDto dto)
@@ -55,6 +58,22 @@ internal class RequestService : IRequestService
 
         await _unitOfWork.Requests.AddAsync(request);
         await _unitOfWork.SaveChangesAsync();
+
+        try
+        {
+            var sender = await _unitOfWork.Users.GetByIdAsync(requesterId);
+            var senderFullName = GetFullName(sender);
+            var bookTitle = listing.Title ?? "a book";
+
+            await _notificationService.CreateNotificationAsync(new CreateNotificationDto
+            {
+                UserId = request.ReceiverId,
+                Title = "New Borrow Request",
+                Content = $"{Truncate(senderFullName, 60)} wants to borrow \"{Truncate(bookTitle, 80)}\"",
+                NotificationType = NotificationType.RequestUpdate
+            });
+        }
+        catch { }
 
         return await GetExistingRequestDtoAsync(request.Id);
     }
@@ -110,6 +129,22 @@ internal class RequestService : IRequestService
 
         await _unitOfWork.Requests.AddAsync(request);
         await _unitOfWork.SaveChangesAsync();
+
+        try
+        {
+            var sender = await _unitOfWork.Users.GetByIdAsync(requesterId);
+            var senderFullName = GetFullName(sender);
+            var bookTitle = listing.Title ?? "a book";
+
+            await _notificationService.CreateNotificationAsync(new CreateNotificationDto
+            {
+                UserId = request.ReceiverId,
+                Title = "New Exchange Request",
+                Content = $"{Truncate(senderFullName, 60)} wants to exchange for \"{Truncate(bookTitle, 80)}\"",
+                NotificationType = NotificationType.RequestUpdate
+            });
+        }
+        catch { }
 
         return await GetExistingRequestDtoAsync(request.Id);
     }
@@ -207,6 +242,35 @@ internal class RequestService : IRequestService
         _unitOfWork.Requests.Update(request);
         await _unitOfWork.SaveChangesAsync();
 
+        try
+        {
+            var bookTitle = request.Listing?.Title ?? "the book";
+            var owner = await _unitOfWork.Users.GetByIdAsync(ownerId);
+            var ownerName = GetFullName(owner);
+
+            if (dto.Status == RequestStatus.Approved)
+            {
+                await _notificationService.CreateNotificationAsync(new CreateNotificationDto
+                {
+                    UserId = request.SenderId,
+                    Title = "Request Approved 🎉",
+                    Content = $"Your request for \"{Truncate(bookTitle, 80)}\" has been approved. Coordinate with {Truncate(ownerName, 60)} to arrange the handoff.",
+                    NotificationType = NotificationType.RequestUpdate
+                });
+            }
+            else if (dto.Status == RequestStatus.Rejected)
+            {
+                await _notificationService.CreateNotificationAsync(new CreateNotificationDto
+                {
+                    UserId = request.SenderId,
+                    Title = "Request Not Approved",
+                    Content = $"Your request for \"{Truncate(bookTitle, 80)}\" was not approved this time.",
+                    NotificationType = NotificationType.RequestUpdate
+                });
+            }
+        }
+        catch { }
+
         return await GetExistingRequestDtoAsync(request.Id);
     }
 
@@ -248,6 +312,28 @@ internal class RequestService : IRequestService
 
         _unitOfWork.Requests.Update(request);
         await _unitOfWork.SaveChangesAsync();
+
+        try
+        {
+            var bookTitle = request.Listing?.Title ?? "the book";
+
+            await _notificationService.CreateNotificationAsync(new CreateNotificationDto
+            {
+                UserId = request.SenderId,
+                Title = "Trade Completed ✅",
+                Content = $"Your trade for \"{Truncate(bookTitle, 80)}\" is marked as complete. You can now leave a review.",
+                NotificationType = NotificationType.RequestUpdate
+            });
+
+            await _notificationService.CreateNotificationAsync(new CreateNotificationDto
+            {
+                UserId = request.ReceiverId,
+                Title = "Trade Completed ✅",
+                Content = $"Your trade for \"{Truncate(bookTitle, 80)}\" is marked as complete. You can now leave a review.",
+                NotificationType = NotificationType.RequestUpdate
+            });
+        }
+        catch { }
 
         return await GetExistingRequestDtoAsync(request.Id);
     }
@@ -336,4 +422,9 @@ internal class RequestService : IRequestService
 
         return user.City ?? user.Governorate ?? string.Empty;
     }
+
+    private static string Truncate(string? value, int maxLength)
+        => string.IsNullOrEmpty(value)
+            ? string.Empty
+            : value.Length <= maxLength ? value : value[..maxLength];
 }
