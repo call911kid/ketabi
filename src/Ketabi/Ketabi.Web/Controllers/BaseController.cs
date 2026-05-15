@@ -47,6 +47,10 @@ namespace Ketabi.Web.Controllers
                         //navbar.BooksListed = summary.BooksListed;
                         navbar.CompletedTransactions = summary.TradesCount;
 
+                        // Fetch unread notification count for bell badge
+                        var notifService = HttpContext.RequestServices.GetService<INotificationService>();
+                        if (notifService != null)
+                            navbar.UnreadNotifications = await notifService.GetUnreadCountAsync(userId);
                     }
                 }
                 // Place into ViewData so _Layout can pass it explicitly to the partial

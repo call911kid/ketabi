@@ -762,3 +762,24 @@
   color: #fff;
   text-decoration: none;
 }
+
+
+
+.notif-nav-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: var(--badge-chip);
+    height: var(--badge-chip);
+    padding-inline: 3px;
+    border-radius: var(--radius-full);
+    background: var(--color-error);
+    color: white;
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-bold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    border: 2px solid var(--color-surface);
+}

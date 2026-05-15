@@ -730,35 +730,14 @@
             </div>
         }
 
-        <hr class="request-card__divider" />
-
-        <section class="request-card__party" aria-label="@Model.CounterpartySectionLabel — @partyRole">
-            <p class="request-card__section-label">
-                <i class="bi bi-person" aria-hidden="true"></i>
-                @Model.CounterpartySectionLabel
-            </p>
-            <div class="request-card__party-row">
-            <div class="request-card__avatar" title="@party.FullName">
-                @if (partyHasAvatar)
-                {
-                    <img src="@party.AvatarUrl" alt="@party.FullName" />
-                }
-                else
-                {
-                    <span>@party.Initials</span>
-                }
-            </div>
-            <div class="request-card__party-info">
-                <p class="request-card__party-name">@party.FullName</p>
-                <p class="request-card__party-handle">@($"@{party.UserName}")</p>
-                <div class="request-card__party-tags">
-                    <span class="request-card__party-tag">
-                        <i class="bi bi-person-badge" aria-hidden="true"></i>@partyRole
-                    </span>
-                    <span class="request-card__party-tag">
-                        <i class="bi @(Model.IsBorrow ? "bi-book" : "bi-arrow-left-right")" aria-hidden="true"></i>
-                        @(Model.IsBorrow ? "Borrow" : "Exchange") request
-                    </span>
+        <div class="request-card__section">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <img src="~/uploads/users/@(string.IsNullOrEmpty(Model.CanAcceptOrReject ? Model.Requester.AvatarUrl : Model.Owner.AvatarUrl) ? "/images/avatar-placeholder.png" : (Model.CanAcceptOrReject ? Model.Requester.AvatarUrl : Model.Owner.AvatarUrl))"
+                     alt="@(Model.CanAcceptOrReject ? Model.Requester.FullName : Model.Owner.FullName)"
+                     class="rounded-circle" style="width: 36px; height: 36px; object-fit: cover;" />
+                <div>
+                    <div class="fw-semibold">@(Model.CanAcceptOrReject ? Model.Requester.FullName : Model.Owner.FullName)</div>
+                    <div class="text-muted small">@(Model.CanAcceptOrReject ? Model.Requester.UserName : Model.Owner.UserName)</div>
                 </div>
             </div>
             </div>
