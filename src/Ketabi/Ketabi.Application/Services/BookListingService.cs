@@ -282,7 +282,34 @@ namespace Ketabi.Application.Services
             return paged.Items.Select(b => _mapper.Map<BookSummaryDto>(b));
         }
 
-
+        public async Task<IEnumerable<PendingBookDto>> GetUserPendingBooksAsync(Guid userId)
+        {
+            var pendingBooks = await _uow.Listings.FindWithIncludesAsync(l => l.UserId == userId && l.ListingStatus == ListingStatus.Pending);
+            return pendingBooks.Select(b => new PendingBookDto
+            {
+                Id = b.Id.ToString(),
+                Title = b.Title,
+                Author = b.Author,
+                Category = b.Category?.Name ?? string.Empty,
+                Condition = b.Condition.ToString(),
+                OwnerId = b.UserId.ToString(),
+                OwnerName = $"{b.User?.FirstName ?? ""} {b.User?.LastName ?? ""}".Trim(),
+                SubmittedAt = b.CreatedAt.ToString("yyyy-MM-dd HH:mm"),
+                Status = b.ListingStatus.ToString(),
+                RejectionReason = b.ReasonForRejection,
+                Description = b.Description ?? string.Empty,
+                TransactionType = b.SharingMode.ToString(),
+                CoverColor = "#6366F1",
+                ISBN = b.ISBN,
+                Language = b.Language,
+                Publisher = b.Publisher,
+                ImageUrl = b.ImageUrl,
+                LocationNote = b.LocationNote,
+                SharingDurationInDays = b.SharingDurationInDays,
+                IsAvailable = b.IsAvailable,
+                Tags = b.Tags?.Select(t => t.Tag) ?? Enumerable.Empty<string>()
+            });
+        }
 
         private async Task ChangeListingStatus(Guid listingId, ListingStatus listingStatus, string reasonForRejection=null!)
         {

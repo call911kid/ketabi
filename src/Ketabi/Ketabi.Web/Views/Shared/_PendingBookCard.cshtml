@@ -1,0 +1,70 @@
+@model Ketabi.Web.ViewModels.Requests.PendingBookCardViewModel
+
+<div class="request-card">
+    <div class="request-card-header">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h6 class="mb-1 text-truncate">@Model.Title</h6>
+                <p class="text-muted mb-0 small">by @Model.Author</p>
+            </div>
+            <span class="badge bg-warning-light text-warning" style="white-space: nowrap;">Pending Review</span>
+        </div>
+    </div>
+
+    <div class="request-card-body">
+        <div class="row g-3 align-items-center">
+            <!-- Book Image -->
+            <div class="col-4">
+                @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" alt="@Model.Title" class="img-fluid rounded" style="object-fit: cover; height: 100px; width: 100%;" />
+                }
+                else
+                {
+                    <div class="rounded d-flex align-items-center justify-content-center" style="background-color: @Model.CoverColor; height: 100px; width: 100%;">
+                        <i class="bi bi-book" style="font-size: 2rem; color: rgba(0,0,0,0.2);"></i>
+                    </div>
+                }
+            </div>
+
+            <!-- Book Details -->
+            <div class="col-8">
+                <div class="d-flex flex-column gap-2">
+                    <div>
+                        <span class="badge bg-light text-dark me-1">@Model.Category</span>
+                        <span class="badge bg-light text-dark">@Model.Condition</span>
+                    </div>
+                    <small class="text-muted">
+                        <i class="bi bi-calendar3"></i> Submitted @Model.SubmittedAt.ToString("MMM dd, yyyy")
+                    </small>
+                    <div>
+                        <span class="badge bg-info-light text-info">@Model.TransactionType</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Description))
+        {
+            <p class="text-muted small mt-3 mb-0 text-truncate" title="@Model.Description">
+                @Model.Description
+            </p>
+        }
+    </div>
+
+    <div class="request-card-footer d-flex gap-2 p-3 border-top">
+        <button class="btn btn-sm btn-outline-secondary flex-grow-1" disabled title="Admin review pending">
+            <i class="bi bi-hourglass-split"></i> Under Review
+        </button>
+    </div>
+</div>
+
+<style>
+    .bg-warning-light {
+        background-color: rgba(255, 193, 7, 0.15) !important;
+    }
+
+    .bg-info-light {
+        background-color: rgba(23, 162, 184, 0.15) !important;
+    }
+</style>

@@ -14,11 +14,13 @@ namespace Ketabi.Web.Controllers;
 public class RequestsController : BaseController
 {
     private readonly IRequestService _requestService;
+    private readonly IBookListingService _bookListingService;
     private readonly IMapper _mapper;
 
-    public RequestsController(IRequestService requestService, IMapper mapper)
+    public RequestsController(IRequestService requestService, IBookListingService bookListingService, IMapper mapper)
     {
         _requestService = requestService;
+        _bookListingService = bookListingService;
         _mapper = mapper;
     }
 
@@ -40,12 +42,14 @@ public class RequestsController : BaseController
 
         var incomingRequests = await _requestService.GetIncomingRequestsAsync(userId, query);
         var outgoingRequests = await _requestService.GetOutgoingRequestsAsync(userId, query);
+        var userPendingBooks = await _bookListingService.GetUserPendingBooksAsync(userId);
 
         var viewModel = new RequestsIndexViewModel
         {
             ActiveTab = tab,
             IncomingRequests = incomingRequests.Items.Select(r => MapToCardViewModel(r, userId)).ToList(),
-            OutgoingRequests = outgoingRequests.Items.Select(r => MapToCardViewModel(r, userId)).ToList()
+            OutgoingRequests = outgoingRequests.Items.Select(r => MapToCardViewModel(r, userId)).ToList(),
+            PendingBooks = userPendingBooks.Select(b => MapPendingBookCardViewModel(b)).ToList()
         };
 
         return View(viewModel);
@@ -191,5 +195,23 @@ public class RequestsController : BaseController
         }
 
         return viewModel;
+    }
+
+    private PendingBookCardViewModel MapPendingBookCardViewModel(Ketabi.Application.DTOs.Books.PendingBookDto dto)
+    {
+        return new PendingBookCardViewModel
+        {
+            BookId = dto.Id,
+            Title = dto.Title,
+            Author = dto.Author,
+            Category = dto.Category,
+            Condition = dto.Condition,
+            TransactionType = dto.TransactionType,
+            ImageUrl = dto.ImageUrl ?? string.Empty,
+            CoverColor = dto.CoverColor,
+            SubmittedAt = DateTime.TryParse(dto.SubmittedAt, out var date) ? date : DateTime.Now,
+            Description = dto.Description,
+            IsAvailable = dto.IsAvailable
+        };
     }
 }
