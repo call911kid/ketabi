@@ -17,4 +17,6 @@ public class UserSummaryDto
     public int ReviewCount { get; set; }
     public int TradesCount { get; set; }
     public int ListingCount { get; set; }
+
+    public string MemberSince { get; set; } = string.Empty;
 }
