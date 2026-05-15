@@ -269,3 +269,131 @@
   line-height: 1;
   border: 2px solid var(--color-surface);
 }
+
+/* ── Toast Container ──────────────────────────────────────────── */
+.notif-toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 1090;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+
+/* ── Toast Card ─────────────────────────────────────────────────── */
+.notif-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: var(--color-surface);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-float);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  min-width: 280px;
+  max-width: 360px;
+  pointer-events: auto;
+
+  opacity: 0;
+  transform: translateY(12px) scale(0.97);
+  transition: opacity var(--duration-normal) var(--ease-default),
+              transform var(--duration-normal) var(--ease-default);
+}
+
+.notif-toast--visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.notif-toast--exit {
+  opacity: 0;
+  transform: translateY(8px) scale(0.97);
+}
+
+/* ── Toast Icon ─────────────────────────────────────────────────── */
+.notif-toast__icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-lg);
+  background: var(--color-indigo-light);
+  color: var(--color-indigo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+/* ── Toast Body ─────────────────────────────────────────────────── */
+.notif-toast__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-toast__title {
+  font-size: var(--text-sm-nav);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+  margin: 0 0 0.15rem;
+  line-height: var(--leading-tight);
+}
+
+.notif-toast__content {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: var(--leading-body);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Toast Close Button ─────────────────────────────────────────── */
+.notif-toast__close {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  color: var(--color-text-faint);
+  font-size: 0.875rem;
+  padding: 0;
+  transition: background var(--duration-base) var(--ease-default),
+              color var(--duration-base) var(--ease-default);
+}
+
+.notif-toast__close:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* ── Live Card Enter Animation (Notifications page) ─────────────── */
+@keyframes cardSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notif-card--live-enter {
+  animation: cardSlideDown 0.35s var(--ease-default) both;
+}
+
+/* ── Notification Card Icon Variants ────────────────────────────── */
+.notif-card__icon--general  { background: var(--color-indigo-light);  color: var(--color-indigo); }
+.notif-card__icon--request  { background: var(--color-success-light);  color: var(--color-success); }
+.notif-card__icon--review   { background: var(--color-warning-light);  color: var(--color-warning); }
+.notif-card__icon--message  { background: var(--color-info-light);     color: var(--color-info); }
+.notif-card__icon--system   { background: var(--color-muted-light);    color: var(--color-text-muted); }
