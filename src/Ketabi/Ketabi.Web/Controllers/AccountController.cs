@@ -103,5 +103,17 @@ namespace Ketabi.Web.Controllers
         }
 
         #endregion
+
+        #region Unauthorized
+
+        [HttpGet("/Account/Unauthorized")]
+        public IActionResult UnauthorizedPage()
+        {
+            Response.StatusCode = StatusCodes.Status403Forbidden;
+            ViewData["Title"] = "Unauthorized";
+            return View("Unauthorized");
+        }
+
+        #endregion
     }
 }

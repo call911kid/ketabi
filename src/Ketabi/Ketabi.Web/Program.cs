@@ -145,6 +145,7 @@ namespace Ketabi.Web
             app.UseUnderDevelopmentGuard();
 
             app.UseAuthentication();
+            app.UseAuthorizationGuard();
             app.UseAuthorization();
 
             app.MapHub<NotificationHub>("/hubs/notifications");
