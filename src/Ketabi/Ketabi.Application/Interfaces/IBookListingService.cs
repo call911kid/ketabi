@@ -25,7 +25,7 @@ namespace Ketabi.Application.Interfaces
 
         Task<IEnumerable<BookSummaryDto>> GetFilteredBooksAsync(BookFilterDto filter);
 
-        Task<BookDetailDto> GetBookByIdAsync(Guid bookId);
+        Task<BookDetailDto> GetBookByIdAsync(Guid bookId, Guid? userId = null);
 
         Task<BookDetailDto> CreateBookAsync(CreateBookDto createDto, Guid userId);
 

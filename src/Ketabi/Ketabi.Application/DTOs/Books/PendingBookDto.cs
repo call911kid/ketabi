@@ -18,4 +18,14 @@ public class PendingBookDto
     public string Description { get; init; } = string.Empty;
     public string TransactionType { get; init; } = string.Empty;
     public string CoverColor { get; init; } = string.Empty;
+    
+    // Additional fields for modal
+    public string? ISBN { get; init; }
+    public string? Language { get; init; }
+    public string? Publisher { get; init; }
+    public string? ImageUrl { get; init; }
+    public string? LocationNote { get; init; }
+    public int? SharingDurationInDays { get; init; }
+    public bool IsAvailable { get; init; }
+    public IEnumerable<string> Tags { get; init; } = new List<string>();
 }

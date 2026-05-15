@@ -87,19 +87,19 @@ namespace Ketabi.Application.Services
 
         public async Task<IEnumerable<BookSummaryDto>> GetAllBooksAsync(int pageNumber, int pageSize)
         {
-            var paged = await _uow.Listings.GetPagedWithIncludesAsync(pageNumber, pageSize);
+            var paged = await _uow.Listings.FindPagedWithIncludesAsync(l => l.ListingStatus == ListingStatus.Approved, pageNumber, pageSize);
             return paged.Items.Select(b => _mapper.Map<BookSummaryDto>(b));
         }
 
         public async Task<IEnumerable<BookSummaryDto>> GetBooksByAuthorAsync(string author, int pageNumber, int pageSize)
         {
-            var paged = await _uow.Listings.FindPagedWithIncludesAsync(b => b.Author.Contains(author), pageNumber, pageSize);
+            var paged = await _uow.Listings.FindPagedWithIncludesAsync(b => b.Author.Contains(author) && b.ListingStatus == ListingStatus.Approved, pageNumber, pageSize);
             return paged.Items.Select(b => _mapper.Map<BookSummaryDto>(b));
         }
 
         public async Task<IEnumerable<BookSummaryDto>> GetBooksByCategoryAsync(string category, int pageNumber, int pageSize)
         {
-            var paged = await _uow.Listings.FindPagedWithIncludesAsync(b => b.Category != null && b.Category.Name == category, pageNumber, pageSize);
+            var paged = await _uow.Listings.FindPagedWithIncludesAsync(b => b.Category != null && b.Category.Name == category && b.ListingStatus == ListingStatus.Approved, pageNumber, pageSize);
             return paged.Items.Select(b => _mapper.Map<BookSummaryDto>(b));
         }
 
@@ -108,7 +108,7 @@ namespace Ketabi.Application.Services
             var book = await _uow.Listings.GetByIdAsync(bookId);
             if (book == null) return Enumerable.Empty<BookSummaryDto>();
 
-            var paged = await _uow.Listings.FindPagedWithIncludesAsync(b => b.CategoryId == book.CategoryId && b.Id != bookId, pageNumber, pageSize);
+            var paged = await _uow.Listings.FindPagedWithIncludesAsync(b => b.CategoryId == book.CategoryId && b.Id != bookId && b.ListingStatus == ListingStatus.Approved, pageNumber, pageSize);
             return paged.Items.Select(b => _mapper.Map<BookSummaryDto>(b));
         }
 
@@ -124,7 +124,8 @@ namespace Ketabi.Application.Services
             var paged = await _uow.Listings.FindPagedWithIncludesAsync(b =>
                 (b.Title != null && b.Title.ToLowerInvariant().Contains(normalizedQuery)) ||
                 (b.Author != null && b.Author.ToLowerInvariant().Contains(normalizedQuery)) ||
-                (b.ISBN != null && b.ISBN.ToLowerInvariant().Contains(normalizedQuery)),
+                (b.ISBN != null && b.ISBN.ToLowerInvariant().Contains(normalizedQuery)) &&
+                b.ListingStatus == ListingStatus.Approved,
                 pageNumber,
                 pageSize);
             return paged.Items.Select(b => _mapper.Map<BookSummaryDto>(b));
@@ -133,7 +134,7 @@ namespace Ketabi.Application.Services
         public async Task<IEnumerable<BookSummaryDto>> GetFilteredBooksAsync(BookFilterDto filter)
         {
             var listings = await _uow.Listings.GetAllWithIncludesAsync();
-            IEnumerable<BookListing> query = listings;
+            IEnumerable<BookListing> query = listings.Where(l => l.ListingStatus == ListingStatus.Approved);
 
             if (!string.IsNullOrWhiteSpace(filter.Query))
             {
@@ -177,10 +178,17 @@ namespace Ketabi.Application.Services
             return items.Select(b => _mapper.Map<BookSummaryDto>(b));
         }
 
-        public async Task<BookDetailDto> GetBookByIdAsync(Guid bookId)
+        public async Task<BookDetailDto> GetBookByIdAsync(Guid bookId, Guid? userId = null)
         {
             var listing = await _uow.Listings.GetByIdWithIncludesAsync(bookId);
             if (listing == null) throw new KeyNotFoundException("Book not found");
+
+            // Check if user can view this book
+            if (listing.ListingStatus != ListingStatus.Approved && 
+                (userId == null || listing.UserId != userId))
+            {
+                throw new UnauthorizedAccessException("Book not available");
+            }
 
             var book = new BookDetailDto
             {
@@ -259,7 +267,7 @@ namespace Ketabi.Application.Services
 
             await _uow.SaveChangesAsync();
 
-            return await GetBookByIdAsync(bookId);
+            return await GetBookByIdAsync(bookId, userId);
         }
 
         public async Task ApproveListingAsync(Guid listingId) => await ChangeListingStatus(listingId, ListingStatus.Approved);

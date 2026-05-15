@@ -111,7 +111,7 @@ public class BooksController : BaseController
             }
 
             // Fetch book details
-            var bookDetailDto = await _bookListingService.GetBookByIdAsync(id);
+            var bookDetailDto = await _bookListingService.GetBookByIdAsync(id, currentUserId);
             if (bookDetailDto == null)
             {
                 return NotFound("Book not found");
@@ -141,7 +141,7 @@ public class BooksController : BaseController
         {
             try
             {
-                var bookDetailDto = await _bookListingService.GetBookByIdAsync(BorrowRequest.BookId);
+                var bookDetailDto = await _bookListingService.GetBookByIdAsync(BorrowRequest.BookId, userId);
                 var viewModel = await BuildBookDetailViewModelAsync(bookDetailDto, userId);
                 viewModel.BorrowRequest = BorrowRequest;
                 return View("Details", viewModel);
@@ -169,7 +169,7 @@ public class BooksController : BaseController
             ModelState.AddModelError(string.Empty, ex.Message);
             try
             {
-                var bookDetailDto = await _bookListingService.GetBookByIdAsync(BorrowRequest.BookId);
+                var bookDetailDto = await _bookListingService.GetBookByIdAsync(BorrowRequest.BookId, userId);
                 var viewModel = await BuildBookDetailViewModelAsync(bookDetailDto, userId);
                 viewModel.BorrowRequest = BorrowRequest;
                 return View("Details", viewModel);
@@ -195,7 +195,7 @@ public class BooksController : BaseController
         {
             try
             {
-                var bookDetailDto = await _bookListingService.GetBookByIdAsync(ExchangeRequest.BookId);
+                var bookDetailDto = await _bookListingService.GetBookByIdAsync(ExchangeRequest.BookId, userId);
                 var viewModel = await BuildBookDetailViewModelAsync(bookDetailDto, userId);
                 viewModel.ExchangeRequest = ExchangeRequest;
                 return View("Details", viewModel);
@@ -223,7 +223,7 @@ public class BooksController : BaseController
             ModelState.AddModelError(string.Empty, ex.Message);
             try
             {
-                var bookDetailDto = await _bookListingService.GetBookByIdAsync(ExchangeRequest.BookId);
+                var bookDetailDto = await _bookListingService.GetBookByIdAsync(ExchangeRequest.BookId, userId);
                 var viewModel = await BuildBookDetailViewModelAsync(bookDetailDto, userId);
                 viewModel.ExchangeRequest = ExchangeRequest;
                 return View("Details", viewModel);
@@ -322,7 +322,13 @@ public class BooksController : BaseController
     [HttpGet]
     public async Task<IActionResult> Edit(Guid id)
     {
-        var bookDetailDto = await _bookListingService.GetBookByIdAsync(id);
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        var bookDetailDto = await _bookListingService.GetBookByIdAsync(id, userId);
         if (bookDetailDto == null)
         {
             return NotFound("Book not found");

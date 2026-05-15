@@ -219,7 +219,15 @@ namespace Ketabi.Application.Services
                 Status = l.ListingStatus?.ToString() ?? "Unknown",
                 Description = l.Description ?? "",
                 TransactionType = l.SharingMode.ToString(),
-                CoverColor = "#6366F1" // Default color, could be randomized or based on category
+                CoverColor = "#6366F1", // Default color, could be randomized or based on category
+                ISBN = l.ISBN,
+                Language = l.Language,
+                Publisher = l.Publisher,
+                ImageUrl = l.ImageUrl,
+                LocationNote = l.LocationNote,
+                SharingDurationInDays = l.SharingDurationInDays,
+                IsAvailable = l.IsAvailable,
+                Tags = l.Tags.Select(t => t.Tag).ToList()
             }).ToList();
         }
 

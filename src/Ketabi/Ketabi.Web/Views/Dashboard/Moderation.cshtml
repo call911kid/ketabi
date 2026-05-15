@@ -5,7 +5,55 @@
     Layout = "_AdminLayout";
 }
 
-<div style="display: flex; flex-direction: column; gap: 24px;">
+<style>
+    .moderation-page {
+        animation: pageFadeIn 0.5s ease both;
+    }
+
+    .moderation-table-row {
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        transform: translateY(0);
+        animation: rowSlideIn 0.35s ease both;
+    }
+
+    .moderation-table-row:hover {
+        transform: translateY(-2px) scale(1.008);
+        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+        background-color: #ffffff;
+    }
+
+    .modal {
+        opacity: 0;
+        transition: opacity 0.25s ease;
+    }
+
+    .modal.show {
+        opacity: 1;
+    }
+
+    .modal .modal-content {
+        transform: translateY(-16px);
+        opacity: 0;
+        transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    .modal.show .modal-content {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    @@keyframes pageFadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @@keyframes rowSlideIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="moderation-page" style="display: flex; flex-direction: column; gap: 24px;">
     <div>
         <h2 style="font-size: 22px; font-weight: 800; color: #0F172A;">Book Moderation</h2>
         <p style="font-size: 14px; color: #64748B; margin-top: 2px;">Review and approve book listings submitted by users.</p>
@@ -83,10 +131,15 @@
                     {
                         @foreach (var book in Model.PendingBooks)
                         {
-                            <tr style="border-bottom: 1px solid #F1F5F9;">
+                            <tr class="moderation-table-row" style="border-bottom: 1px solid #F1F5F9; cursor: pointer;" onclick="openBookDetailsModal(this)" data-book-id="@book.Id" data-book-title="@Html.Raw(book.Title.Replace("\"", "&quot;").Replace("'", "&#39;"))" data-book-author="@Html.Raw(book.Author.Replace("\"", "&quot;").Replace("'", "&#39;"))" data-book-category="@book.Category" data-book-condition="@book.Condition" data-book-transaction-type="@book.TransactionType" data-book-owner-name="@book.OwnerName" data-book-submitted-at="@book.SubmittedAt" data-book-description="@Html.Raw((book.Description ?? "").Replace("\"", "&quot;").Replace("'", "&#39;"))" data-book-isbn="@book.ISBN" data-book-language="@book.Language" data-book-publisher="@book.Publisher" data-book-sharing-duration="@(book.SharingDurationInDays?.ToString() ?? "")" data-book-is-available="@(book.IsAvailable ? "true" : "false")" data-book-image-url="@book.ImageUrl" data-book-location-note="@Html.Raw((book.LocationNote ?? "").Replace("\"", "&quot;").Replace("'", "&#39;"))" data-book-tags="@Html.Raw(string.Join(",", book.Tags ?? new List<string>()))" data-book-cover-color="@book.CoverColor">
                                 <td style="padding: 1rem 1.5rem;">
                                     <div style="display: flex; align-items: center; gap: 12px;">
-                                        <div style="width: 40px; height: 56px; background: @book.CoverColor; border-radius: 6px; flex-shrink: 0;"></div>
+                                        <div style="width: 40px; height: 56px; border-radius: 6px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: @book.CoverColor;">
+                                            @if (!string.IsNullOrWhiteSpace(book.ImageUrl))
+                                            {
+                                                <img src="@book.ImageUrl" alt="@book.Title" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+                                            }
+                                        </div>
                                         <div>
                                             <p style="font-size: 14px; font-weight: 600; color: #0F172A; margin: 0;">@book.Title</p>
                                             <p style="font-size: 13px; color: #64748B; margin: 4px 0 0 0;">by @book.Author</p>
@@ -114,11 +167,11 @@
                                 </td>
                                 <td style="padding: 1rem 1.5rem; text-align: center;">
                                     <div style="display: flex; gap: 8px; justify-content: center;">
-                                        <button style="padding: 6px 12px; background: #10B981; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 4px;" onclick="approveBook('@book.Id')">
+                                        <button style="padding: 6px 12px; background: #10B981; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 4px;" onclick="event.stopPropagation(); showApprovalModal('@book.Id', '@book.Title')">
                                             <i class="bi bi-check" style="font-size: 11px;"></i>
                                             Approve
                                         </button>
-                                        <button style="padding: 6px 12px; background: #EF4444; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 4px;" onclick="rejectBook('@book.Id')">
+                                        <button style="padding: 6px 12px; background: #EF4444; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 4px;" onclick="event.stopPropagation(); showRejectionModal('@book.Id', '@book.Title')">
                                             <i class="bi bi-x" style="font-size: 11px;"></i>
                                             Reject
                                         </button>
@@ -143,19 +196,340 @@
     </div>
 </div>
 
+<!-- Book Details Modal -->
+<div id="bookDetailsModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
+    <div class="modal-content" style="background-color: #fefefe; margin: 5% auto; padding: 0; border: 1px solid #888; width: 90%; max-width: 800px; border-radius: 14px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <div class="modal-header" style="padding: 1.5rem; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 18px; font-weight: 700; color: #0F172A; margin: 0;">Book Details</h3>
+            <button onclick="closeBookDetailsModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748B;">&times;</button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem; max-height: 70vh; overflow-y: auto;">
+            <div id="bookDetailsContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+        <div class="modal-footer" style="padding: 1.5rem; border-top: 1px solid #E2E8F0; display: flex; gap: 12px; justify-content: flex-end;">
+            <button onclick="closeBookDetailsModal()" style="padding: 8px 16px; background: #F1F5F9; color: #475569; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Approval Confirmation Modal -->
+<div id="approvalModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
+    <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 0; border: 1px solid #888; width: 90%; max-width: 500px; border-radius: 14px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <div class="modal-header" style="padding: 1.5rem; border-bottom: 1px solid #E2E8F0;">
+            <h3 style="font-size: 18px; font-weight: 700; color: #0F172A; margin: 0;">Confirm Approval</h3>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 1rem;">
+                <div style="width: 48px; height: 48px; border-radius: 10px; background: #10B98118; display: flex; align-items: center; justify-content: center; color: #10B981;">
+                    <i class="bi bi-check-circle" style="font-size: 24px;"></i>
+                </div>
+                <div>
+                    <p style="font-size: 16px; font-weight: 600; color: #0F172A; margin: 0;">Approve Book Listing</p>
+                    <p id="approvalBookTitle" style="font-size: 14px; color: #64748B; margin: 4px 0 0 0;"></p>
+                </div>
+            </div>
+            <p style="font-size: 14px; color: #64748B; margin: 0;">Are you sure you want to approve this book listing? Once approved, it will be visible to all users.</p>
+        </div>
+        <div class="modal-footer" style="padding: 1.5rem; border-top: 1px solid #E2E8F0; display: flex; gap: 12px; justify-content: flex-end;">
+            <button onclick="closeApprovalModal()" style="padding: 8px 16px; background: #F1F5F9; color: #475569; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;">Cancel</button>
+            <button id="confirmApprovalBtn" onclick="confirmApproval()" style="padding: 8px 16px; background: #10B981; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;">Approve Book</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rejection Confirmation Modal -->
+<div id="rejectionModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
+    <div class="modal-content" style="background-color: #fefefe; margin: 10% auto; padding: 0; border: 1px solid #888; width: 90%; max-width: 500px; border-radius: 14px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <div class="modal-header" style="padding: 1.5rem; border-bottom: 1px solid #E2E8F0;">
+            <h3 style="font-size: 18px; font-weight: 700; color: #0F172A; margin: 0;">Reject Book Listing</h3>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 1rem;">
+                <div style="width: 48px; height: 48px; border-radius: 10px; background: #EF444418; display: flex; align-items: center; justify-content: center; color: #EF4444;">
+                    <i class="bi bi-x-circle" style="font-size: 24px;"></i>
+                </div>
+                <div>
+                    <p style="font-size: 16px; font-weight: 600; color: #0F172A; margin: 0;">Reject Book Listing</p>
+                    <p id="rejectionBookTitle" style="font-size: 14px; color: #64748B; margin: 4px 0 0 0;"></p>
+                </div>
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <label for="rejectionReason" style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Rejection Reason <span style="color: #EF4444;">*</span></label>
+                <textarea id="rejectionReason" placeholder="Please provide a reason for rejection..." style="width: 100%; min-height: 80px; padding: 12px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 14px; resize: vertical;" required></textarea>
+            </div>
+            <p style="font-size: 14px; color: #64748B; margin: 0;">The book owner will be notified of this rejection with the provided reason.</p>
+        </div>
+        <div class="modal-footer" style="padding: 1.5rem; border-top: 1px solid #E2E8F0; display: flex; gap: 12px; justify-content: flex-end;">
+            <button onclick="closeRejectionModal()" style="padding: 8px 16px; background: #F1F5F9; color: #475569; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;">Cancel</button>
+            <button id="confirmRejectionBtn" onclick="confirmRejection()" style="padding: 8px 16px; background: #EF4444; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;">Reject Book</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    function approveBook(bookId) {
-        if (confirm('Are you sure you want to approve this book listing?')) {
-            // TODO: Implement approve functionality
-            alert('Book approved! (This is a placeholder - implement actual approval logic)');
+    let currentBookId = null;
+    let currentBookTitle = null;
+
+    // Book Details Modal Functions
+    function showModal(modal) {
+        modal.style.display = 'block';
+        requestAnimationFrame(() => modal.classList.add('show'));
+    }
+
+    function hideModal(modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            if (!modal.classList.contains('show')) {
+                modal.style.display = 'none';
+            }
+        }, 250);
+    }
+
+    function openBookDetailsModal(rowElement) {
+        const modal = document.getElementById('bookDetailsModal');
+        const content = document.getElementById('bookDetailsContent');
+        
+        // Get data from the row's data attributes
+        const bookData = {
+            Id: rowElement.getAttribute('data-book-id'),
+            Title: rowElement.getAttribute('data-book-title'),
+            Author: rowElement.getAttribute('data-book-author'),
+            Category: rowElement.getAttribute('data-book-category'),
+            Condition: rowElement.getAttribute('data-book-condition'),
+            TransactionType: rowElement.getAttribute('data-book-transaction-type'),
+            OwnerName: rowElement.getAttribute('data-book-owner-name'),
+            SubmittedAt: rowElement.getAttribute('data-book-submitted-at'),
+            Description: rowElement.getAttribute('data-book-description') || '',
+            ISBN: rowElement.getAttribute('data-book-isbn') || null,
+            Language: rowElement.getAttribute('data-book-language') || null,
+            Publisher: rowElement.getAttribute('data-book-publisher') || null,
+            SharingDurationInDays: rowElement.getAttribute('data-book-sharing-duration') ? parseInt(rowElement.getAttribute('data-book-sharing-duration')) : null,
+            IsAvailable: rowElement.getAttribute('data-book-is-available') === 'true',
+            ImageUrl: rowElement.getAttribute('data-book-image-url') || null,
+            LocationNote: rowElement.getAttribute('data-book-location-note') || null,
+            Tags: rowElement.getAttribute('data-book-tags') ? rowElement.getAttribute('data-book-tags').split(',').filter(t => t.trim()) : [],
+            CoverColor: rowElement.getAttribute('data-book-cover-color')
+        };
+
+        function resolveBookImageUrl(imageUrl) {
+            if (!imageUrl) {
+                return null;
+            }
+            if (imageUrl.startsWith('/') || imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+                return imageUrl;
+            }
+            return `/uploads/books/${imageUrl}`;
+        }
+        
+        const imageSrc = resolveBookImageUrl(bookData.ImageUrl);
+        
+        // Build the book details HTML
+        const bookDetailsHtml = `
+            <div style="display: flex; gap: 24px; margin-bottom: 24px;">
+                <div style="flex-shrink: 0;">
+                    ${imageSrc ? 
+                        `<img src="${imageSrc}" alt="${bookData.Title}" style="width: 200px; height: 280px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);" />` :
+                        `<div style="width: 200px; height: 280px; background: ${bookData.CoverColor}; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">${bookData.Title.charAt(0)}</div>`
+                    }
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="font-size: 24px; font-weight: 800; color: #0F172A; margin: 0 0 8px 0;">${bookData.Title}</h2>
+                    <p style="font-size: 18px; color: #64748B; margin: 0 0 16px 0;">by ${bookData.Author}</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <p style="font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 4px 0;">Category</p>
+                            <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; background: #F1F5F9; border-radius: 6px; font-size: 14px; font-weight: 500; color: #475569;">
+                                <i class="bi bi-tag" style="font-size: 12px;"></i>
+                                ${bookData.Category}
+                            </span>
+                        </div>
+                        <div>
+                            <p style="font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 4px 0;">Condition</p>
+                            <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; background: #FEF3C7; border-radius: 6px; font-size: 14px; font-weight: 500; color: #92400E;">
+                                <i class="bi bi-star" style="font-size: 12px;"></i>
+                                ${bookData.Condition}
+                            </span>
+                        </div>
+                        <div>
+                            <p style="font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 4px 0;">Transaction Type</p>
+                            <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; background: #E0F2FE; border-radius: 6px; font-size: 14px; font-weight: 500; color: #0369A1;">
+                                <i class="bi bi-arrow-left-right" style="font-size: 12px;"></i>
+                                ${bookData.TransactionType}
+                            </span>
+                        </div>
+                        <div>
+                            <p style="font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 4px 0;">Availability</p>
+                            <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; background: ${bookData.IsAvailable ? '#D1FAE5' : '#FEE2E2'}; border-radius: 6px; font-size: 14px; font-weight: 500; color: ${bookData.IsAvailable ? '#065F46' : '#991B1B'};">
+                                <i class="bi bi-${bookData.IsAvailable ? 'check' : 'x'}-circle" style="font-size: 12px;"></i>
+                                ${bookData.IsAvailable ? 'Available' : 'Not Available'}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    ${bookData.Tags && bookData.Tags.length > 0 ? `
+                    <div style="margin-bottom: 16px;">
+                        <p style="font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 8px 0;">Tags</p>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            ${bookData.Tags.map(tag => `<span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; background: #F3F4F6; border-radius: 4px; font-size: 12px; color: #374151;">#${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                ${bookData.ISBN ? `
+                <div>
+                    <p style="font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 4px 0;">ISBN</p>
+                    <p style="font-size: 14px; color: #0F172A; margin: 0;">${bookData.ISBN}</p>
+                </div>
+                ` : ''}
+                ${bookData.Language ? `
+                <div>
+                    <p style="font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 4px 0;">Language</p>
+                    <p style="font-size: 14px; color: #0F172A; margin: 0;">${bookData.Language}</p>
+                </div>
+                ` : ''}
+                ${bookData.Publisher ? `
+                <div>
+                    <p style="font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 4px 0;">Publisher</p>
+                    <p style="font-size: 14px; color: #0F172A; margin: 0;">${bookData.Publisher}</p>
+                </div>
+                ` : ''}
+                ${bookData.SharingDurationInDays ? `
+                <div>
+                    <p style="font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 4px 0;">Sharing Duration</p>
+                    <p style="font-size: 14px; color: #0F172A; margin: 0;">${bookData.SharingDurationInDays} days</p>
+                </div>
+                ` : ''}
+            </div>
+            
+            ${bookData.Description ? `
+            <div style="margin-bottom: 24px;">
+                <p style="font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 8px 0;">Description</p>
+                <p style="font-size: 14px; color: #374151; line-height: 1.6; margin: 0;">${bookData.Description}</p>
+            </div>
+            ` : ''}
+            
+            ${bookData.LocationNote ? `
+            <div style="margin-bottom: 24px;">
+                <p style="font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 8px 0;">Location Notes</p>
+                <p style="font-size: 14px; color: #374151; line-height: 1.6; margin: 0;">${bookData.LocationNote}</p>
+            </div>
+            ` : ''}
+            
+            <div style="border-top: 1px solid #E2E8F0; padding-top: 16px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <i class="bi bi-person" style="color: #64748B;"></i>
+                    <p style="font-size: 14px; color: #64748B; margin: 0;">Listed by <strong>${bookData.OwnerName}</strong></p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-calendar" style="color: #64748B;"></i>
+                    <p style="font-size: 14px; color: #64748B; margin: 0;">Submitted on ${bookData.SubmittedAt}</p>
+                </div>
+            </div>
+        `;
+        
+        content.innerHTML = bookDetailsHtml;
+        showModal(modal);
+    }
+
+    function closeBookDetailsModal() {
+        hideModal(document.getElementById('bookDetailsModal'));
+    }
+
+    // Approval Modal Functions
+    function showApprovalModal(bookId, bookTitle) {
+        currentBookId = bookId;
+        currentBookTitle = bookTitle;
+        document.getElementById('approvalBookTitle').textContent = bookTitle;
+        showModal(document.getElementById('approvalModal'));
+    }
+
+    function closeApprovalModal() {
+        hideModal(document.getElementById('approvalModal'));
+        currentBookId = null;
+        currentBookTitle = null;
+    }
+
+    function confirmApproval() {
+        if (currentBookId) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/Dashboard/ApproveBook';
+            
+            const bookIdInput = document.createElement('input');
+            bookIdInput.type = 'hidden';
+            bookIdInput.name = 'bookId';
+            bookIdInput.value = currentBookId;
+            
+            form.appendChild(bookIdInput);
+            document.body.appendChild(form);
+            form.submit();
         }
     }
 
-    function rejectBook(bookId) {
-        const reason = prompt('Please provide a reason for rejection:');
-        if (reason) {
-            // TODO: Implement reject functionality
-            alert('Book rejected! (This is a placeholder - implement actual rejection logic)');
+    // Rejection Modal Functions
+    function showRejectionModal(bookId, bookTitle) {
+        currentBookId = bookId;
+        currentBookTitle = bookTitle;
+        document.getElementById('rejectionBookTitle').textContent = bookTitle;
+        document.getElementById('rejectionReason').value = '';
+        showModal(document.getElementById('rejectionModal'));
+    }
+
+    function closeRejectionModal() {
+        hideModal(document.getElementById('rejectionModal'));
+        currentBookId = null;
+        currentBookTitle = null;
+    }
+
+    function confirmRejection() {
+        const reason = document.getElementById('rejectionReason').value.trim();
+        if (!reason) {
+            alert('Please provide a rejection reason.');
+            return;
+        }
+        
+        if (currentBookId) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/Dashboard/RejectBook';
+            
+            const bookIdInput = document.createElement('input');
+            bookIdInput.type = 'hidden';
+            bookIdInput.name = 'bookId';
+            bookIdInput.value = currentBookId;
+            
+            const reasonInput = document.createElement('input');
+            reasonInput.type = 'hidden';
+            reasonInput.name = 'reason';
+            reasonInput.value = reason;
+            
+            form.appendChild(bookIdInput);
+            form.appendChild(reasonInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+        const bookDetailsModal = document.getElementById('bookDetailsModal');
+        const approvalModal = document.getElementById('approvalModal');
+        const rejectionModal = document.getElementById('rejectionModal');
+        
+        if (event.target === bookDetailsModal) {
+            closeBookDetailsModal();
+        }
+        if (event.target === approvalModal) {
+            closeApprovalModal();
+        }
+        if (event.target === rejectionModal) {
+            closeRejectionModal();
         }
     }
 </script>

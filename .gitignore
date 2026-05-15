@@ -15,7 +15,7 @@ TestResults/
 Thumbs.db
 .DS_Store
 
-
+*.lscache
 wwwroot/lib/
 node_modules/
 
