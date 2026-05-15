@@ -1,4 +1,5 @@
 ﻿@model Ketabi.Application.DTOs.Dashboard.UserOverviewDto
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
     Layout = "_AdminLayout";
     ViewData["ActiveAdminPage"] = "UserManagement";
@@ -6,6 +7,7 @@
     var search = ViewData["Search"]?.ToString();
 }
 
+<meta name="csrf-token" content="@Antiforgery.GetAndStoreTokens(ViewContext.HttpContext).RequestToken" />
 <style>
     /* Header buttons */
     .btn-dark { background: #111827; border: none; border-radius: 10px; padding: 8px 20px; font-size: 14px; font-weight: 600; }
@@ -19,6 +21,7 @@
 
     /* Table wrapper */
     .table { background: #fff; border-radius: 16px; overflow: hidden; }
+    .table { overflow: visible !important; }
 
     /* Table head */
     .table thead th { font-size: 11px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: .06em; border-bottom: 1.5px solid #f3f4f6; padding: 12px 16px; background: #fff; }
@@ -30,6 +33,7 @@
 
     /* Avatar */
     .rounded-circle { flex-shrink: 0; }
+    .dropdown-menu { z-index: 1050; }
 
     /* Status badge */
     .status-active    { background: #dcfce7; color: #16a34a; border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 500; display: inline-block; }
@@ -44,10 +48,13 @@
     <div>
         <h2 class="fw-bold mb-0">User Management</h2>
         <p class="text-muted">@Model.NumberOfUsers active members across the platform.</p>
+        @if (!string.IsNullOrEmpty(Model.CurrentUserRole))
+        {
+            <span class="badge bg-secondary">Your role: @Model.CurrentUserRole</span>
+        }
     </div>
     <div class="d-flex gap-2">
         <button class="btn btn-dark">All Users</button>
-        <button class="btn btn-outline-secondary">Archived <span class="badge bg-danger">1</span></button>
     </div>
 </div>
 
@@ -71,6 +78,7 @@
     <thead>
         <tr>
             <th>User</th><th>Status</th>
+            <th>Role</th> 
             <th>Books</th><th>Trades</th>
             <th>Reputation Score</th>
             <th>Actions</th>
@@ -106,6 +114,12 @@
                 <td>
                     <span class="status-active">Active</span>
                 </td>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="role-label">@(!string.IsNullOrEmpty(user.Role) ? user.Role : "User")</span>
+                    
+                    </div>
+                </td>
                 <td>@user.ListingCount</td>
                 <td>@user.TradesCount</td>
                 <td>
@@ -132,9 +146,9 @@
                             <i class="bi bi-three-dots-vertical"></i>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">View Profile</a></li>
-                            <li><a class="dropdown-item text-warning" href="#">Suspend</a></li>
-                            <li><a class="dropdown-item text-danger" href="#">Ban</a></li>
+                            <li><button type="button" class="dropdown-item role-action" data-email="@user.Email" data-role="User">Make User</button></li>
+                            <li><button type="button" class="dropdown-item  role-action" data-email="@user.Email" data-role="Moderator">Make Moderator</button></li>
+                            <li><button type="button" class="dropdown-item  role-action" data-email="@user.Email" data-role="Admin">Make Admin</button></li>
                         </ul>
                     </div>
                 </td>
@@ -169,5 +183,43 @@
 
         // Restore opacity on page load (in case browser cached it)
         searchInput.style.opacity = '1';
+    </script>
+    <script>
+        document.addEventListener('click', async function (e) {
+            const btn = e.target.closest('.role-action, .assign-role-btn');
+            if (!btn) return;
+
+            const role = btn.dataset.role || btn.closest('div')?.querySelector('.role-select')?.value;
+            const email = btn.dataset.email || btn.closest('div')?.querySelector('[data-email]')?.dataset.email;
+            if (!role || !email) return;
+
+            const row = btn.closest('tr');
+            const label = row?.querySelector('.role-label');
+            const tokenMeta = document.querySelector('meta[name="csrf-token"]');
+            const token = tokenMeta ? tokenMeta.content : '';
+
+            btn.disabled = true;
+            try {
+                const res = await fetch('/Admin/user-management/add-role', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify({ email: email, role: role })
+                });
+
+                if (res.ok) {
+                    if (label) label.textContent = role;
+                } else {
+                    const data = await res.json().catch(() => null);
+                    alert((data && data.error) || 'Failed to assign role');
+                }
+            } catch (err) {
+                alert('Request failed');
+            } finally {
+                btn.disabled = false;
+            }
+        });
     </script>
 }

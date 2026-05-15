@@ -119,6 +119,18 @@ namespace Ketabi.Infrastructure.Authentication
 
         }
 
+        public async Task<IReadOnlyCollection<string>> GetRolesAsync(Guid userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return Array.Empty<string>();
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            return (IReadOnlyCollection<string>)roles;
+        }
+
         public async Task RemoveFromRoleAsync(string email, string roleName)
         {
             var user = await _userManager.FindByEmailAsync(email)
