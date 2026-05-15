@@ -1,4 +1,4 @@
-﻿using Ketabi.Core.Interfaces;
+using Ketabi.Core.Interfaces;
 using Ketabi.Core.Interfaces.Repositories;
 using Ketabi.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -13,13 +13,15 @@ namespace Ketabi.Infrastructure
         public IBookListingRepository Listings { get; set; }
         public IRequestRepository Requests { get; set; }
         public IReviewRepository Reviews { get; set; }
+        public INotificationRepository Notifications { get; set; }
 
         public UnitOfWork(KetabiDbContext context,
             IUserRepository users,
             ICategoryRepository categories,
             IBookListingRepository listings,
             IRequestRepository requests,
-            IReviewRepository reviews
+            IReviewRepository reviews,
+            INotificationRepository notifications
             )
         {
             _context = context;
@@ -28,6 +30,7 @@ namespace Ketabi.Infrastructure
             Listings = listings;
             Requests = requests;
             Reviews = reviews;
+            Notifications = notifications;
         }
 
         public async Task<int> SaveChangesAsync() =>

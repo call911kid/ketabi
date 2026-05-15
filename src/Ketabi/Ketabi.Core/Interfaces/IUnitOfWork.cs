@@ -1,4 +1,4 @@
-﻿namespace Ketabi.Core.Interfaces;
+namespace Ketabi.Core.Interfaces;
 
 using Ketabi.Core.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -10,6 +10,7 @@ public interface IUnitOfWork : IDisposable
     IBookListingRepository Listings { get; }
     IRequestRepository Requests { get; }
     IReviewRepository Reviews { get; }
+    INotificationRepository Notifications { get; }
     Task<int> SaveChangesAsync();
     Task<IDbContextTransaction> BeginTransactionAsync();
 
