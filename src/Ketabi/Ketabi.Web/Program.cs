@@ -125,6 +125,8 @@ namespace Ketabi.Web
 
             app.UseRouting();
 
+            app.UseUnderDevelopmentGuard();
+
             app.UseAuthentication();
             app.UseAuthorization();
 
