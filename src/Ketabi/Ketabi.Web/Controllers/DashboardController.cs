@@ -18,5 +18,13 @@ namespace Ketabi.Web.Controllers
             ViewData["ActiveAdminPage"] = "Overview";
             return View(overview);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Moderation()
+        {
+            var moderation = await _dashboardService.GetBookModerationAsync();
+            ViewData["ActiveAdminPage"] = "Moderation";
+            return View(moderation);
+        }
     }
 }

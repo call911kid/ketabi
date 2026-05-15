@@ -46,13 +46,12 @@
             <div><i class="bi bi-grid-1x2"></i> Overview</div>
         </a>
         
-        <a asp-controller="UserManagement" asp-action="Index" class="admin-nav-item @(activePage == "UserManagement" ? "active" : "")">
-            <div><i class="bi bi-people"></i> User Management</div>
+        <a asp-controller="Dashboard" asp-action="Moderation" class="admin-nav-item @(activePage == "Moderation" ? "active" : "")">
+            <div><i class="bi bi-shield-check"></i> Book Moderation</div>
         </a>
         
-        <a href="#" class="admin-nav-item @(activePage == "BookModeration" ? "active" : "")">
-            <div><i class="bi bi-journal-check"></i> Book Moderation</div>
-            <span class="admin-nav-badge">5</span>
+        <a asp-controller="UserManagement" asp-action="Index" class="admin-nav-item @(activePage == "UserManagement" ? "active" : "")">
+            <div><i class="bi bi-people"></i> User Management</div>
         </a>
         
         <a href="#" class="admin-nav-item @(activePage == "TradeRequests" ? "active" : "")">

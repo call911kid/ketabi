@@ -1,0 +1,161 @@
+@model Ketabi.Application.DTOs.Dashboard.BookModerationDto
+
+@{
+    ViewData["Title"] = "Book Moderation";
+    Layout = "_AdminLayout";
+}
+
+<div style="display: flex; flex-direction: column; gap: 24px;">
+    <div>
+        <h2 style="font-size: 22px; font-weight: 800; color: #0F172A;">Book Moderation</h2>
+        <p style="font-size: 14px; color: #64748B; margin-top: 2px;">Review and approve book listings submitted by users.</p>
+    </div>
+
+    <!-- KPI Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <div style="background: #fff; border-radius: 14px; padding: 1.25rem 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #E2E8F0; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="width: 42px; height: 42px; border-radius: 10px; background: #F59E0B18; display: flex; align-items: center; justify-content: center; color: #F59E0B;">
+                    <i class="bi bi-clock" style="font-size: 20px;"></i>
+                </div>
+                <div style="display: flex; align-items: center; gap: 4px; font-size: 12px; color: #64748B; font-weight: 600;">
+                    Pending review
+                </div>
+            </div>
+            <div>
+                <p style="font-size: 26px; font-weight: 800; color: #0F172A; line-height: 1;">@Model.TotalPendingBooks</p>
+                <p style="font-size: 13px; color: #64748B; margin-top: 4px;">Books Awaiting Approval</p>
+            </div>
+        </div>
+
+        <div style="background: #fff; border-radius: 14px; padding: 1.25rem 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #E2E8F0; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="width: 42px; height: 42px; border-radius: 10px; background: #10B98118; display: flex; align-items: center; justify-content: center; color: #10B981;">
+                    <i class="bi bi-check-circle" style="font-size: 20px;"></i>
+                </div>
+                <div style="display: flex; align-items: center; gap: 4px; font-size: 12px; color: #10B981; font-weight: 600;">
+                    +@Model.BooksApprovedThisWeek this week
+                </div>
+            </div>
+            <div>
+                <p style="font-size: 26px; font-weight: 800; color: #0F172A; line-height: 1;">@Model.TotalApprovedBooks</p>
+                <p style="font-size: 13px; color: #64748B; margin-top: 4px;">Approved Books</p>
+            </div>
+        </div>
+
+        <div style="background: #fff; border-radius: 14px; padding: 1.25rem 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #E2E8F0; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="width: 42px; height: 42px; border-radius: 10px; background: #EF444418; display: flex; align-items: center; justify-content: center; color: #EF4444;">
+                    <i class="bi bi-x-circle" style="font-size: 20px;"></i>
+                </div>
+                <div style="display: flex; align-items: center; gap: 4px; font-size: 12px; color: #EF4444; font-weight: 600;">
+                    +@Model.BooksRejectedThisWeek this week
+                </div>
+            </div>
+            <div>
+                <p style="font-size: 26px; font-weight: 800; color: #0F172A; line-height: 1;">@Model.TotalRejectedBooks</p>
+                <p style="font-size: 13px; color: #64748B; margin-top: 4px;">Rejected Books</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Books Table -->
+    <div style="background: #fff; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #E2E8F0; overflow: hidden;">
+        <div style="padding: 1.5rem; border-bottom: 1px solid #E2E8F0;">
+            <h3 style="font-size: 18px; font-weight: 700; color: #0F172A; margin: 0;">Pending Book Reviews</h3>
+            <p style="font-size: 14px; color: #64748B; margin-top: 4px;">Books submitted by users that need your approval.</p>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead style="background: #F8FAFC;">
+                    <tr>
+                        <th style="padding: 1rem 1.5rem; text-align: left; font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #E2E8F0;">Book Details</th>
+                        <th style="padding: 1rem 1.5rem; text-align: left; font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #E2E8F0;">Owner</th>
+                        <th style="padding: 1rem 1.5rem; text-align: left; font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #E2E8F0;">Category</th>
+                        <th style="padding: 1rem 1.5rem; text-align: left; font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #E2E8F0;">Condition</th>
+                        <th style="padding: 1rem 1.5rem; text-align: left; font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #E2E8F0;">Submitted</th>
+                        <th style="padding: 1rem 1.5rem; text-align: center; font-size: 12px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #E2E8F0;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.PendingBooks.Any())
+                    {
+                        @foreach (var book in Model.PendingBooks)
+                        {
+                            <tr style="border-bottom: 1px solid #F1F5F9;">
+                                <td style="padding: 1rem 1.5rem;">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="width: 40px; height: 56px; background: @book.CoverColor; border-radius: 6px; flex-shrink: 0;"></div>
+                                        <div>
+                                            <p style="font-size: 14px; font-weight: 600; color: #0F172A; margin: 0;">@book.Title</p>
+                                            <p style="font-size: 13px; color: #64748B; margin: 4px 0 0 0;">by @book.Author</p>
+                                            <p style="font-size: 12px; color: #94A3B8; margin: 2px 0 0 0;">@book.TransactionType</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="padding: 1rem 1.5rem;">
+                                    <p style="font-size: 14px; font-weight: 500; color: #0F172A; margin: 0;">@book.OwnerName</p>
+                                </td>
+                                <td style="padding: 1rem 1.5rem;">
+                                    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; background: #F1F5F9; border-radius: 6px; font-size: 12px; font-weight: 500; color: #475569;">
+                                        <i class="bi bi-tag" style="font-size: 11px;"></i>
+                                        @book.Category
+                                    </span>
+                                </td>
+                                <td style="padding: 1rem 1.5rem;">
+                                    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; background: #FEF3C7; border-radius: 6px; font-size: 12px; font-weight: 500; color: #92400E;">
+                                        <i class="bi bi-star" style="font-size: 11px;"></i>
+                                        @book.Condition
+                                    </span>
+                                </td>
+                                <td style="padding: 1rem 1.5rem;">
+                                    <p style="font-size: 13px; color: #64748B; margin: 0;">@book.SubmittedAt</p>
+                                </td>
+                                <td style="padding: 1rem 1.5rem; text-align: center;">
+                                    <div style="display: flex; gap: 8px; justify-content: center;">
+                                        <button style="padding: 6px 12px; background: #10B981; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 4px;" onclick="approveBook('@book.Id')">
+                                            <i class="bi bi-check" style="font-size: 11px;"></i>
+                                            Approve
+                                        </button>
+                                        <button style="padding: 6px 12px; background: #EF4444; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 4px;" onclick="rejectBook('@book.Id')">
+                                            <i class="bi bi-x" style="font-size: 11px;"></i>
+                                            Reject
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" style="padding: 3rem; text-align: center; color: #64748B;">
+                                <i class="bi bi-check-circle" style="font-size: 48px; color: #10B981; margin-bottom: 1rem;"></i>
+                                <p style="font-size: 16px; font-weight: 500; margin: 0 0 0.5rem 0;">All caught up!</p>
+                                <p style="font-size: 14px; margin: 0;">No books are currently pending review.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function approveBook(bookId) {
+        if (confirm('Are you sure you want to approve this book listing?')) {
+            // TODO: Implement approve functionality
+            alert('Book approved! (This is a placeholder - implement actual approval logic)');
+        }
+    }
+
+    function rejectBook(bookId) {
+        const reason = prompt('Please provide a reason for rejection:');
+        if (reason) {
+            // TODO: Implement reject functionality
+            alert('Book rejected! (This is a placeholder - implement actual rejection logic)');
+        }
+    }
+</script>

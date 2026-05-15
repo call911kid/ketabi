@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Ketabi.Application.Common;
 using Ketabi.Application.DTOs.AuditLogs;
+using Ketabi.Application.DTOs.Books;
 using Ketabi.Application.DTOs.Common;
 using Ketabi.Application.DTOs.Dashboard;
 using Ketabi.Application.DTOs.Requests;
@@ -46,6 +47,24 @@ namespace Ketabi.Application.Services
             pOverview.HighPriorityReportsCount = await GetHighPriorityReportsCountAsync();
 
             return pOverview;
+        }
+
+        public async Task<BookModerationDto> GetBookModerationAsync()
+        {
+            var now = DateTime.UtcNow;
+            var weekAgo = now.AddDays(-7);
+
+            var moderationDto = new BookModerationDto
+            {
+                TotalPendingBooks = await _unitOfWork.Listings.CountAsync(l => l.ListingStatus == ListingStatus.Pending),
+                TotalApprovedBooks = await _unitOfWork.Listings.CountAsync(l => l.ListingStatus == ListingStatus.Approved),
+                TotalRejectedBooks = await _unitOfWork.Listings.CountAsync(l => l.ListingStatus == ListingStatus.Rejected),
+                BooksApprovedThisWeek = await _unitOfWork.Listings.CountAsync(l => l.ListingStatus == ListingStatus.Approved && l.UpdatedAt >= weekAgo),
+                BooksRejectedThisWeek = await _unitOfWork.Listings.CountAsync(l => l.ListingStatus == ListingStatus.Rejected && l.UpdatedAt >= weekAgo),
+                PendingBooks = await GetPendingBooksAsync()
+            };
+
+            return moderationDto;
         }
 
         public async Task<UserOverviewDto> GetUserOverviewAsync(PagedRequestDto pagination, string? search = null)
@@ -180,6 +199,28 @@ namespace Ketabi.Application.Services
         {
             // For now, return mock data. Replace with actual reports when implemented.
             return 2;
+        }
+
+        private async Task<IReadOnlyList<PendingBookDto>> GetPendingBooksAsync()
+        {
+            // Get pending listings with owner information
+            var pendingListings = await _unitOfWork.Listings.FindWithIncludesAsync(l => l.ListingStatus == ListingStatus.Pending);
+
+            return pendingListings.Take(20).Select(l => new PendingBookDto
+            {
+                Id = l.Id.ToString(),
+                Title = l.Title,
+                Author = l.Author,
+                Category = l.Category.Name,
+                Condition = l.Condition.ToString(),
+                OwnerId = l.UserId.ToString(),
+                OwnerName = $"{l.User.FirstName} {l.User.LastName}",
+                SubmittedAt = l.CreatedAt.ToString("yyyy-MM-dd HH:mm"),
+                Status = l.ListingStatus?.ToString() ?? "Unknown",
+                Description = l.Description ?? "",
+                TransactionType = l.SharingMode.ToString(),
+                CoverColor = "#6366F1" // Default color, could be randomized or based on category
+            }).ToList();
         }
 
     }
