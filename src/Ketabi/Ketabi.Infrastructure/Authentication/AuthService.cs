@@ -1,4 +1,5 @@
 using Ketabi.Application.DTOs.Auth;
+using Ketabi.Application.Exceptions;
 using Ketabi.Application.Interfaces;
 using Ketabi.Core.Domain.Entities;
 using Ketabi.Core.Interfaces;
@@ -68,6 +69,12 @@ namespace Ketabi.Infrastructure.Authentication
                     throw new InvalidOperationException(string.Join(", ", result.Errors.Select(error => error.Description)));
                 }
 
+                var roleResult=await _userManager.AddToRoleAsync(ketabiUser, RolesConstants.User);
+                if (!roleResult.Succeeded)
+                {
+                    throw new NotFoundException("User Role not found");
+                }
+
                 var user = new User
                 {
                     Id = ketabiUser.Id,
@@ -80,23 +87,8 @@ namespace Ketabi.Infrastructure.Authentication
                     ProfilePictureUrl = request.ProfilePictureUrl,
                     ReputationScore = 0
                 };
-
+                
                 await _unitOfWork.Users.AddAsync(user);
-
-                if (!await _roleManager.RoleExistsAsync("User"))
-                {
-                    var createRoleResult = await _roleManager.CreateAsync(new IdentityRole<Guid>("User"));
-                    if (!createRoleResult.Succeeded)
-                    {
-                        throw new InvalidOperationException(string.Join(", ", createRoleResult.Errors.Select(error => error.Description)));
-                    }
-                }
-
-                var roleResult = await _userManager.AddToRoleAsync(ketabiUser, "User");
-                if (!roleResult.Succeeded)
-                {
-                    throw new InvalidOperationException(string.Join(", ", roleResult.Errors.Select(error => error.Description)));
-                }
 
                 await _unitOfWork.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -107,6 +99,42 @@ namespace Ketabi.Infrastructure.Authentication
                 throw;
             }
 
+        }
+
+        public async Task AddToRoleAsync(string email, string roleName)
+        {
+            var user = await _userManager.FindByEmailAsync(email)
+                ?? await _userManager.FindByNameAsync(email) //ambigious but works for now
+                ?? throw new NotFoundException("User not found");
+
+            if(!await _roleManager.RoleExistsAsync(roleName))
+            {
+                throw new NotFoundException($"Role {roleName} does not exist");
+            }
+            var result = await _userManager.AddToRoleAsync(user, roleName);
+
+            if (!result.Succeeded) {
+                throw new InvalidOperationException(string.Join(", ", result.Errors.Select(error => error.Description)));
+            }
+
+        }
+
+        public async Task RemoveFromRoleAsync(string email, string roleName)
+        {
+            var user = await _userManager.FindByEmailAsync(email)
+                ?? await _userManager.FindByNameAsync(email) //ambigious but works for now
+                ?? throw new NotFoundException("User not found");
+
+            if (!await _roleManager.RoleExistsAsync(roleName))
+            {
+                throw new NotFoundException($"Role {roleName} does not exist");
+            }
+
+            var result = await _userManager.RemoveFromRoleAsync(user, roleName);
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException(string.Join(", ", result.Errors.Select(error => error.Description)));
+            }
         }
 
     }

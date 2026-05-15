@@ -1,20 +1,22 @@
+using System.Text;
 using Ketabi.Application;
 using Ketabi.Application.Common;
 using Ketabi.Application.Interfaces;
 using Ketabi.Infrastructure;
+using Ketabi.Infrastructure.Authentication;
 using Ketabi.Web.Mappings;
 using Ketabi.Web.Middlewares;
 using Ketabi.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 namespace Ketabi.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -86,6 +88,24 @@ namespace Ketabi.Web
 
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope()) // seeding roles
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+
+                foreach (var role in new[] { RolesConstants.User, RolesConstants.Admin, RolesConstants.Moderator })
+                {
+                    if (!await roleManager.RoleExistsAsync(role))
+                    {
+                        var result = await roleManager.CreateAsync(new IdentityRole<Guid>(role));
+
+                        if (!result.Succeeded)
+                            throw new InvalidOperationException(string.Join(", ", result.Errors.Select(e => e.Description)));
+                    }
+                }
+
+            }
+
 
             // Configure the HTTP request pipeline.
             app.UseCustomExceptionHandler();
