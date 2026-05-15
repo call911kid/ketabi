@@ -5,7 +5,7 @@ namespace Ketabi.Application.DTOs.Dashboard;
 /// </summary>
 public class UserGrowthDto
 {
-    public DateOnly Month { get; init; }
+    public string Month { get; init; } = string.Empty;
     public int NumberOfUsers { get; init; }
     public int NumberOfBooks { get; init; }
 }

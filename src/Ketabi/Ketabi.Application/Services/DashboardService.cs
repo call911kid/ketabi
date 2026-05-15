@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ketabi.Application.Common;
+using Ketabi.Application.DTOs.AuditLogs;
 using Ketabi.Application.DTOs.Common;
 using Ketabi.Application.DTOs.Dashboard;
 using Ketabi.Application.DTOs.Requests;
@@ -41,7 +42,8 @@ namespace Ketabi.Application.Services
 
             pOverview.UserGrowth = await GetUserGrowthAsync(now);
             pOverview.CategoryDistribution = await GetCategoryDistributionAsync();
-
+            pOverview.RecentAuditLogs = await GetRecentAuditLogsAsync();
+            pOverview.HighPriorityReportsCount = await GetHighPriorityReportsCountAsync();
 
             return pOverview;
         }
@@ -122,17 +124,17 @@ namespace Ketabi.Application.Services
 
         private async Task<IReadOnlyList<UserGrowthDto>> GetUserGrowthAsync(DateTime now)
         {
-            var firstMonth = new DateTime(now.Year, now.Month, 1).AddMonths(-11);
+            var firstMonth = new DateTime(now.Year, now.Month, 1).AddMonths(-6); // Last 7 months
             var growth = new List<UserGrowthDto>();
 
-            for (var i = 0; i < 12; i++)
+            for (var i = 0; i < 7; i++)
             {
                 var monthStart = firstMonth.AddMonths(i);
                 var nextMonthStart = monthStart.AddMonths(1);
 
                 growth.Add(new UserGrowthDto
                 {
-                    Month = DateOnly.FromDateTime(monthStart),
+                    Month = monthStart.ToString("MMM"),
                     NumberOfUsers = await _unitOfWork.Users.CountAsync(u =>
                         u.CreatedAt >= monthStart && u.CreatedAt < nextMonthStart),
                     NumberOfBooks = await _unitOfWork.Listings.CountAsync(b =>
@@ -147,13 +149,37 @@ namespace Ketabi.Application.Services
         {
             var categories = await _unitOfWork.Categories.GetTopCategoryListingCountsAsync(10);
 
+            var colors = new[] { "#6366F1", "#F59E0B", "#10B981", "#3B82F6", "#EC4899", "#8B5CF6", "#06B6D4", "#F97316", "#84CC16", "#EF4444" };
+
             return categories
-                .Select(c => new CategoryDistributionDto
+                .Select((c, index) => new CategoryDistributionDto
                 {
                     Name = c.Name,
-                    Value = c.ListingCount
+                    Value = c.ListingCount,
+                    Color = colors[index % colors.Length]
                 })
                 .ToList();
+        }
+
+        private async Task<IReadOnlyList<AuditLogDto>> GetRecentAuditLogsAsync()
+        {
+            // For now, return mock data. Replace with actual audit logs when implemented.
+            return new List<AuditLogDto>
+            {
+                new AuditLogDto { Id = "al1", AdminName = "Layla Hassan", Action = "Banned User", Target = "Chen Wei", TargetType = "user", Details = "Account permanently banned after 3 harassment reports within 30 days.", Timestamp = DateTime.UtcNow.AddHours(-1), Severity = "critical", Ip = "196.52.100.4" },
+                new AuditLogDto { Id = "al2", AdminName = "Omar Khalil", Action = "Approved Book", Target = "1984 by George Orwell", TargetType = "book", Details = "Book listing approved after manual review. Condition verified.", Timestamp = DateTime.UtcNow.AddHours(-2), Severity = "info", Ip = "196.52.100.7" },
+                new AuditLogDto { Id = "al3", AdminName = "Omar Khalil", Action = "Resolved Report", Target = "Report #r4", TargetType = "user", Details = "No-show report resolved. Warning issued to Zara Al-Farsi.", Timestamp = DateTime.UtcNow.AddHours(-3), Severity = "warning", Ip = "196.52.100.7" },
+                new AuditLogDto { Id = "al4", AdminName = "Layla Hassan", Action = "Suspended User", Target = "Rajan Patel", TargetType = "user", Details = "Account suspended after 3 verified complaints about fake listings.", Timestamp = DateTime.UtcNow.AddDays(-1), Severity = "critical", Ip = "196.52.100.4" },
+                new AuditLogDto { Id = "al5", AdminName = "Priya Sharma", Action = "Rejected Book", Target = "The Great Gatsby", TargetType = "book", Details = "Listing rejected: book condition (Worn) requires photo documentation.", Timestamp = DateTime.UtcNow.AddDays(-1).AddHours(1), Severity = "warning", Ip = "196.52.100.9" },
+                new AuditLogDto { Id = "al6", AdminName = "Layla Hassan", Action = "Added Category", Target = "Children", TargetType = "category", Details = "New category \"Children\" created with orange color tag.", Timestamp = DateTime.UtcNow.AddDays(-2), Severity = "info", Ip = "196.52.100.4" },
+                new AuditLogDto { Id = "al7", AdminName = "Layla Hassan", Action = "Broadcast Notification", Target = "All Users", TargetType = "notification", Details = "Maintenance window announcement sent to 847 users.", Timestamp = DateTime.UtcNow.AddDays(-3), Severity = "info", Ip = "196.52.100.4" },
+            };
+        }
+
+        private async Task<int> GetHighPriorityReportsCountAsync()
+        {
+            // For now, return mock data. Replace with actual reports when implemented.
+            return 2;
         }
 
     }

@@ -42,7 +42,7 @@
     <div class="admin-sidebar-nav">
         <div class="admin-sidebar-nav-title">Navigation</div>
         
-        <a href="#" class="admin-nav-item @(activePage == "Overview" ? "active" : "")">
+        <a asp-controller="Dashboard" asp-action="Overview" class="admin-nav-item @(activePage == "Overview" ? "active" : "")">
             <div><i class="bi bi-grid-1x2"></i> Overview</div>
         </a>
         
