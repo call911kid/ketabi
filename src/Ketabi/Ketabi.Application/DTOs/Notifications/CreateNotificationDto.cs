@@ -2,13 +2,10 @@ using Ketabi.Core.Domain.Enums;
 
 namespace Ketabi.Application.DTOs.Notifications;
 
-public class NotificationDto
+public class CreateNotificationDto
 {
-    public Guid NotificationId { get; set; }
+    public Guid UserId { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
-    public bool IsRead { get; set; }
     public NotificationType NotificationType { get; set; }
-    public string TimeAgo { get; set; } = string.Empty;
-    public DateTime CreatedAt { get; set; }
 }
