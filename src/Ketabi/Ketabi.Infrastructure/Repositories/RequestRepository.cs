@@ -60,6 +60,14 @@ internal class RequestRepository : GenericRepository<Request>, IRequestRepositor
             (r.Status == RequestStatus.Pending || r.Status == RequestStatus.Approved));
     }
 
+    public async Task<bool> IsUserPartyToRequestForListingAsync(Guid userId, Guid listingId)
+    {
+        return await _dbSet.AnyAsync(r =>
+            (r.ListingId == listingId || r.OfferedListingId == listingId) &&
+            (r.SenderId == userId || r.ReceiverId == userId) &&
+            (r.Status == RequestStatus.Pending || r.Status == RequestStatus.Approved));
+    }
+
     public async Task<IReadOnlyList<Request>> GetPendingRequestsForListingAsync(Guid listingId, Guid excludingRequestId)
     {
         return await _dbSet

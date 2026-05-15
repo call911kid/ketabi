@@ -184,10 +184,14 @@ namespace Ketabi.Application.Services
             if (listing == null) throw new KeyNotFoundException("Book not found");
 
             // Check if user can view this book
-            if (listing.ListingStatus != ListingStatus.Approved && 
+            if (listing.ListingStatus != ListingStatus.Approved &&
                 (userId == null || listing.UserId != userId))
             {
-                throw new UnauthorizedAccessException("Book not available");
+                var canViewViaRequest = userId.HasValue &&
+                    await _uow.Requests.IsUserPartyToRequestForListingAsync(userId.Value, bookId);
+
+                if (!canViewViaRequest)
+                    throw new UnauthorizedAccessException("Book not available");
             }
 
             var book = new BookDetailDto

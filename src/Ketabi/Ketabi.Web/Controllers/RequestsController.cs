@@ -190,7 +190,10 @@ public class RequestsController : BaseController
                 Category = dto.OfferedListingCategory ?? string.Empty,
                 Condition = dto.OfferedListingCondition ?? default,
                 SharingMode = dto.OfferedListingSharingMode ?? default,
-                IsAvailable = true
+                IsAvailable = true,
+                OwnerId = dto.RequesterId,
+                OwnerName = dto.RequesterFullName,
+                OwnerAvatarUrl = dto.RequesterAvatarUrl
             };
         }
 
