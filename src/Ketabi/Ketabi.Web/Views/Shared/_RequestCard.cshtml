@@ -2,6 +2,9 @@
 
 @{
     var requestCardStylesAdded = Context.Items.ContainsKey("RequestCardStylesAdded");
+    var party = Model.CanAcceptOrReject ? Model.Requester : Model.Owner;
+    var partyRole = Model.CanAcceptOrReject ? "Requester" : "Owner";
+    var partyHasAvatar = !string.IsNullOrEmpty(party.AvatarUrl);
 }
 
 @if (!requestCardStylesAdded)
@@ -9,171 +12,409 @@
     Context.Items["RequestCardStylesAdded"] = true;
     <style>
         .request-card {
+            --rc-radius: 24px;
+            --rc-pad-x: 1.25rem;
+            --rc-pad-y: 1.15rem;
+            --rc-gap: 1rem;
+            --rc-indigo: var(--color-indigo, #5b5bd6);
+            --rc-indigo-soft: rgba(91, 91, 214, 0.08);
+            --rc-border: rgba(91, 91, 214, 0.12);
             position: relative;
-            border: 1px solid rgba(91, 91, 214, 0.12);
-            border-radius: 28px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border: 1px solid var(--rc-border);
+            border-radius: var(--rc-radius);
             overflow: hidden;
-            background: #ffffff;
-            box-shadow: 0 24px 60px rgba(34, 44, 90, 0.08);
-            transition: transform 0.24s ease, box-shadow 0.24s ease;
-            animation: fadeInUp 0.7s ease both;
+            background: var(--color-surface, #fff);
+            box-shadow: 0 16px 48px rgba(27, 36, 80, 0.06);
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+            animation: rc-fade-in 0.55s ease both;
         }
 
         .request-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 32px 80px rgba(34, 44, 90, 0.12);
+            transform: translateY(-3px);
+            border-color: rgba(91, 91, 214, 0.22);
+            box-shadow: 0 24px 56px rgba(91, 91, 214, 0.12);
         }
 
         .request-card::before {
             content: "";
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 6px;
-            height: 100%;
-            background: linear-gradient(180deg, rgba(91, 91, 214, 0.92), rgba(63, 81, 181, 0.62));
+            inset: 0 auto 0 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--rc-indigo), #4f46e5 55%, rgba(79, 70, 229, 0.35));
+            border-radius: var(--rc-radius) 0 0 var(--rc-radius);
+            z-index: 1;
         }
 
-        .request-card > .card-body {
+        .request-card::after {
+            content: "";
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(91, 91, 214, 0.07), transparent 68%);
+            pointer-events: none;
+        }
+
+        .request-card__header {
             position: relative;
-            padding-left: 1.5rem;
+            z-index: 2;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: var(--rc-pad-y) var(--rc-pad-x) 0.85rem calc(var(--rc-pad-x) + 4px);
+            background: linear-gradient(135deg, rgba(91, 91, 214, 0.06), rgba(255, 255, 255, 0));
+            border-bottom: 1px solid rgba(91, 91, 214, 0.08);
         }
 
-        .request-card-header {
-            border-bottom: none;
-            background: transparent;
-            padding-bottom: 0;
-        }
-
-        .request-card-meta {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.55rem;
-            color: #6c757d;
-            font-size: 0.88rem;
-        }
-
-        .request-card-meta i {
-            font-size: 1rem;
-            color: #5b5bd6;
-        }
-
-        .request-type-chip,
-        .request-category-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            padding: 0.4rem 0.8rem;
-            border-radius: 999px;
-            background: rgba(91, 91, 214, 0.08);
-            color: #2f327a;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .request-card-header .badge {
-            border-radius: 999px;
-            padding: 0.55rem 0.85rem;
-            font-size: 0.8rem;
+        .request-card__eyebrow {
+            display: block;
+            font-size: 0.68rem;
             font-weight: 700;
-            letter-spacing: 0.02em;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--color-text-muted, #6b7080);
+            margin-bottom: 0.2rem;
         }
 
-        .status-supported { background: rgba(56, 189, 248, 0.18); color: #0369a1; }
-        .status-pending { background: rgba(253, 186, 116, 0.18); color: #7a5800; }
-        .status-approved { background: rgba(34, 197, 94, 0.16); color: #166534; }
-        .status-rejected { background: rgba(248, 113, 113, 0.18); color: #9b1c1c; }
-        .status-cancelled { background: rgba(107, 114, 128, 0.16); color: #374151; }
+        .request-card__date {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--color-text, #0c0c14);
+            line-height: 1.2;
+        }
 
-        .request-card-body {
-            padding-top: 1rem;
+        .request-card__status {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.45rem 0.85rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .request-card__status::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.85;
+        }
+
+        .status-pending  { background: rgba(253, 186, 116, 0.2);  color: #7a5800; }
+        .status-approved { background: rgba(34, 197, 94, 0.18);   color: #166534; }
+        .status-rejected { background: rgba(248, 113, 113, 0.18); color: #9b1c1c; }
+        .status-cancelled{ background: rgba(107, 114, 128, 0.14); color: #374151; }
+        .status-supported{ background: rgba(56, 189, 248, 0.18);  color: #0369a1; }
+
+        .request-card__body {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: var(--rc-gap);
+            padding: var(--rc-pad-y) var(--rc-pad-x) 0.5rem calc(var(--rc-pad-x) + 4px);
+        }
+
+        .request-card__section-label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin: 0 0 0.65rem;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: var(--color-text-muted, #6b7080);
+        }
+
+        .request-card__section-label i {
+            font-size: 0.85rem;
+            color: var(--rc-indigo);
         }
 
         .request-card__book {
             display: grid;
-            grid-template-columns: auto 1fr;
+            grid-template-columns: 76px 1fr;
             gap: 1rem;
-            align-items: flex-start;
-            margin-bottom: 1.15rem;
+            align-items: start;
+            padding: 0.85rem;
+            border-radius: 16px;
+            background: var(--rc-indigo-soft);
+            border: 1px solid rgba(91, 91, 214, 0.1);
         }
 
-        .request-card__book img {
-            min-width: 72px;
-            width: 72px;
-            height: 96px;
-            border-radius: 16px;
+        .request-card__cover {
+            width: 76px;
+            height: 104px;
+            border-radius: 12px;
             object-fit: cover;
-            box-shadow: 0 20px 50px rgba(91, 91, 214, 0.08);
+            box-shadow: 0 10px 28px rgba(91, 91, 214, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .request-card__book-meta {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
         }
 
         .request-card__title {
-            margin-bottom: 0.55rem;
+            margin: 0;
             font-size: 1rem;
-            line-height: 1.3;
+            font-weight: 700;
+            line-height: 1.35;
         }
 
         .request-card__title a {
-            color: #101828;
+            color: var(--color-text, #0c0c14);
             text-decoration: none;
+            transition: color 0.15s ease;
         }
 
         .request-card__title a:hover {
-            color: #4f46e5;
-            text-decoration: underline;
+            color: var(--rc-indigo);
         }
 
-        .request-card__section {
-            border-top: 1px solid rgba(91, 91, 214, 0.08);
-            padding-top: 1rem;
-            margin-top: 0.5rem;
+        .request-card__category {
+            margin: 0;
+            font-size: 0.84rem;
+            color: var(--color-text-muted, #6b7080);
         }
 
-        .request-card__section small {
-            display: block;
-            margin-bottom: 0.5rem;
+        .request-card__chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-top: 0.15rem;
         }
 
-        .request-card__note {
-            background: rgba(91, 91, 214, 0.05);
-            padding: 0.9rem 1rem;
-            border-radius: 18px;
-            margin-bottom: 1rem;
-        }
-
-        .request-card-footer {
-            display: grid;
-            gap: 0.75rem;
-        }
-
-        .request-card-footer .btn {
-            min-height: 42px;
-            font-size: 0.9rem;
+        .request-card__chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.32rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
             font-weight: 600;
+            background: rgba(255, 255, 255, 0.75);
+            border: 1px solid rgba(91, 91, 214, 0.12);
+            color: #2f327a;
+        }
+
+        .request-card__chip i {
+            font-size: 0.8rem;
+            color: var(--rc-indigo);
+        }
+
+        .request-card__divider {
+            height: 1px;
+            margin: 0;
+            border: none;
+            background: linear-gradient(90deg, transparent, rgba(91, 91, 214, 0.14), transparent);
         }
 
         .request-card__offered-trigger {
             display: block;
             width: 100%;
             margin: 0;
-            padding: 0.85rem 1rem;
-            border: 1px solid rgba(91, 91, 214, 0.12);
-            border-radius: 16px;
-            background: rgba(91, 91, 214, 0.04);
+            padding: 0.75rem 0.85rem;
+            border: 1px dashed rgba(91, 91, 214, 0.28);
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(91, 91, 214, 0.04), rgba(255, 255, 255, 0.9));
             text-align: left;
             color: inherit;
             cursor: pointer;
-            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .request-card__offered-trigger:hover,
         .request-card__offered-trigger:focus-visible {
             background: rgba(91, 91, 214, 0.08);
-            border-color: rgba(91, 91, 214, 0.25);
+            border-color: rgba(91, 91, 214, 0.4);
+            border-style: solid;
+            box-shadow: 0 6px 18px rgba(91, 91, 214, 0.1);
             transform: translateY(-1px);
             outline: none;
         }
 
-        /* Lighter backdrop only for offered-book modals */
+        .request-card__offered-inner {
+            display: grid;
+            grid-template-columns: 48px 1fr auto;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .request-card__offered-cover {
+            width: 48px;
+            height: 64px;
+            border-radius: 8px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(91, 91, 214, 0.12);
+        }
+
+        .request-card__offered-text {
+            min-width: 0;
+        }
+
+        .request-card__offered-title {
+            margin: 0;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--color-text, #0c0c14);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .request-card__offered-author {
+            margin: 0.15rem 0 0;
+            font-size: 0.78rem;
+            color: var(--color-text-muted, #6b7080);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .request-card__offered-action {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: rgba(91, 91, 214, 0.1);
+            color: var(--rc-indigo);
+            font-size: 0.9rem;
+        }
+
+        .request-card__party {
+            display: grid;
+            grid-template-columns: 44px 1fr;
+            gap: 0.85rem;
+            align-items: center;
+            padding: 0.75rem 0.85rem;
+            border-radius: 14px;
+            background: rgba(248, 249, 255, 0.9);
+            border: 1px solid rgba(91, 91, 214, 0.08);
+        }
+
+        .request-card__avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, var(--rc-indigo), #4f46e5);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 12px rgba(91, 91, 214, 0.2);
+        }
+
+        .request-card__avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .request-card__party-info {
+            min-width: 0;
+        }
+
+        .request-card__party-name {
+            margin: 0;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--color-text, #0c0c14);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .request-card__party-handle {
+            margin: 0.1rem 0 0.5rem;
+            font-size: 0.78rem;
+            color: var(--color-text-muted, #6b7080);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .request-card__party-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .request-card__party-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: var(--color-text-muted, #6b7080);
+        }
+
+        .request-card__party-tag i {
+            color: var(--rc-indigo);
+            font-size: 0.82rem;
+        }
+
+        .request-card__note {
+            padding: 0.85rem 1rem;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(91, 91, 214, 0.06), rgba(91, 91, 214, 0.02));
+            border-left: 3px solid var(--rc-indigo);
+            border-top: 1px solid rgba(91, 91, 214, 0.08);
+            border-right: 1px solid rgba(91, 91, 214, 0.08);
+            border-bottom: 1px solid rgba(91, 91, 214, 0.08);
+        }
+
+        .request-card__note-text {
+            margin: 0.35rem 0 0;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: #2d2d4a;
+            word-break: break-word;
+        }
+
+        .request-card__footer {
+            position: relative;
+            z-index: 2;
+            padding: 0.85rem var(--rc-pad-x) var(--rc-pad-y) calc(var(--rc-pad-x) + 4px);
+            border-top: 1px solid rgba(91, 91, 214, 0.1);
+            background: rgba(248, 249, 255, 0.5);
+        }
+
+        .request-card__footer .btn {
+            min-height: 42px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border-radius: 12px;
+        }
+
+        .request-card__footer .btn-primary {
+            box-shadow: 0 8px 20px rgba(91, 91, 214, 0.22);
+        }
+
+        /* Offered-book modal */
         body:has(.offered-book-modal.show) .modal-backdrop {
             --bs-backdrop-opacity: 0.12;
             background-color: rgba(91, 91, 214, 0.08) !important;
@@ -184,29 +425,27 @@
             z-index: 1040 !important;
         }
 
-        .offered-book-modal.show {
-            z-index: 1055 !important;
-        }
+        .offered-book-modal.show { z-index: 1055 !important; }
 
         .offered-book-modal .modal-content {
             border: none;
             border-radius: 24px;
             overflow: hidden;
-            background: #ffffff;
+            background: #fff;
             box-shadow: 0 32px 80px rgba(27, 36, 80, 0.22);
         }
 
+        .offered-book-modal .modal-header,
+        .offered-book-modal .modal-body,
+        .offered-book-modal .modal-footer {
+            background: #fff;
+        }
+
         .offered-book-modal .modal-header {
-            background: #ffffff;
             border-bottom: 1px solid rgba(91, 91, 214, 0.12);
         }
 
-        .offered-book-modal .modal-body {
-            background: #ffffff;
-        }
-
         .offered-book-modal .modal-footer {
-            background: #ffffff;
             border-top: 1px solid rgba(91, 91, 214, 0.1);
             position: relative;
             z-index: 2;
@@ -240,16 +479,9 @@
             margin-bottom: 0.25rem;
         }
 
-        .obm-author {
-            color: #6c757d;
-            margin-bottom: 0.75rem;
-        }
+        .obm-author { color: #6c757d; margin-bottom: 0.75rem; }
 
-        .obm-badges {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
+        .obm-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
         .obm-badge {
             display: inline-flex;
@@ -262,12 +494,12 @@
         }
 
         .obm-badge-exchange { background: rgba(91, 91, 214, 0.12); color: #3730a3; }
-        .obm-badge-borrow { background: rgba(34, 197, 94, 0.12); color: #166534; }
-        .obm-badge-both { background: rgba(251, 146, 60, 0.12); color: #92400e; }
-        .obm-badge-new { background: rgba(34, 197, 94, 0.12); color: #166534; }
-        .obm-badge-good { background: rgba(56, 189, 248, 0.14); color: #0369a1; }
-        .obm-badge-fair { background: rgba(251, 191, 36, 0.14); color: #78350f; }
-        .obm-badge-worn { background: rgba(248, 113, 113, 0.14); color: #9b1c1c; }
+        .obm-badge-borrow   { background: rgba(34, 197, 94, 0.12);  color: #166534; }
+        .obm-badge-both     { background: rgba(251, 146, 60, 0.12); color: #92400e; }
+        .obm-badge-new      { background: rgba(34, 197, 94, 0.12);  color: #166534; }
+        .obm-badge-good     { background: rgba(56, 189, 248, 0.14); color: #0369a1; }
+        .obm-badge-fair     { background: rgba(251, 191, 36, 0.14); color: #78350f; }
+        .obm-badge-worn     { background: rgba(248, 113, 113, 0.14); color: #9b1c1c; }
 
         .obm-meta-grid {
             display: grid;
@@ -307,58 +539,71 @@
             background: linear-gradient(135deg, #4f46e5, #4338ca);
         }
 
-        @@keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(18px); }
-            to { opacity: 1; transform: translateY(0); }
+        @@keyframes rc-fade-in {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @@media (max-width: 400px) {
+            .request-card__book {
+                grid-template-columns: 64px 1fr;
+            }
+            .request-card__cover {
+                width: 64px;
+                height: 88px;
+            }
         }
     </style>
 }
 
-<div class="card request-card h-100">
-    <div class="card-header request-card-header px-3 pt-3 pb-2 bg-transparent">
-        <div class="d-flex justify-content-between align-items-start">
-            <div>
-                <small class="text-muted d-block mb-1">Requested on</small>
-                <span class="fw-semibold">@Model.RequestDate.ToString("MMM dd, yyyy")</span>
-            </div>
-            <span class="badge @(Model.Status switch
-            {
-                Ketabi.Core.Domain.Enums.RequestStatus.Pending => "status-pending",
-                Ketabi.Core.Domain.Enums.RequestStatus.Approved => "status-approved",
-                Ketabi.Core.Domain.Enums.RequestStatus.Rejected => "status-rejected",
-                Ketabi.Core.Domain.Enums.RequestStatus.Cancelled => "status-cancelled",
-                Ketabi.Core.Domain.Enums.RequestStatus.Completed => "status-supported",
-                _ => "status-pending"
-            })">
-                @Model.Status.ToString()
+<article class="card request-card h-100 border-0">
+    <header class="request-card__header">
+        <div>
+            <span class="request-card__eyebrow">
+                <i class="bi bi-calendar3 me-1" aria-hidden="true"></i>Requested
             </span>
+            <time class="request-card__date" datetime="@Model.RequestDate.ToString("yyyy-MM-dd")">
+                @Model.RequestDate.ToString("MMM dd, yyyy")
+            </time>
         </div>
-    </div>
+        <span class="request-card__status @(Model.Status switch
+        {
+            Ketabi.Core.Domain.Enums.RequestStatus.Pending   => "status-pending",
+            Ketabi.Core.Domain.Enums.RequestStatus.Approved  => "status-approved",
+            Ketabi.Core.Domain.Enums.RequestStatus.Rejected  => "status-rejected",
+            Ketabi.Core.Domain.Enums.RequestStatus.Cancelled   => "status-cancelled",
+            Ketabi.Core.Domain.Enums.RequestStatus.Completed => "status-supported",
+            _ => "status-pending"
+        })">
+            @Model.Status.ToString()
+        </span>
+    </header>
 
-    <div class="card-body request-card-body px-3 pb-3">
-        <div class="request-card__book">
-            <img src="@(string.IsNullOrEmpty(Model.BookImageUrl) ? "/images/book-placeholder.png" : Model.BookImageUrl)"
-                 alt="@Model.BookTitle" />
-            <div>
-                <h5 class="request-card__title">
+    <div class="request-card__body">
+        <section class="request-card__book" aria-label="Requested book">
+            <img class="request-card__cover"
+                 src="@(string.IsNullOrEmpty(Model.BookImageUrl) ? "/images/book-placeholder.png" : Model.BookImageUrl)"
+                 alt="@Model.BookTitle cover" />
+            <div class="request-card__book-meta">
+                <h3 class="request-card__title">
                     <a href="@Url.Action("Details", "Books", new { id = Model.BookId })">@Model.BookTitle</a>
-                </h5>
-                <p class="mb-2 text-muted">@Model.BookCategory</p>
-                <div class="d-flex flex-wrap gap-2">
-                    <span class="request-type-chip">
-                        <i class="bi bi-arrow-left-right"></i>
+                </h3>
+                <p class="request-card__category">@Model.BookCategory</p>
+                <div class="request-card__chips">
+                    <span class="request-card__chip">
+                        <i class="bi @(Model.IsBorrow ? "bi-book" : "bi-arrow-left-right")" aria-hidden="true"></i>
                         @(Model.IsBorrow ? "Borrow" : "Exchange")
                     </span>
                     @if (Model.IsBorrow && Model.ReturnDate.HasValue)
                     {
-                        <span class="request-category-chip">
-                            <i class="bi bi-calendar-check"></i>
-                            Return by @Model.ReturnDate.Value.ToString("MMM dd")
+                        <span class="request-card__chip">
+                            <i class="bi bi-calendar-check" aria-hidden="true"></i>
+                            Return @Model.ReturnDate.Value.ToString("MMM dd")
                         </span>
                     }
                 </div>
             </div>
-        </div>
+        </section>
 
         @if (Model.OfferedBook != null)
         {
@@ -366,19 +611,19 @@
             var ob = Model.OfferedBook;
             var condBadge = ob.Condition switch
             {
-                Ketabi.Core.Domain.Enums.ListingCondition.New => "obm-badge-new",
-                Ketabi.Core.Domain.Enums.ListingCondition.LikeNew => "obm-badge-new",
+                Ketabi.Core.Domain.Enums.ListingCondition.New      => "obm-badge-new",
+                Ketabi.Core.Domain.Enums.ListingCondition.LikeNew  => "obm-badge-new",
                 Ketabi.Core.Domain.Enums.ListingCondition.VeryGood => "obm-badge-good",
-                Ketabi.Core.Domain.Enums.ListingCondition.Good => "obm-badge-good",
-                Ketabi.Core.Domain.Enums.ListingCondition.Fair => "obm-badge-fair",
-                Ketabi.Core.Domain.Enums.ListingCondition.Poor => "obm-badge-worn",
+                Ketabi.Core.Domain.Enums.ListingCondition.Good     => "obm-badge-good",
+                Ketabi.Core.Domain.Enums.ListingCondition.Fair     => "obm-badge-fair",
+                Ketabi.Core.Domain.Enums.ListingCondition.Poor     => "obm-badge-worn",
                 _ => "obm-badge-good"
             };
             var modeBadge = ob.SharingMode switch
             {
                 Ketabi.Core.Domain.Enums.SharingMode.Exchange => "obm-badge-exchange",
-                Ketabi.Core.Domain.Enums.SharingMode.Borrow => "obm-badge-borrow",
-                Ketabi.Core.Domain.Enums.SharingMode.Both => "obm-badge-both",
+                Ketabi.Core.Domain.Enums.SharingMode.Borrow   => "obm-badge-borrow",
+                Ketabi.Core.Domain.Enums.SharingMode.Both     => "obm-badge-both",
                 _ => "obm-badge-exchange"
             };
             var modeIcon = ob.SharingMode switch
@@ -387,26 +632,32 @@
                 _ => "bi-arrow-left-right"
             };
 
-            <div class="request-card__section">
-                <small class="text-muted d-block mb-2">Offering in exchange</small>
+            <hr class="request-card__divider" />
+
+            <section aria-label="Book offered in exchange">
+                <p class="request-card__section-label">
+                    <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
+                    Offered in exchange
+                </p>
                 <button type="button"
                         class="request-card__offered-trigger"
                         data-bs-toggle="modal"
                         data-bs-target="#@modalId"
                         aria-label="View details of @ob.Title">
-                    <div class="d-flex align-items-center gap-2">
-                        <img src="@(string.IsNullOrEmpty(ob.ImageUrl) ? "/images/book-placeholder.png" : ob.ImageUrl)"
-                             alt="@ob.Title"
-                             class="rounded"
-                             style="width: 44px; height: 58px; object-fit: cover;" />
-                        <div class="flex-grow-1 min-width-0">
-                            <div class="fw-semibold text-truncate">@ob.Title</div>
-                            <div class="text-muted small text-truncate">@ob.Author</div>
+                    <div class="request-card__offered-inner">
+                        <img class="request-card__offered-cover"
+                             src="@(string.IsNullOrEmpty(ob.ImageUrl) ? "/images/book-placeholder.png" : ob.ImageUrl)"
+                             alt="" />
+                        <div class="request-card__offered-text">
+                            <p class="request-card__offered-title">@ob.Title</p>
+                            <p class="request-card__offered-author">@ob.Author</p>
                         </div>
-                        <i class="bi bi-box-arrow-up-right text-primary"></i>
+                        <span class="request-card__offered-action" aria-hidden="true">
+                            <i class="bi bi-chevron-right"></i>
+                        </span>
                     </div>
                 </button>
-            </div>
+            </section>
 
             <div class="modal fade offered-book-modal"
                  id="@modalId"
@@ -473,60 +724,78 @@
             </div>
         }
 
-        <div class="request-card__section">
-            <div class="d-flex align-items-center gap-2 mb-2">
-                <img src="@(string.IsNullOrEmpty(Model.CanAcceptOrReject ? Model.Requester.AvatarUrl : Model.Owner.AvatarUrl) ? "/images/avatar-placeholder.png" : (Model.CanAcceptOrReject ? Model.Requester.AvatarUrl : Model.Owner.AvatarUrl))"
-                     alt="@(Model.CanAcceptOrReject ? Model.Requester.FullName : Model.Owner.FullName)"
-                     class="rounded-circle" style="width: 36px; height: 36px; object-fit: cover;" />
-                <div>
-                    <div class="fw-semibold">@(Model.CanAcceptOrReject ? Model.Requester.FullName : Model.Owner.FullName)</div>
-                    <div class="text-muted small">@(Model.CanAcceptOrReject ? Model.Requester.UserName : Model.Owner.UserName)</div>
+        <hr class="request-card__divider" />
+
+        <section class="request-card__party" aria-label="@partyRole information">
+            <div class="request-card__avatar" title="@party.FullName">
+                @if (partyHasAvatar)
+                {
+                    <img src="@party.AvatarUrl" alt="@party.FullName" />
+                }
+                else
+                {
+                    <span>@party.Initials</span>
+                }
+            </div>
+            <div class="request-card__party-info">
+                <p class="request-card__party-name">@party.FullName</p>
+                <p class="request-card__party-handle">@($"@{party.UserName}")</p>
+                <div class="request-card__party-tags">
+                    <span class="request-card__party-tag">
+                        <i class="bi bi-person-badge" aria-hidden="true"></i>@partyRole
+                    </span>
+                    <span class="request-card__party-tag">
+                        <i class="bi @(Model.IsBorrow ? "bi-book" : "bi-arrow-left-right")" aria-hidden="true"></i>
+                        @(Model.IsBorrow ? "Borrow" : "Exchange") request
+                    </span>
                 </div>
             </div>
-            <div class="request-card-meta">
-                <span><i class="bi bi-person"></i>@(Model.CanAcceptOrReject ? "Requester" : "Owner")</span>
-                <span><i class="bi bi-book-half"></i>@(Model.IsBorrow ? "Borrow request" : "Exchange request")</span>
-            </div>
-        </div>
+        </section>
 
         @if (!string.IsNullOrEmpty(Model.Note))
         {
-            <div class="request-card__note">
-                <small class="text-muted">Note</small>
-                <div>@Model.Note</div>
-            </div>
+            <blockquote class="request-card__note">
+                <p class="request-card__section-label mb-0">
+                    <i class="bi bi-chat-quote" aria-hidden="true"></i> Note
+                </p>
+                <p class="request-card__note-text">@Model.Note</p>
+            </blockquote>
         }
+    </div>
 
-        <div class="request-card-footer">
+    @if (Model.CanAcceptOrReject || Model.CanWithdraw || Model.Status == Ketabi.Core.Domain.Enums.RequestStatus.Approved)
+    {
+        <footer class="request-card__footer">
             @if (Model.CanAcceptOrReject)
             {
                 <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-primary btn-sm" onclick="updateRequestStatus('@Model.RequestId', 'Approved')">
-                        <i class="bi bi-check-circle me-1"></i>Accept Request
+                    <button type="button" class="btn btn-primary" onclick="updateRequestStatus('@Model.RequestId', 'Approved')">
+                        <i class="bi bi-check-circle me-1"></i>Accept
                     </button>
-                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="updateRequestStatus('@Model.RequestId', 'Rejected')">
-                        <i class="bi bi-x-circle me-1"></i>Reject Request
+                    <button type="button" class="btn btn-outline-danger" onclick="updateRequestStatus('@Model.RequestId', 'Rejected')">
+                        <i class="bi bi-x-circle me-1"></i>Reject
                     </button>
                 </div>
             }
             else if (Model.CanWithdraw)
             {
-                <button type="button" class="btn btn-outline-secondary btn-sm w-100" onclick="cancelRequest('@Model.RequestId')">
-                    <i class="bi bi-x me-1"></i>Cancel Request
+                <button type="button" class="btn btn-outline-secondary w-100" onclick="cancelRequest('@Model.RequestId')">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i>Cancel request
                 </button>
             }
             else if (Model.Status == Ketabi.Core.Domain.Enums.RequestStatus.Approved)
             {
-                <button type="button" class="btn btn-primary btn-sm w-100" onclick="completeRequest('@Model.RequestId')">
-                    <i class="bi bi-check2-all me-1"></i>Mark as Completed
+                <button type="button" class="btn btn-primary w-100" onclick="completeRequest('@Model.RequestId')">
+                    <i class="bi bi-check2-circle me-1"></i>Mark completed
                 </button>
             }
-        </div>
-    </div>
-</div>
+        </footer>
+    }
+</article>
 
 @{
     var offeredBookModalPortalAdded = Context.Items.ContainsKey("OfferedBookModalPortalAdded");
+    var requestCardScriptsAdded = Context.Items.ContainsKey("RequestCardScriptsAdded");
 }
 @if (!offeredBookModalPortalAdded)
 {
@@ -541,88 +810,81 @@
         });
     </script>
 }
+@if (!requestCardScriptsAdded)
+{
+    Context.Items["RequestCardScriptsAdded"] = true;
+    <script>
+        function updateRequestStatus(requestId, status) {
+            const note = status === 'Rejected' ? prompt('Optional note for rejection:') : '';
 
-<script>
-    function updateRequestStatus(requestId, status) {
-        const note = status === 'Rejected' ? prompt('Optional note for rejection:') : '';
-
-        fetch('@Url.Action("UpdateStatus", "Requests")', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-            },
-            body: new URLSearchParams({
-                requestId: requestId,
-                status: status,
-                note: note || ''
+            fetch('@Url.Action("UpdateStatus", "Requests")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: new URLSearchParams({
+                    requestId: requestId,
+                    status: status,
+                    note: note || ''
+                })
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while updating the request.');
-        });
-    }
-
-    function cancelRequest(requestId) {
-        if (!confirm('Are you sure you want to cancel this request?')) return;
-
-        fetch('@Url.Action("CancelRequest", "Requests")', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-            },
-            body: new URLSearchParams({
-                requestId: requestId
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while cancelling the request.');
-        });
-    }
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the request.');
+            });
+        }
 
-    function completeRequest(requestId) {
-        if (!confirm('Are you sure you want to mark this request as completed?')) return;
+        function cancelRequest(requestId) {
+            if (!confirm('Are you sure you want to cancel this request?')) return;
 
-        fetch('@Url.Action("CompleteRequest", "Requests")', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-            },
-            body: new URLSearchParams({
-                requestId: requestId
+            fetch('@Url.Action("CancelRequest", "Requests")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: new URLSearchParams({ requestId: requestId })
             })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while completing the request.');
-        });
-    }
-</script>
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) location.reload();
+                else alert('Error: ' + data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while cancelling the request.');
+            });
+        }
+
+        function completeRequest(requestId) {
+            if (!confirm('Are you sure you want to mark this request as completed?')) return;
+
+            fetch('@Url.Action("CompleteRequest", "Requests")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: new URLSearchParams({ requestId: requestId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) location.reload();
+                else alert('Error: ' + data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while completing the request.');
+            });
+        }
+    </script>
+}
