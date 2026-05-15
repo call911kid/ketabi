@@ -1,3 +1,4 @@
+using Ketabi.Application.Common;
 using Ketabi.Application.DTOs.Auth;
 using Ketabi.Application.Exceptions;
 using Ketabi.Application.Interfaces;
