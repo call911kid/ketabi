@@ -2,7 +2,6 @@ using AutoMapper;
 using Ketabi.Application.DTOs.Books;
 using Ketabi.Application.DTOs.Users;
 using Ketabi.Core.Domain.Entities;
-using System.Linq;
 
 namespace Ketabi.Application.Mappings;
 
@@ -36,7 +35,8 @@ public class BookMappingProfile : Profile
             .ForMember(d => d.Location, o => o.MapFrom(s => s.City != null && s.Governorate != null ? s.City + ", " + s.Governorate : s.City ?? s.Governorate ?? string.Empty))
             .ForMember(d => d.ReputationScore, o => o.MapFrom(s => s.ReputationScore))
             .ForMember(d => d.ReviewCount, o => o.Ignore())
-            .ForMember(d => d.TradesCount, o => o.Ignore());
+            .ForMember(d => d.TradesCount, o => o.Ignore())
+            .ForMember(d => d.MemberSince, o => o.MapFrom(s => s.CreatedAt.ToString("MMMM yyyy")));
 
         CreateMap<CreateBookDto, BookListing>()
             .ForMember(d => d.Id, o => o.MapFrom(_ => Guid.NewGuid()))

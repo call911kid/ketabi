@@ -73,6 +73,29 @@ public class ProfileController : BaseController
             var profileDto = await _userService.GetUserProfileAsync(id, currentUserId);
             var vm = _mapper.Map<ProfileViewModel>(profileDto);
 
+            // Normalize identity and presentation fields
+            vm.Email = profileDto.Email ?? string.Empty;
+            vm.FirstName = profileDto.FirstName ?? string.Empty;
+            vm.LastName = profileDto.LastName ?? string.Empty;
+            vm.FullName = string.Join(' ', new[] { vm.FirstName, vm.LastName }.Where(s => !string.IsNullOrWhiteSpace(s)));
+            vm.Bio = profileDto.Bio;
+            vm.UserName = string.IsNullOrWhiteSpace(profileDto.Email) ? string.Empty : profileDto.Email.Split('@').FirstOrDefault() ?? string.Empty;
+            vm.IsOwnProfile = profileDto.IsOwnProfile;
+
+            // Avatar: DTO stores filename only; resolve to public URL for views
+            vm.AvatarUrl = string.IsNullOrWhiteSpace(profileDto.AvatarUrl)
+                ? AppConstants.DefaultProfilePic
+                : profileDto.AvatarUrl;
+
+            // Stats
+            vm.ReputationScore = profileDto.Stats?.ReputationScore ?? 0.0;
+            vm.ReviewCount = profileDto.Stats?.ReviewCount ?? 0;
+            vm.BooksListed = profileDto.Stats?.BooksListed ?? 0;
+            vm.ActiveListings = profileDto.Stats?.BooksListed ?? 0;
+            vm.CompletedBorrows = 0;
+            vm.CompletedExchanges = 0;
+            vm.MemberSince = profileDto.MemberSince ?? string.Empty;
+
             // Load user's books for listings tab (paginated)
             var booksDto = await _bookListingService.GetBooksByUserIdAsync(id, booksPage, 6);
             var books = booksDto.Select(b => new Ketabi.Web.ViewModels.Shared.BookCardViewModel
@@ -80,18 +103,59 @@ public class ProfileController : BaseController
                 BookId = b.Id,
                 Title = b.Title,
                 Author = b.Author ?? string.Empty,
-                ImageUrl = b.ImageUrl ?? string.Empty,
+                ImageUrl = string.IsNullOrWhiteSpace(b.ImageUrl) ? "/img/cover-placeholder.svg" : b.ImageUrl,
                 Condition = b.Condition,
                 SharingMode = Enum.TryParse<Ketabi.Core.Domain.Enums.SharingMode>(b.SharingMode, true, out var sm) ? sm : Ketabi.Core.Domain.Enums.SharingMode.Borrow,
                 IsAvailable = true,
                 OwnerName = b.OwnerName,
-                OwnerAvatarUrl = string.IsNullOrWhiteSpace(b.OwnerImageUrl) ? "/uploads/users/default-avatar.png" : b.OwnerImageUrl,
+                OwnerAvatarUrl = string.IsNullOrWhiteSpace(b.OwnerAvatarUrl) ? AppConstants.DefaultProfilePic : b.OwnerAvatarUrl,
                 OwnerReputation = b.OwnerRating,
                 ShowOwnerActions = currentUserId.HasValue && currentUserId.Value == id,
                 DistanceInKm = b.DistanceInKm
             }).ToList();
 
+            // Load paged reviews and map to view models
+            try
+            {
+                var reviewsResult = await _reviewService.GetReviewsForUserAsync(id, new Ketabi.Application.DTOs.Common.PagedRequestDto { Page = reviewsPage, PageSize = 5 });
+                if (reviewsResult != null && reviewsResult.Success && reviewsResult.Data != null)
+                {
+                    vm.Reviews = reviewsResult.Data.Items.Select(r => new Ketabi.Web.ViewModels.Profile.ReviewItemViewModel
+                    {
+                        ReviewId = r.ReviewId,
+                        ReviewerName = r.Reviewer?.FullName ?? string.Empty,
+                        ReviewerAvatar = string.IsNullOrWhiteSpace(r.Reviewer?.AvatarUrl) ? "/uploads/users/profile-picture.png" : $"/uploads/users/{r.Reviewer?.AvatarUrl}",
+                        Rating = r.Rating,
+                        Comment = r.Comment,
+                        RelatedBookTitle = r.RelatedBookTitle ?? string.Empty,
+                        TimeAgo = r.TimeAgo ?? string.Empty
+                    }).ToList();
+
+                    vm.ReviewsPager = new PagerViewModel
+                    {
+                        CurrentPage = reviewsResult.Data.Page,
+                        TotalCount = reviewsResult.Data.TotalCount,
+                        TotalPages = reviewsResult.Data.TotalPages
+                    };
+                }
+                else
+                {
+                    vm.Reviews = new List<Ketabi.Web.ViewModels.Profile.ReviewItemViewModel>();
+                    vm.ReviewsPager = new PagerViewModel { CurrentPage = reviewsPage, TotalCount = 0, TotalPages = 0 };
+                    if (reviewsResult != null)
+                        _logger.LogWarning("Failed to load reviews for user {UserId}: {Errors}", id, string.Join(';', reviewsResult.Errors ?? new List<string>()));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading reviews for user {UserId}", id);
+                vm.Reviews = new List<Ketabi.Web.ViewModels.Profile.ReviewItemViewModel>();
+                vm.ReviewsPager = new PagerViewModel { CurrentPage = reviewsPage, TotalCount = 0, TotalPages = 0 };
+            }
+
             vm.Books = books;
+            vm.BooksListed = books.Count;
+
             vm.BooksPager = new PagerViewModel
             {
                 CurrentPage = booksPage,

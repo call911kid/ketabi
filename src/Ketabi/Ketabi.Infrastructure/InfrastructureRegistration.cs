@@ -1,4 +1,4 @@
-﻿using Ketabi.Application.Interfaces;
+using Ketabi.Application.Interfaces;
 using Ketabi.Core.Interfaces;
 using Ketabi.Core.Interfaces.Repositories;
 using Ketabi.Infrastructure.Authentication;
@@ -42,6 +42,7 @@ public static class InfrastructureRegistration
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IReviewRepository, ReviewRepository>();
         services.AddScoped<IRequestRepository, RequestRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
 
         services.AddScoped<IAuthService, AuthService>();
 

@@ -6,6 +6,7 @@ using Ketabi.Infrastructure;
 using Ketabi.Infrastructure.Authentication;
 using Ketabi.Web.Mappings;
 using Ketabi.Web.Middlewares;
+using Ketabi.Web.Realtime;
 using Ketabi.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -37,6 +38,9 @@ namespace Ketabi.Web
 
             // Add controllers with views
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddSignalR();
+            builder.Services.AddScoped<INotificationDispatcher, NotificationDispatcher>();
 
             var jwtSettings = builder.Configuration.GetSection("Jwt");
             var jwtKey = jwtSettings["Key"];
@@ -123,6 +127,8 @@ namespace Ketabi.Web
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.MapHub<NotificationHub>("/hubs/notifications");
 
             app.MapControllerRoute(
                 name: "default",

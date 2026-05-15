@@ -18,6 +18,7 @@ public static class ApplicationRegistration
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IDashboardService, DashboardService>();
+        services.AddScoped<INotificationService, NotificationService>();
         return services;
     }
 }

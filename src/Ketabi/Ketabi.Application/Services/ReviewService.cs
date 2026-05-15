@@ -1,10 +1,11 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Ketabi.Application.DTOs.Common;
 using Ketabi.Application.DTOs.Reviews;
 using Ketabi.Application.Interfaces;
 using Ketabi.Core.Domain.Entities;
 using Ketabi.Core.Domain.Enums;
 using Ketabi.Core.Interfaces;
+using Ketabi.Application.DTOs.Notifications;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +18,13 @@ namespace Ketabi.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public ReviewService(IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly INotificationService _notificationService;
+
+        public ReviewService(IUnitOfWork unitOfWork, IMapper mapper, INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _notificationService = notificationService;
         }
         // Create
         public async Task<ServiceResultDto<ReviewDto>> CreateReviewAsync(Guid reviewerId, CreateReviewDto createReviewDto)
@@ -68,6 +72,21 @@ namespace Ketabi.Application.Services
             review.Reviewer = reviewer;
             review.TargetUser = reviewee;
             review.RelatedRequest = request;
+
+            try
+            {
+                var reviewerFullName = $"{reviewer.FirstName} {reviewer.LastName}".Trim();
+                var relatedBookTitle = request?.Listing?.Title ?? "a book";
+
+                await _notificationService.CreateNotificationAsync(new CreateNotificationDto
+                {
+                    UserId = createReviewDto.RevieweeId,
+                    Title = "New Review Received",
+                    Content = $"{Truncate(reviewerFullName, 60)} gave you {createReviewDto.Rating} ⭐ for \"{Truncate(relatedBookTitle, 80)}\"",
+                    NotificationType = NotificationType.Review
+                });
+            }
+            catch { }
 
             return ServiceResultDto<ReviewDto>.Ok(
                 _mapper.Map<ReviewDto>(review),
@@ -130,5 +149,10 @@ namespace Ketabi.Application.Services
 
             return ServiceResultDto<bool>.Ok(true, "Review deleted successfully.");
         }
+
+        private static string Truncate(string? value, int maxLength)
+            => string.IsNullOrEmpty(value)
+                ? string.Empty
+                : value.Length <= maxLength ? value : value[..maxLength];
     }
 }

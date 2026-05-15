@@ -1,0 +1,132 @@
+@* ─────────────────────────────────────────────────────────────────────────
+   Views/Notifications/Index.cshtml
+   Model: NotificationsViewModel
+   CSS:   ketabi-notifications.css
+───────────────────────────────────────────────────────────────────────── *@
+@model Ketabi.Web.ViewModels.Notifications.NotificationsViewModel
+
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/ketabi-notifications.css" asp-append-version="true" />
+}
+
+<div class="notif-page">
+
+    @* ── Page Header ── *@
+    <div class="notif-page__header">
+        <div class="notif-page__header-left">
+            <h1 class="notif-page__title">Notifications</h1>
+            @if (Model.UnreadCount > 0)
+            {
+                <span class="notif-page__badge">@Model.UnreadCount</span>
+            }
+        </div>
+
+        @if (Model.UnreadCount > 0)
+        {
+            <form asp-action="MarkAllRead" asp-controller="Notifications" method="post" class="m-0">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="notif-mark-all-btn" id="btn-mark-all-read">
+                    <i class="bi bi-check2-all" aria-hidden="true"></i> Mark all as read
+                </button>
+            </form>
+        }
+    </div>
+
+    @* ── Notification List ── *@
+    @if (Model.Notifications.Any())
+    {
+        <div id="notif-live-list" class="notif-list">
+            @foreach (var notif in Model.Notifications)
+            {
+                <div class="notif-card @(!notif.IsRead ? "notif-card--unread" : "")"
+                     data-id="@notif.NotificationId"
+                     id="notif-@notif.NotificationId">
+
+                    @* Unread indicator dot *@
+                    @if (!notif.IsRead)
+                    {
+                        <span class="notif-card__dot" aria-label="Unread"></span>
+                    }
+
+                    @* Type icon *@
+                    <div class="notif-card__icon"
+                         style="background: @notif.TypeIconBg; color: @notif.TypeIconColor;"
+                         aria-hidden="true">
+                        <i class="bi @notif.TypeIcon"></i>
+                    </div>
+
+                    @* Content *@
+                    <div class="notif-card__body">
+                        <p class="notif-card__title">@notif.Title</p>
+                        <p class="notif-card__content">@notif.Content</p>
+                    </div>
+
+                    @* Time *@
+                    <span class="notif-card__time">@notif.TimeAgo</span>
+                </div>
+            }
+        </div>
+
+        @* ── Pagination ── *@
+        @if (Model.Pager.TotalPages > 1)
+        {
+            <nav class="notif-pager" aria-label="Notifications pagination">
+                <a class="notif-pager__btn @(Model.Pager.CurrentPage <= 1 ? "notif-pager__btn--disabled" : "")"
+                   asp-action="Index" asp-route-page="@(Model.Pager.CurrentPage - 1)"
+                   aria-disabled="@(Model.Pager.CurrentPage <= 1 ? "true" : "false")">
+                    <i class="bi bi-chevron-left" aria-hidden="true"></i> Prev
+                </a>
+                <span class="notif-pager__info">
+                    Page @Model.Pager.CurrentPage of @Model.Pager.TotalPages
+                </span>
+                <a class="notif-pager__btn @(Model.Pager.CurrentPage >= Model.Pager.TotalPages ? "notif-pager__btn--disabled" : "")"
+                   asp-action="Index" asp-route-page="@(Model.Pager.CurrentPage + 1)"
+                   aria-disabled="@(Model.Pager.CurrentPage >= Model.Pager.TotalPages ? "true" : "false")">
+                    Next <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                </a>
+            </nav>
+        }
+    }
+    else
+    {
+        @* ── Empty State ── *@
+        <div class="notif-empty">
+            <div class="notif-empty__icon" aria-hidden="true">
+                <i class="bi bi-bell-slash"></i>
+            </div>
+            <h2 class="notif-empty__title">All caught up!</h2>
+            <p class="notif-empty__sub">We'll notify you when something important happens.</p>
+        </div>
+    }
+
+</div>
+
+@section Scripts {
+    <script>
+        // ── Mark single notification as read on click (AJAX) ──
+        document.querySelectorAll('.notif-card--unread').forEach(function (card) {
+            card.addEventListener('click', async function () {
+                const id = card.dataset.id;
+
+                // Optimistic UI update
+                card.classList.remove('notif-card--unread');
+                const dot = card.querySelector('.notif-card__dot');
+                if (dot) dot.remove();
+
+                try {
+                    await fetch('/Notifications/MarkRead', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(id)
+                    });
+                } catch (err) {
+                    console.error('MarkRead failed:', err);
+                }
+            });
+        });
+    </script>
+}
