@@ -11,7 +11,7 @@ namespace Ketabi.Web.Controllers
         {
             _dashboardService = dashboardService;
         }
-        [HttpGet]
+        [HttpGet("/Admin/user-management")]
         public async Task<IActionResult> Index(int page = 1, int pageSize = 10, string? search = null)
         {
             var pagination = new PagedRequestDto { Page = page, PageSize = pageSize };

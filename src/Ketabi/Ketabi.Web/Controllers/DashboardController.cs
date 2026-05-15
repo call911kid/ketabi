@@ -11,7 +11,7 @@ namespace Ketabi.Web.Controllers
             _dashboardService = dashboardService;
         }
 
-        [HttpGet]
+        [HttpGet("/Admin")]
         public async Task<IActionResult> Overview()
         {
             var overview = await _dashboardService.GetPlatformOverviewAsync();

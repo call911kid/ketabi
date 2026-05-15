@@ -14,7 +14,7 @@ namespace Ketabi.Web.Controllers
             _categoryService = categoryService;
         }
 
-        [HttpGet]
+        [HttpGet("/Admin/Categories")]
         public async Task<IActionResult> Index()
         {
             var categories = await _categoryService.GetAllCategoriesAsync();
