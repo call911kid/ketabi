@@ -30,6 +30,9 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Ketabi.Web.styles.css" asp-append-version="true" />
 
+    <!-- SignalR client — required for real-time notifications -->
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body style="background-color: var(--color-bg); font-family: var(--font-primary);">
@@ -50,6 +53,8 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+    <script src="~/js/ketabi-notifications-realtime.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

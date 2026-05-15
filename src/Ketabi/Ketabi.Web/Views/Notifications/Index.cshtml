@@ -39,7 +39,7 @@
     @* ── Notification List ── *@
     @if (Model.Notifications.Any())
     {
-        <div class="notif-list" id="notificationList">
+        <div id="notif-live-list" class="notif-list">
             @foreach (var notif in Model.Notifications)
             {
                 <div class="notif-card @(!notif.IsRead ? "notif-card--unread" : "")"
