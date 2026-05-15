@@ -30,15 +30,17 @@
                 @if (isExplorer) { <span class="nav-indicator"></span> }
             </a>
             
-            <a asp-controller="Profile" asp-action="Index" class="ketabi-nav-link @(isLibrary ? "active" : "")">
+            
+
+            @if (Model?.IsAuthenticated == true)
+            {
+                <a asp-controller="Profile" asp-action="Index" class="ketabi-nav-link @(isLibrary ? "active" : "")">
                 <!-- Library Icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg>
                 <span>My Library</span>
                 @if (isLibrary) { <span class="nav-indicator"></span> }
-            </a>
+                </a>
 
-            @if (Model?.IsAuthenticated == true)
-            {
                 <a asp-controller="Requests" asp-action="Index" class="ketabi-nav-link position-relative @(isRequests ? "active" : "")">
                     <!-- Inbox Icon -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
@@ -57,7 +59,7 @@
 
         <!-- Right: Actions -->
         <div class="d-flex align-items-center gap-2">
-            @if (!isExplorer)
+            @* @if (!isExplorer)
             {
                 <div class="d-none d-xl-flex position-relative me-2 ketabi-nav-search">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); color: var(--color-text-muted);"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -65,7 +67,7 @@
                         <input type="text" name="q" class="form-control py-1" style="padding-left: 32px; border-radius: 12px; font-size: 0.85rem; width: 200px; background: rgba(0,0,0,0.03); border: 1px solid transparent; transition: all 0.2s;" placeholder="Search books..." onfocus="this.style.background='white'; this.style.borderColor='var(--color-indigo)';" onblur="this.style.background='rgba(0,0,0,0.03)'; this.style.borderColor='transparent';" />
                     </form>
                 </div>
-            }
+            } *@
             @if (Model?.IsAuthenticated == true)
             {
                 <a asp-controller="Books" asp-action="Create" class="btn ketabi-btn-add d-none d-sm-flex align-items-center gap-2">
@@ -357,6 +359,7 @@
         color: white;
     }
     .ketabi-btn-signin:hover {
+        background: var(--color-indigo-dark, #4B4BC2);
         opacity: 0.9;
         color: white;
     }
