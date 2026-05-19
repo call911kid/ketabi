@@ -16,11 +16,11 @@ Thumbs.db
 .DS_Store
 
 *.lscache
-wwwroot/lib/
+# wwwroot/lib/
 node_modules/
 
-dist/
-wwwroot/dist/
+# dist/
+# wwwroot/dist/
 
 docs/web-docs
 src/Ketabi/Ketabi.Web/appsettings.json

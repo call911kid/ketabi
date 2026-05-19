@@ -27,19 +27,19 @@ public class NotificationsController : BaseController
             return RedirectToAction("Login", "Account");
 
         var notifications = await _notificationService.GetNotificationsAsync(userId, page, PageSize);
-        var unreadCount   = await _notificationService.GetUnreadCountAsync(userId);
-        var totalCount    = await _notificationService.GetTotalCountAsync(userId);
-        int totalPages    = (int)Math.Ceiling(totalCount / (double)PageSize);
+        var unreadCount = await _notificationService.GetUnreadCountAsync(userId);
+        var totalCount = await _notificationService.GetTotalCountAsync(userId);
+        int totalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
 
         var vm = new NotificationsViewModel
         {
             UnreadCount = unreadCount,
-            TotalCount  = totalCount,
+            TotalCount = totalCount,
             Pager = new PagerViewModel
             {
                 CurrentPage = page,
-                TotalPages  = totalPages,
-                TotalCount  = totalCount
+                TotalPages = totalPages,
+                TotalCount = totalCount
             },
             Notifications = notifications.Select(n => new NotificationItemViewModel
             {
@@ -83,7 +83,7 @@ public class NotificationsController : BaseController
         return Ok();
     }
 
-    // ── Icon mapping helpers ──────────────────────────────────────────────
+    //  Icon mapping helpers 
     private static string GetIcon(NotificationType t) => t switch
     {
         NotificationType.RequestUpdate => "bi-arrow-left-right",
