@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="web.config" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Ketabi.Application\Ketabi.Application.csproj" />
     <ProjectReference Include="..\Ketabi.Infrastructure\Ketabi.Infrastructure.csproj" />
   </ItemGroup>
@@ -24,5 +28,9 @@
 
 	<ItemGroup>
 	  <Folder Include="Views\Account\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="web.config" />
 	</ItemGroup>
 </Project>
