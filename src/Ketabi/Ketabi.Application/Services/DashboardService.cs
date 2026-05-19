@@ -20,9 +20,12 @@ namespace Ketabi.Application.Services
     internal class DashboardService : IDashboardService
     {
         private readonly IUnitOfWork _unitOfWork;
-        public DashboardService(IUnitOfWork unitOfWork)
+        private readonly IAuthService _authService;
+
+        public DashboardService(IUnitOfWork unitOfWork, IAuthService authService)
         {
             _unitOfWork = unitOfWork;
+            _authService = authService;
         }
 
         public async Task<PlatformOverviewDto> GetPlatformOverviewAsync()
@@ -75,18 +78,30 @@ namespace Ketabi.Application.Services
 
             foreach (var user in pagedUsers.Items)
             {
+                var roles = await _authService.GetRolesAsync(user.Id);
                 users.Add(new UserSummaryDto
                 {
                     UserId = user.Id,
                     FullName = user.FirstName+' '+user.LastName,
                     UserName = user.Email.Split('@')[0],
+                    Email = user.Email,
                     AvatarUrl= user.ProfilePictureUrl,
                     Location = user.City,
+                    Role = GetPrimaryRole(roles),
                     ReputationScore = user.ReputationScore,
                     ReviewCount = await _unitOfWork.Reviews.CountReviewsForUserAsync(user.Id),
                     TradesCount = await _unitOfWork.Requests.CountCompletedTradesForUserAsync(user.Id),
                     ListingCount = await _unitOfWork.Listings.CountAsync(l => l.UserId == user.Id)
                 });
+            }
+
+            static string GetPrimaryRole(IReadOnlyCollection<string> roles)
+            {
+                if (roles.Contains("Admin", StringComparer.OrdinalIgnoreCase))
+                    return "Admin";
+                if (roles.Contains("Moderator", StringComparer.OrdinalIgnoreCase))
+                    return "Moderator";
+                return "User";
             }
 
             return new UserOverviewDto

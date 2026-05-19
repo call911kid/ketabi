@@ -1,3 +1,4 @@
+using Ketabi.Application.Common;
 using Ketabi.Application.DTOs.Auth;
 using Ketabi.Application.Exceptions;
 using Ketabi.Application.Interfaces;
@@ -117,6 +118,18 @@ namespace Ketabi.Infrastructure.Authentication
                 throw new InvalidOperationException(string.Join(", ", result.Errors.Select(error => error.Description)));
             }
 
+        }
+
+        public async Task<IReadOnlyCollection<string>> GetRolesAsync(Guid userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return Array.Empty<string>();
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            return (IReadOnlyCollection<string>)roles;
         }
 
         public async Task RemoveFromRoleAsync(string email, string roleName)

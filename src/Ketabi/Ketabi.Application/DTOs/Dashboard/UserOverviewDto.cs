@@ -7,6 +7,8 @@ namespace Ketabi.Application.DTOs.Dashboard
     {
         public int NumberOfUsers { get; set; }
 
+        public string CurrentUserRole { get; set; } = string.Empty;
+
         public PagedResponseDto<UserSummaryDto> Users { get; set; } = new();
     }
 }

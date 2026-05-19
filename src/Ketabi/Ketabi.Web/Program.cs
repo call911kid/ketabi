@@ -3,7 +3,6 @@ using Ketabi.Application;
 using Ketabi.Application.Common;
 using Ketabi.Application.Interfaces;
 using Ketabi.Infrastructure;
-using Ketabi.Infrastructure.Authentication;
 using Ketabi.Web.Mappings;
 using Ketabi.Web.Middlewares;
 using Ketabi.Web.Realtime;
@@ -90,6 +89,24 @@ namespace Ketabi.Web
                     };
                 });
 
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy(PoliciesConstants.AdminOnly, policy =>
+                    policy.RequireRole(RolesConstants.Admin));
+
+                options.AddPolicy(PoliciesConstants.ModeratorOnly, policy =>
+                    policy.RequireRole(RolesConstants.Moderator));
+
+                options.AddPolicy(PoliciesConstants.UserOnly, policy =>
+                    policy.RequireRole(RolesConstants.User));
+
+                options.AddPolicy(PoliciesConstants.AdminOrModerator, policy =>
+                    policy.RequireRole(RolesConstants.Admin, RolesConstants.Moderator));
+
+                options.AddPolicy(PoliciesConstants.AuthenticatedUser, policy =>
+                    policy.RequireAuthenticatedUser());
+            });
+
 
             var app = builder.Build();
 
@@ -97,7 +114,7 @@ namespace Ketabi.Web
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
-                foreach (var role in new[] { RolesConstants.User, RolesConstants.Admin, RolesConstants.Moderator })
+                foreach (var role in RolesConstants.All)
                 {
                     if (!await roleManager.RoleExistsAsync(role))
                     {
@@ -125,7 +142,10 @@ namespace Ketabi.Web
 
             app.UseRouting();
 
+            app.UseUnderDevelopmentGuard();
+
             app.UseAuthentication();
+            app.UseAuthorizationGuard();
             app.UseAuthorization();
 
             app.MapHub<NotificationHub>("/hubs/notifications");
