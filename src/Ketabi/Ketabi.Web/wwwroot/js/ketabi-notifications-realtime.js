@@ -42,6 +42,8 @@
 
     // ── Toast ─────────────────────────────────────────────────────────────────
     function showToast(dto) {
+        console.log("Toast Now");
+        alert("Alert from Toast");
         const container = getOrCreateToastContainer();
         const toast     = buildToast(dto);
 

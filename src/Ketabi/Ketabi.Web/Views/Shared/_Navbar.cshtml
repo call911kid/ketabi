@@ -76,13 +76,13 @@
                     <span>Add Book</span>
                 </a>
 
-                <a asp-controller="Chat" asp-action="Index" class="ketabi-icon-action position-relative d-none d-sm-flex" title="Messages">
+                <a asp-controller="Chat" asp-action="Index" class="ketabi-icon-action position-relative d-flex" title="Messages">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 </a>
 
                 <a id="notif-bell-btn"
                    asp-controller="Notifications" asp-action="Index"
-                   class="ketabi-icon-action position-relative d-none d-sm-flex"
+                   class="ketabi-icon-action position-relative d-flex"
                    title="Notifications" aria-label="Notifications">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
                     @if (Model.UnreadNotifications > 0)
@@ -560,6 +560,14 @@
             border: none;
             background: #F8F9FA;
             color: var(--color-text, #0C0C14);
+        }
+
+        /* Ensure icon action buttons have adequate touch targets on mobile */
+        .ketabi-icon-action {
+            width: 40px;
+            height: 40px;
+            padding: 10px;
+            border-radius: 10px;
         }
 
         /* Floating mobile menu: fixed to viewport with side margins */
