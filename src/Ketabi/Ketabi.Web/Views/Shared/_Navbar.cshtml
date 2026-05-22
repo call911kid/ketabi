@@ -34,7 +34,7 @@
 
             @if (Model?.IsAuthenticated == true)
             {
-                <a asp-controller="Profile" asp-action="Index" class="ketabi-nav-link @(isLibrary ? "active" : "")">
+                <a asp-controller="Profile" asp-action="Index" asp-route-id="@Model.CurrentUserId" class="ketabi-nav-link @(isLibrary ? "active" : "")">
                 <!-- Library Icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg>
                 <span>My Library</span>
@@ -130,7 +130,7 @@
 
                         <!-- Menu Items -->
                         <div class="py-1">
-                            <a class="dropdown-item ketabi-dropdown-item group" asp-controller="Profile" asp-action="Index">
+                            <a class="dropdown-item ketabi-dropdown-item group" asp-controller="Profile" asp-action="Index" asp-route-id="@Model.CurrentUserId">
                                 <div class="ketabi-dropdown-icon-wrapper">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                 </div>
@@ -231,12 +231,12 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             <span>Explore</span>
         </a>
-        <a asp-controller="Profile" asp-action="Index" class="ketabi-mobile-link @(isLibrary ? "active" : "")">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg>
-            <span>My Library</span>
-        </a>
         @if (Model?.IsAuthenticated == true)
         {
+            <a asp-controller="Profile" asp-action="Index" asp-route-id="@Model.CurrentUserId" class="ketabi-mobile-link @(isLibrary ? "active" : "")">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg>
+                <span>My Library</span>
+            </a>
             <a asp-controller="Requests" asp-action="Index" class="ketabi-mobile-link @(isRequests ? "active" : "")">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
                 <span>Requests</span>

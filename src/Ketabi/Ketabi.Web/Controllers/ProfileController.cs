@@ -50,7 +50,8 @@ public class ProfileController : BaseController
                 ProfilePictureUrl = newImageUrl
             });
 
-            return Json(new { success = true, newImageUrl });
+            //return Json(new { success = true, newImageUrl });
+            return RedirectToAction("Index", new { id = userId });
         }
         catch (Exception ex)
         {
@@ -140,7 +141,7 @@ public class ProfileController : BaseController
                 }
                 else
                 {
-                    vm.Reviews = new List<Ketabi.Web.ViewModels.Profile.ReviewItemViewModel>();
+                    vm.Reviews = new List<ReviewItemViewModel>();
                     vm.ReviewsPager = new PagerViewModel { CurrentPage = reviewsPage, TotalCount = 0, TotalPages = 0 };
                     if (reviewsResult != null)
                         _logger.LogWarning("Failed to load reviews for user {UserId}: {Errors}", id, string.Join(';', reviewsResult.Errors ?? new List<string>()));
@@ -149,7 +150,7 @@ public class ProfileController : BaseController
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error loading reviews for user {UserId}", id);
-                vm.Reviews = new List<Ketabi.Web.ViewModels.Profile.ReviewItemViewModel>();
+                vm.Reviews = new List<ReviewItemViewModel>();
                 vm.ReviewsPager = new PagerViewModel { CurrentPage = reviewsPage, TotalCount = 0, TotalPages = 0 };
             }
 
