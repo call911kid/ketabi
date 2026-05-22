@@ -29,3 +29,8 @@ src/Ketabi/Ketabi.Web/appsettings.Production.json
 
 src/Ketabi/Ketabi.Web/wwwroot/uploads/
 
+# Publish Profiles
+Properties/PublishProfiles/
+*.pubxml.user
+*.pubxml.userosmac
+*.Publish.xml
