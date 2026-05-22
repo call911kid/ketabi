@@ -33,10 +33,16 @@ public class BooksController : BaseController
         _mapper = mapper;
         _fileService = fileService;
     }
-
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> Create()
     {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
         var viewModel = new CreateBookViewModel();
         await PopulateReferenceDataAsync(viewModel);
         return View(viewModel);
