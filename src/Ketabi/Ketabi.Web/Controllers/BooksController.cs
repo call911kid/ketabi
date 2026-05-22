@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Ketabi.Application.Common;
 using AutoMapper;
 using Ketabi.Application.DTOs.Books;
@@ -124,6 +125,37 @@ public class BooksController : BaseController
         {
             TempData["ErrorMessage"] = "An error occurred while loading the book details: " + ex.Message;
             return RedirectToAction("Index", "Home");
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        try
+        {
+            await _bookListingService.DeleteBookAsync(id, userId);
+            TempData["SuccessMessage"] = "Listing deleted successfully.";
+            return RedirectToAction("Index", "Home");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound("Book not found");
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = "An error occurred while deleting the listing: " + ex.Message;
+            return RedirectToAction("Details", new { id });
         }
     }
 
