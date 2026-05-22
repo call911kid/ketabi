@@ -319,6 +319,13 @@ namespace Ketabi.Application.Services
             });
         }
 
+        public async Task<IEnumerable<BookSummaryDto>> GetListingsByUserIdAsync(Guid userId, int pageNumber, int pageSize)
+        {
+            var paged = await _uow.Listings.FindPagedWithIncludesAsync(l => l.ListingStatus == ListingStatus.Approved && l.UserId==userId, pageNumber, pageSize);
+            return paged.Items.Select(b => _mapper.Map<BookSummaryDto>(b));
+        }
+
+
         private async Task ChangeListingStatus(Guid listingId, ListingStatus listingStatus, string reasonForRejection=null!)
         {
             var listing = await _uow.Listings.GetByIdAsync(listingId);

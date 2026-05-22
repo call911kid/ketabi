@@ -39,6 +39,7 @@ namespace Ketabi.Application.Interfaces
         Task DeleteBookAsync(Guid bookId, Guid userId);
 
         Task<IEnumerable<PendingBookDto>> GetUserPendingBooksAsync(Guid userId);
+        Task<IEnumerable<BookSummaryDto>>GetListingsByUserIdAsync(Guid userId, int pageNumber, int pageSize);
 
         
     }
