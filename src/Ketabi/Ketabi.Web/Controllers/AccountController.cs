@@ -99,7 +99,7 @@ namespace Ketabi.Web.Controllers
         public IActionResult Logout()
         {
             Response.Cookies.Delete(AppConstants.AuthCookieName);
-            return RedirectToAction(nameof(Login));
+            return RedirectToAction("Index", "Home");
         }
 
         #endregion
