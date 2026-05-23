@@ -1,0 +1,37 @@
+@model Ketabi.Web.ViewModels.Chat.ChatIndexViewModel
+@{
+    ViewData["Title"] = "Messages";
+    /* The chat page is full-height and must not scroll the outer body.
+       The layout must NOT render the standard page wrapper padding here.
+       Use a dedicated body class to suppress it. */
+    ViewData["BodyClass"] = "chat-page-body";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/ketabi-chat.css" asp-append-version="true" />
+}
+
+<div class="chat-layout" data-active-conv="@(Model.ActiveConversation?.ConversationId ?? "")">
+
+    @* Sidebar — always rendered; CSS controls mobile visibility *@
+    <aside class="chat-sidebar @(Model.ActiveConversation != null ? "chat-sidebar--hidden-mobile" : "")">
+        @await Html.PartialAsync("Partials/_ChatSidebar", Model)
+    </aside>
+
+    @* Main panel *@
+    <main class="chat-main">
+        @if (Model.ActiveConversation != null)
+        {
+            @await Html.PartialAsync("Partials/_ChatWindow", Model.ActiveConversation)
+        }
+        else
+        {
+            @await Html.PartialAsync("Partials/_EmptyState", Model)
+        }
+    </main>
+
+</div>
+
+@section Scripts {
+    <script src="~/js/ketabi-chat.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,48 @@
+@model Ketabi.Web.ViewModels.Chat.ConversationDetailViewModel
+
+<div class="chat-window">
+
+  @await Html.PartialAsync("Partials/_ChatHeader",   Model)
+  @await Html.PartialAsync("Partials/_JourneyBar",   Model)
+  @await Html.PartialAsync("Partials/_StatusBanner", Model)
+
+  <!-- Messages feed: flex-1 scrollable -->
+  <div class="chat-window__feed" id="chat-feed">
+    @foreach (var msg in Model.Messages)
+    {
+      @await Html.PartialAsync("Partials/_MessageBubble", msg)
+    }
+
+    @if (Model.ShowReviewForm)
+    {
+      @await Html.PartialAsync("Partials/_ReviewForm", Model)
+    }
+
+    <!-- Scroll anchor — JS calls scrollIntoView() on this element -->
+    <div id="chat-feed-end"></div>
+  </div>
+
+  @if (Model.ShowHandoffBar)
+  {
+    @await Html.PartialAsync("Partials/_HandoffConfirm", Model)
+  }
+
+  @if (Model.ShowMessageInput)
+  {
+    <!-- Message input bar — fixed to the bottom of the chat window -->
+    <div class="chat-input-bar">
+      <textarea id="chat-input"
+                class="chat-input-bar__textarea form-control"
+                placeholder="Type a message…"
+                rows="1"
+                aria-label="Message input"></textarea>
+      <button id="chat-send-btn"
+              class="chat-input-bar__send-btn"
+              aria-label="Send message"
+              disabled>
+        <i class="bi bi-send-fill" aria-hidden="true"></i>
+      </button>
+    </div>
+  }
+
+</div>

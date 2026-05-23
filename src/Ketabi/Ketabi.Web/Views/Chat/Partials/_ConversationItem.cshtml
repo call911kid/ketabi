@@ -1,0 +1,42 @@
+@model Ketabi.Web.ViewModels.Chat.ConversationSummaryViewModel
+
+<a class="chat-conv-item @(Model.IsSelected ? "chat-conv-item--selected" : "")"
+   asp-controller="Chat" asp-action="Index" asp-route-id="@Model.ConversationId"
+   data-search-name="@Model.OtherUser.FullName"
+   data-search-book="@Model.Book.Title">
+
+  <!-- Book cover + user avatar badge (stacked) -->
+  <div class="chat-conv-item__media">
+    <div class="chat-conv-item__cover">
+      <img src="@Model.Book.CoverImageUrl" alt="@Model.Book.Title"
+           class="chat-conv-item__cover-img" loading="lazy" />
+    </div>
+    <img src="@Model.OtherUser.AvatarUrl" alt="@Model.OtherUser.FullName"
+         class="chat-conv-item__avatar-badge" loading="lazy" />
+  </div>
+
+  <!-- Text content -->
+  <div class="chat-conv-item__body">
+    <div class="chat-conv-item__row">
+      <span class="chat-conv-item__name">@Model.OtherUser.FullName</span>
+      <span class="chat-conv-item__time">@Model.LastMessageTimeAgo</span>
+    </div>
+    <p class="chat-conv-item__book-title">📚 @Model.Book.Title</p>
+    <p class="chat-conv-item__last-msg">
+      @if (Model.LastMessageIsMine)
+      {
+        <span class="chat-conv-item__you-prefix">You: </span>
+      }
+      @Model.LastMessagePreview
+    </p>
+    <!-- Status pill -->
+    @{
+      var cfg = Ketabi.Web.ViewModels.Chat.ChatStatusConfig.Map[Model.TransactionStatus];
+    }
+    <div class="chat-conv-item__status-row">
+      <span class="chat-conv-item__status-dot @cfg.DotCssClass"></span>
+      <span class="chat-conv-item__status-pill @cfg.CssClass">@cfg.Label</span>
+    </div>
+  </div>
+
+</a>

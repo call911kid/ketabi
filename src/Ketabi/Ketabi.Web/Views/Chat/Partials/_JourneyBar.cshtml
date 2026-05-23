@@ -1,0 +1,28 @@
+@model Ketabi.Web.ViewModels.Chat.ConversationDetailViewModel
+@using Ketabi.Web.ViewModels.Chat
+@{
+    var steps     = ChatJourneyConfig.Steps;
+    var activeIdx = Model.JourneyActiveIndex;
+}
+
+<div class="journey-bar" role="progressbar" aria-label="Transaction progress">
+  @for (int i = 0; i < steps.Count; i++)
+  {
+    var step      = steps[i];
+    var isDone    = i < activeIdx;
+    var isCurrent = i == activeIdx;
+    var isFuture  = i > activeIdx;
+
+    <div class="journey-bar__step @(isDone ? "journey-bar__step--done" : "") @(isCurrent ? "journey-bar__step--current" : "") @(isFuture ? "journey-bar__step--future" : "")">
+      <div class="journey-bar__icon-wrap">
+        <i class="bi @step.Icon journey-bar__icon" aria-hidden="true"></i>
+      </div>
+      <span class="journey-bar__label">@step.Label</span>
+    </div>
+
+    @if (i < steps.Count - 1)
+    {
+      <div class="journey-bar__connector @(isDone ? "journey-bar__connector--filled" : "")"></div>
+    }
+  }
+</div>

@@ -1,0 +1,53 @@
+@model Ketabi.Web.ViewModels.Chat.ChatIndexViewModel
+
+<div class="chat-sidebar__inner">
+
+  <!-- Header -->
+  <div class="chat-sidebar__header">
+    <div class="chat-sidebar__header-left">
+      <h2 class="chat-sidebar__title">Messages</h2>
+      <p class="chat-sidebar__subtitle">
+        @Model.Conversations.Count conversation@(Model.Conversations.Count != 1 ? "s" : "")
+        @if (Model.ActiveConversationCount > 0)
+        {
+          <span class="chat-sidebar__active-badge">@Model.ActiveConversationCount active</span>
+        }
+      </p>
+    </div>
+    <button class="chat-sidebar__filter-btn" aria-label="Filter conversations">
+      <i class="bi bi-funnel" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <!-- Search (client-side filter, no page reload) -->
+  <div class="chat-sidebar__search">
+    <i class="bi bi-search chat-sidebar__search-icon" aria-hidden="true"></i>
+    <input type="text"
+           id="chat-search"
+           class="form-control chat-sidebar__search-input"
+           placeholder="Search conversations…"
+           autocomplete="off" />
+  </div>
+
+  <!-- Conversation list -->
+  <div class="chat-sidebar__list" id="conversation-list">
+    @if (!Model.Conversations.Any())
+    {
+      <div class="chat-sidebar__empty">
+        <div class="chat-sidebar__empty-icon">
+          <i class="bi bi-chat-dots" aria-hidden="true"></i>
+        </div>
+        <p class="chat-sidebar__empty-title">No messages yet</p>
+        <p class="chat-sidebar__empty-sub">Chats open automatically when a book request is accepted.</p>
+      </div>
+    }
+    else
+    {
+      @foreach (var conv in Model.Conversations)
+      {
+        @await Html.PartialAsync("Partials/_ConversationItem", conv)
+      }
+    }
+  </div>
+
+</div>

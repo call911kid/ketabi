@@ -1,0 +1,25 @@
+@model Ketabi.Web.ViewModels.Chat.ConversationDetailViewModel
+@{
+    var cfg = Ketabi.Web.ViewModels.Chat.ChatStatusConfig.Map[Model.TransactionStatus];
+}
+<div class="chat-status-banner @cfg.CssClass">
+  <div class="chat-status-banner__icon-wrap">
+    <i class="bi @GetStatusIcon(Model.TransactionStatus) chat-status-banner__icon" aria-hidden="true"></i>
+  </div>
+  <div class="chat-status-banner__text">
+    <span class="chat-status-banner__label">@cfg.Label</span>
+    <span class="chat-status-banner__sublabel">@Html.Raw(cfg.Sublabel)</span>
+  </div>
+</div>
+
+@functions {
+    static string GetStatusIcon(Ketabi.Web.ViewModels.Chat.TransactionStatus s) => s switch
+    {
+        Ketabi.Web.ViewModels.Chat.TransactionStatus.Active                    => "bi-chat-dots",
+        Ketabi.Web.ViewModels.Chat.TransactionStatus.MeetupPending             => "bi-clock",
+        Ketabi.Web.ViewModels.Chat.TransactionStatus.HandoffConfirmedRequester => "bi-clock",
+        Ketabi.Web.ViewModels.Chat.TransactionStatus.HandoffConfirmedOwner     => "bi-clock",
+        Ketabi.Web.ViewModels.Chat.TransactionStatus.Completed                 => "bi-check-circle",
+        _                                                                       => "bi-chat-dots"
+    };
+}

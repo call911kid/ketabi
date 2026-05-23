@@ -1,0 +1,61 @@
+@model Ketabi.Web.ViewModels.Chat.ConversationDetailViewModel
+
+<div class="review-card" id="review-form-card">
+
+  <!-- Green header -->
+  <div class="review-card__header">
+    <div class="review-card__header-icon">
+      <i class="bi bi-balloon-heart-fill" aria-hidden="true"></i>
+    </div>
+    <div class="review-card__header-text">
+      <p class="review-card__header-title">Transaction complete!</p>
+      <p class="review-card__header-sub">How was your experience with @Model.OtherUser.FullName?</p>
+    </div>
+    <img src="@Model.OtherUser.AvatarUrl"
+         alt="@Model.OtherUser.FullName"
+         class="review-card__other-avatar" />
+  </div>
+
+  <!-- Rating + comment body -->
+  <div class="review-card__body">
+
+    <!-- Star rating (outside the form; JS bridges selection to hidden input) -->
+    <div class="review-card__stars" role="group" aria-label="Star rating">
+      @{
+        var starLabels = new[] { "", "Poor", "Fair", "Good", "Great", "Excellent!" };
+      }
+      @for (int n = 1; n <= 5; n++)
+      {
+        <button type="button"
+                class="review-card__star-btn"
+                data-value="@n"
+                aria-label="@n star@(n > 1 ? "s" : "")"
+                title="@starLabels[n]">
+          <i class="bi bi-star review-card__star-icon" aria-hidden="true"></i>
+        </button>
+      }
+      <span class="review-card__rating-label" id="rating-label" aria-live="polite"></span>
+    </div>
+
+    <form asp-controller="Chat" asp-action="SubmitReview" method="post">
+      @Html.AntiForgeryToken()
+      <input type="hidden" name="conversationId" value="@Model.ConversationId" />
+      <input type="hidden" name="revieweeId"     value="@Model.OtherUser.UserId" />
+      <input type="hidden" name="rating"         id="rating-hidden-input" value="0" />
+
+      <textarea name="comment"
+                class="form-control review-card__comment"
+                placeholder="Share your experience with @Model.OtherUser.FullName… (optional)"
+                rows="2"></textarea>
+
+      <button type="submit"
+              class="review-card__submit-btn"
+              id="review-submit-btn"
+              disabled>
+        <i class="bi bi-star-fill" aria-hidden="true"></i>
+        Submit Review
+      </button>
+
+    </form>
+  </div><!-- /.review-card__body -->
+</div><!-- /.review-card -->

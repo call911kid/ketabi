@@ -1,0 +1,67 @@
+@model Ketabi.Web.ViewModels.Chat.ConversationDetailViewModel
+
+<div class="handoff-bar" id="handoff-bar">
+
+  <!-- Collapsible toggle header -->
+  <button class="handoff-bar__toggle"
+          id="handoff-toggle"
+          aria-expanded="true"
+          aria-controls="handoff-content">
+    <span class="handoff-bar__toggle-label">Confirm Physical Handoff</span>
+    <i class="bi bi-chevron-down handoff-bar__chevron" aria-hidden="true"></i>
+  </button>
+
+  <!-- Collapsible body -->
+  <div class="handoff-bar__body" id="handoff-content">
+
+    <!-- Participant confirmation status -->
+    <div class="handoff-bar__participants">
+      <div class="handoff-bar__participant">
+        <div class="handoff-bar__participant-img-wrap">
+          <img src="~/img/mock/layla.jpg" alt="You" class="handoff-bar__participant-img" />
+          @if (Model.CurrentUserConfirmedHandoff)
+          {
+            <span class="handoff-bar__confirmed-badge" aria-label="Confirmed">
+              <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+            </span>
+          }
+        </div>
+        <span class="handoff-bar__participant-name @(Model.CurrentUserConfirmedHandoff ? "handoff-bar__participant-name--confirmed" : "")">
+          You @(Model.CurrentUserConfirmedHandoff ? "✓" : "")
+        </span>
+      </div>
+      <div class="handoff-bar__participant">
+        <div class="handoff-bar__participant-img-wrap">
+          <img src="@Model.OtherUser.AvatarUrl" alt="@Model.OtherUser.FullName"
+               class="handoff-bar__participant-img" />
+          @if (Model.OtherUserConfirmedHandoff)
+          {
+            <span class="handoff-bar__confirmed-badge" aria-label="Confirmed">
+              <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+            </span>
+          }
+        </div>
+        <span class="handoff-bar__participant-name @(Model.OtherUserConfirmedHandoff ? "handoff-bar__participant-name--confirmed" : "")">
+          @Model.OtherUser.FullName.Split(' ')[0] @(Model.OtherUserConfirmedHandoff ? "✓" : "")
+        </span>
+      </div>
+      <span class="handoff-bar__both-label">Both must confirm</span>
+    </div>
+
+    <!-- Confirm button (POST to future endpoint) -->
+    <form asp-controller="Chat" asp-action="ConfirmHandoff" method="post">
+      <input type="hidden" name="conversationId" value="@Model.ConversationId" />
+      @Html.AntiForgeryToken()
+      <button type="submit" class="handoff-bar__confirm-btn">
+        <i class="bi bi-check-circle" aria-hidden="true"></i>
+        I Confirm the Handoff
+      </button>
+    </form>
+
+    <p class="handoff-bar__hint">
+      Tap after the book has physically changed hands.
+      Once both parties confirm, you'll each be invited to leave a review.
+    </p>
+
+  </div>
+</div>

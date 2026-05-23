@@ -1,0 +1,60 @@
+@model Ketabi.Web.ViewModels.Chat.ConversationDetailViewModel
+
+<header class="chat-header">
+
+  <!-- Mobile back button (hidden on md+) -->
+  <a href="/Chat" class="chat-header__back-btn d-md-none" aria-label="Back to inbox">
+    <i class="bi bi-arrow-left" aria-hidden="true"></i>
+  </a>
+
+  <!-- Book cover thumbnail -->
+  <img src="@Model.Book.CoverImageUrl"
+       alt="@Model.Book.Title"
+       class="chat-header__book-cover" loading="lazy" />
+
+  <!-- Book info -->
+  <div class="chat-header__book-info">
+    <p class="chat-header__book-title">@Model.Book.Title</p>
+    <div class="chat-header__meta">
+      @if (Model.RequestType == Ketabi.Web.ViewModels.Chat.RequestType.Exchange)
+      {
+        <span class="chat-header__meta-item">
+          <i class="bi bi-arrow-left-right" aria-hidden="true"></i> Exchange
+        </span>
+      }
+      else
+      {
+        <span class="chat-header__meta-item">
+          <i class="bi bi-book" aria-hidden="true"></i>
+          Borrow · @Model.BorrowDurationDays d
+        </span>
+      }
+      <span class="chat-header__meta-sep">·</span>
+      <span class="chat-header__meta-item">with @Model.OtherUser.FullName</span>
+    </div>
+  </div>
+
+  <!-- Spacer -->
+  <div class="chat-header__spacer"></div>
+
+  <!-- Other user info (right side) -->
+  <div class="chat-header__user">
+    <img src="@Model.OtherUser.AvatarUrl"
+         alt="@Model.OtherUser.FullName"
+         class="chat-header__user-avatar" loading="lazy" />
+    <div class="chat-header__user-info d-none d-sm-block">
+      <p class="chat-header__user-name">@Model.OtherUser.FullName</p>
+      <div class="chat-header__user-meta">
+        <i class="bi bi-geo-alt" aria-hidden="true"></i>
+        <span>@Model.OtherUser.Location</span>
+        @if (!string.IsNullOrEmpty(Model.OtherUser.FormattedRating))
+        {
+          <span class="chat-header__user-sep">·</span>
+          <i class="bi bi-star-fill chat-header__star-icon" aria-hidden="true"></i>
+          <span class="chat-header__user-rating">@Model.OtherUser.FormattedRating</span>
+        }
+      </div>
+    </div>
+  </div>
+
+</header>

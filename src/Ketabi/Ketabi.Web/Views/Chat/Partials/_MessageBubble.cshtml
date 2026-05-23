@@ -1,0 +1,23 @@
+@model Ketabi.Web.ViewModels.Chat.MessageViewModel
+
+@if (Model.ShowDateDivider)
+{
+  <div class="chat-divider">
+    <span class="chat-divider__label">@Model.DateLabel</span>
+  </div>
+}
+
+<div class="chat-bubble-row @(Model.IsMine ? "chat-bubble-row--mine" : "chat-bubble-row--theirs")">
+  @if (!Model.IsMine)
+  {
+    <img src="@Model.SenderAvatarUrl"
+         alt="@Model.SenderName"
+         class="chat-bubble-row__avatar" loading="lazy" />
+  }
+  <div class="chat-bubble-group">
+    <div class="chat-bubble @(Model.IsMine ? "chat-bubble--mine" : "chat-bubble--theirs")">
+      @Model.Text
+    </div>
+    <span class="chat-bubble-group__time">@Model.FormattedTime</span>
+  </div>
+</div>

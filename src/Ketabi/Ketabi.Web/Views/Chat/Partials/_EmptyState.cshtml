@@ -1,0 +1,28 @@
+@model Ketabi.Web.ViewModels.Chat.ChatIndexViewModel
+
+<div class="chat-empty-state">
+  <div class="chat-empty-state__icon-wrap">
+    <i class="bi bi-chat-dots chat-empty-state__icon" aria-hidden="true"></i>
+  </div>
+  <div class="chat-empty-state__text">
+    <p class="chat-empty-state__title">
+      @(Model.Conversations.Any() ? "Select a conversation" : "No messages yet")
+    </p>
+    <p class="chat-empty-state__sub">
+      @if (Model.Conversations.Any())
+      {
+        @:Choose a conversation from the sidebar to start chatting.
+      }
+      else
+      {
+        @:Your conversations will appear here once a book request is accepted.
+      }
+    </p>
+    @if (Model.Conversations.Any())
+    {
+      <p class="chat-empty-state__hint">
+        @Model.Conversations.Count conversation@(Model.Conversations.Count != 1 ? "s" : "") in inbox ←
+      </p>
+    }
+  </div>
+</div>
