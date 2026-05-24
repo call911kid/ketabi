@@ -32,9 +32,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.ReputationScore).HasDefaultValue(0.0);
 
         builder.Property(u => u.CreatedAt).IsRequired();
-        
+
         builder.Property(u => u.UpdatedAt);
-        
+
         builder.Property(u => u.IsDeleted).HasDefaultValue(false);
 
         builder.HasQueryFilter(e => !e.IsDeleted);
@@ -75,5 +75,16 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
                .WithOne()
                .HasForeignKey<User>(u => u.Id)
                .OnDelete(DeleteBehavior.Cascade);
+
+        //for chat 
+        builder.HasMany(u => u.OwnedConversations)
+            .WithOne(c => c.Owner)
+            .HasForeignKey(c => c.OwnerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(u => u.RequestedConversations)
+            .WithOne(c => c.Requester)
+            .HasForeignKey(c => c.RequesterId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

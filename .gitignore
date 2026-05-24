@@ -22,12 +22,16 @@ node_modules/
 # dist/
 # wwwroot/dist/
 
+extract.cs
+update_docs.py
 docs/web-docs
 src/Ketabi/Ketabi.Web/appsettings.json
 src/Ketabi/Ketabi.Web/appsettings.Development.json
 src/Ketabi/Ketabi.Web/appsettings.Production.json
 
 src/Ketabi/Ketabi.Web/wwwroot/uploads/
+src/Ketabi/Ketabi.Web/wwwroot/img/mock/
+
 
 # Publish Profiles
 Properties/PublishProfiles/
