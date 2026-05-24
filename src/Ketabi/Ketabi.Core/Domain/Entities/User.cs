@@ -5,9 +5,9 @@ public sealed class User : BaseEntity
     public User(Guid id) : base(id) { }
     public User() : base() { }
 
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    public string Email { get; set; }
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
     public string? Bio { get; set; }
     public string? City { get; set; }
     public string? Governorate { get; set; }
@@ -21,4 +21,6 @@ public sealed class User : BaseEntity
     public ICollection<Review> ReviewsWritten { get; set; } = new List<Review>();
     public ICollection<Review> ReviewsReceived { get; set; } = new List<Review>();
     public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+    public ICollection<Conversation> OwnedConversations { get; set; } = new List<Conversation>();
+    public ICollection<Conversation> RequestedConversations { get; set; } = new List<Conversation>();
 }
