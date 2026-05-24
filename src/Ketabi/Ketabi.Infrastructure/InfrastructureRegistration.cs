@@ -43,6 +43,8 @@ public static class InfrastructureRegistration
         services.AddScoped<IReviewRepository, ReviewRepository>();
         services.AddScoped<IRequestRepository, RequestRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
+        services.AddScoped<IConversationRepository, ConversationRepository>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
 
         services.AddScoped<IAuthService, AuthService>();
 

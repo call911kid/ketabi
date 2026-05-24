@@ -15,13 +15,19 @@ namespace Ketabi.Infrastructure
         public IReviewRepository Reviews { get; set; }
         public INotificationRepository Notifications { get; set; }
 
+        public IConversationRepository Conversations { get; set; }
+
+        public IMessageRepository Messages { get; set; }
+
         public UnitOfWork(KetabiDbContext context,
             IUserRepository users,
             ICategoryRepository categories,
             IBookListingRepository listings,
             IRequestRepository requests,
             IReviewRepository reviews,
-            INotificationRepository notifications
+            INotificationRepository notifications,
+            IConversationRepository conversations,
+            IMessageRepository messages
             )
         {
             _context = context;
@@ -31,6 +37,8 @@ namespace Ketabi.Infrastructure
             Requests = requests;
             Reviews = reviews;
             Notifications = notifications;
+            Conversations = conversations;
+            Messages = messages;
         }
 
         public async Task<int> SaveChangesAsync() =>

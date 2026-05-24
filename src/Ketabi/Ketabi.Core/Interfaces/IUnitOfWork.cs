@@ -11,6 +11,9 @@ public interface IUnitOfWork : IDisposable
     IRequestRepository Requests { get; }
     IReviewRepository Reviews { get; }
     INotificationRepository Notifications { get; }
+    IConversationRepository Conversations { get; }
+    IMessageRepository Messages { get; }
+
     Task<int> SaveChangesAsync();
     Task<IDbContextTransaction> BeginTransactionAsync();
 
