@@ -1,11 +1,11 @@
+using Ketabi.Core.Domain.Entities;
+using Ketabi.Infrastructure.Persistence.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Ketabi.Core.Domain.Entities;
-using Ketabi.Infrastructure.Persistence.Identity;
 
 namespace Ketabi.Infrastructure.Persistence
-{ 
+{
     public class KetabiDbContext : IdentityDbContext<KetabiUser, IdentityRole<Guid>, Guid>
     {
         public KetabiDbContext(DbContextOptions<KetabiDbContext> options) : base(options) { }
@@ -16,6 +16,8 @@ namespace Ketabi.Infrastructure.Persistence
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<Conversation> Conversations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
