@@ -11,7 +11,10 @@
     <link rel="stylesheet" href="~/css/ketabi-chat.css" asp-append-version="true" />
 }
 
-<div class="chat-layout" data-active-conv="@(Model.ActiveConversation?.ConversationId ?? "")">
+@{
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+}
+<div class="chat-layout" data-active-conv="@(Model.ActiveConversation?.ConversationId ?? "")" data-current-user-id="@currentUserId">
 
     @* Sidebar — always rendered; CSS controls mobile visibility *@
     <aside class="chat-sidebar @(Model.ActiveConversation != null ? "chat-sidebar--hidden-mobile" : "")">

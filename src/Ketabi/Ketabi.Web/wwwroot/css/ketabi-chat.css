@@ -368,6 +368,14 @@
   box-shadow:       0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
+/* Keep the chat header positioned below the fixed site navbar */
+.chat-header {
+  position: sticky;
+  top: calc(var(--navbar-height, 64px));
+  z-index: 40; /* sit under the navbar (navbar uses z-index:50) */
+  backdrop-filter: blur(6px);
+}
+
 .chat-header__back-btn {
   width:           2.25rem;
   height:          2.25rem;
@@ -978,6 +986,63 @@
   transform:  translateY(-1px);
 }
 
+
+/* ─────────────────────────────────────────────────────────────────────────
+   10b  REVIEW MODAL OVERLAY
+   ───────────────────────────────────────────────────────────────────────── */
+
+.review-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+}
+
+.review-modal--open {
+    display: flex;
+}
+
+.review-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.review-modal__dialog {
+    position: relative;
+    z-index: 1;
+    background: var(--color-surface);
+    border-radius: var(--radius-2xl);
+    padding: 32px;
+    max-width: 480px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.review-modal__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background var(--duration-base) var(--ease-default);
+}
+
+.review-modal__close:hover {
+    background: rgba(0, 0, 0, 0.12);
+}
 
 /* ─────────────────────────────────────────────────────────────────────────
    11  MESSAGE INPUT BAR

@@ -8,7 +8,24 @@
   </a>
 
   <!-- Book cover thumbnail -->
-  <img src="@Model.Book.CoverImageUrl"
+  @{
+      var cover = Model.Book?.CoverImageUrl ?? string.Empty;
+      string coverSrc;
+      if (string.IsNullOrEmpty(cover))
+      {
+          coverSrc = "/img/cover-placeholder.svg";
+      }
+      else if (cover.StartsWith("/") || cover.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+      {
+          coverSrc = cover;
+      }
+      else
+      {
+          coverSrc = $"/uploads/books/{cover}";
+      }
+  }
+
+  <img src="@coverSrc"
        alt="@Model.Book.Title"
        class="chat-header__book-cover" loading="lazy" />
 
@@ -39,7 +56,7 @@
 
   <!-- Other user info (right side) -->
   <div class="chat-header__user">
-    <img src="@Model.OtherUser.AvatarUrl"
+    <img src="@(string.IsNullOrEmpty(Model.OtherUser.AvatarUrl) ? "/uploads/users/default-avatar.png" : $"/uploads/users/{Model.OtherUser.AvatarUrl}")"
          alt="@Model.OtherUser.FullName"
          class="chat-header__user-avatar" loading="lazy" />
     <div class="chat-header__user-info d-none d-sm-block">

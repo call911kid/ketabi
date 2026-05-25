@@ -11,7 +11,8 @@
       <p class="review-card__header-title">Transaction complete!</p>
       <p class="review-card__header-sub">How was your experience with @Model.OtherUser.FullName?</p>
     </div>
-    <img src="@Model.OtherUser.AvatarUrl"
+    @* BUG 4: Use /uploads/users/ prefix + null-safe fallback for the other user's avatar *@
+    <img src="@(string.IsNullOrEmpty(Model.OtherUser.AvatarUrl) ? "/uploads/users/default-avatar.png" : $"/uploads/users/{Model.OtherUser.AvatarUrl}")"
          alt="@Model.OtherUser.FullName"
          class="review-card__other-avatar" />
   </div>

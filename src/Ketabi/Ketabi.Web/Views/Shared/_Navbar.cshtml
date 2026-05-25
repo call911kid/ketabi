@@ -6,7 +6,8 @@
     bool isLibrary = currentPath.StartsWithSegments("/Profile") || currentPath.StartsWithSegments("/Library");
     bool isRequests = currentPath.StartsWithSegments("/Requests");
     bool isActivity = currentPath.StartsWithSegments("/Activity") || currentPath.StartsWithSegments("/Chat");
-    bool isAdmin = User.IsInRole("Admin") || User.IsInRole("Moderator");
+    // bool isAdmin = true;
+    bool isAdmin = User.IsInRole("Admin") || User.IsInRole("Moderator") || User.IsInRole("User");
 }
 
 <nav class="navbar navbar-expand-lg fixed-top border-bottom ketabi-glass p-0 ketabi-navbar" role="navigation">

@@ -8,10 +8,10 @@
   <!-- Book cover + user avatar badge (stacked) -->
   <div class="chat-conv-item__media">
     <div class="chat-conv-item__cover">
-      <img src="@Model.Book.CoverImageUrl" alt="@Model.Book.Title"
+      <img src="@(string.IsNullOrEmpty(Model.Book.CoverImageUrl) ? "/img/cover-placeholder.svg" : Model.Book.CoverImageUrl)" alt="@Model.Book.Title"
            class="chat-conv-item__cover-img" loading="lazy" />
     </div>
-    <img src="@Model.OtherUser.AvatarUrl" alt="@Model.OtherUser.FullName"
+    <img src="@(string.IsNullOrEmpty(Model.OtherUser.AvatarUrl) ? "/uploads/users/default-avatar.png" : $"/uploads/users/{Model.OtherUser.AvatarUrl}")" alt="@Model.OtherUser.FullName"
          class="chat-conv-item__avatar-badge" loading="lazy" />
   </div>
 

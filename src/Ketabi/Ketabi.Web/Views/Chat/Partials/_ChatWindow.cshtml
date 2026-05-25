@@ -13,11 +13,6 @@
       @await Html.PartialAsync("Partials/_MessageBubble", msg)
     }
 
-    @if (Model.ShowReviewForm)
-    {
-      @await Html.PartialAsync("Partials/_ReviewForm", Model)
-    }
-
     <!-- Scroll anchor — JS calls scrollIntoView() on this element -->
     <div id="chat-feed-end"></div>
   </div>
@@ -42,6 +37,25 @@
               disabled>
         <i class="bi bi-send-fill" aria-hidden="true"></i>
       </button>
+    </div>
+  }
+
+  @if (Model.ShowReviewForm)
+  {
+    <div id="review-modal"
+         class="review-modal review-modal--open"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="review-modal-title">
+      <div class="review-modal__backdrop"></div>
+      <div class="review-modal__dialog">
+        <button id="review-modal-close"
+                class="review-modal__close"
+                aria-label="Close review">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+        @await Html.PartialAsync("Partials/_ReviewForm", Model)
+      </div>
     </div>
   }
 

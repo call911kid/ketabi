@@ -16,9 +16,12 @@
 
     <!-- Participant confirmation status -->
     <div class="handoff-bar__participants">
+      <!-- BUG 4: "You" slot — use CurrentUserAvatarUrl (the authenticated user's own avatar) -->
       <div class="handoff-bar__participant">
         <div class="handoff-bar__participant-img-wrap">
-          <img src="~/img/mock/layla.jpg" alt="You" class="handoff-bar__participant-img" />
+          <img src="@(string.IsNullOrEmpty(Model.CurrentUserAvatarUrl) ? "/uploads/users/default-avatar.png" : $"/uploads/users/{Model.CurrentUserAvatarUrl}")"
+               alt="You"
+               class="handoff-bar__participant-img" />
           @if (Model.CurrentUserConfirmedHandoff)
           {
             <span class="handoff-bar__confirmed-badge" aria-label="Confirmed">
@@ -30,9 +33,11 @@
           You @(Model.CurrentUserConfirmedHandoff ? "✓" : "")
         </span>
       </div>
+      <!-- BUG 4: Other user slot — use OtherUser.AvatarUrl with /uploads/users/ prefix and fallback -->
       <div class="handoff-bar__participant">
         <div class="handoff-bar__participant-img-wrap">
-          <img src="@Model.OtherUser.AvatarUrl" alt="@Model.OtherUser.FullName"
+          <img src="@(string.IsNullOrEmpty(Model.OtherUser.AvatarUrl) ? "/uploads/users/default-avatar.png" : $"/uploads/users/{Model.OtherUser.AvatarUrl}")"
+               alt="@Model.OtherUser.FullName"
                class="handoff-bar__participant-img" />
           @if (Model.OtherUserConfirmedHandoff)
           {

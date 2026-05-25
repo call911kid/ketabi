@@ -49,9 +49,9 @@
 
         container.appendChild(toast);
 
-        requestAnimationFrame(function () {
+        setTimeout(function () {
             toast.classList.add('notif-toast--visible');
-        });
+        }, 16);
 
         const dismissTimer = setTimeout(function () { dismissToast(toast); }, 5000);
 
