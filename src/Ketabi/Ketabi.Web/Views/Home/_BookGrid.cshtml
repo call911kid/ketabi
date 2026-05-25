@@ -4,6 +4,7 @@
    Renders: section header + responsive Bootstrap grid of _BookCard partials
             + empty state + CTA banner.
    Grid: 2 cols (xs) → 3 cols (md) → 4 cols (xl)
+   Pagination: Infinite scroll (loads more books when scrolling to bottom)
 ───────────────────────────────────────────────────────────────────────── *@
 @model ExplorerViewModel
 
@@ -60,7 +61,12 @@
     else
     {
         @* Bootstrap responsive grid: 2 → 3 → 4 columns *@
-        <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3 g-md-4">
+        <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3 g-md-4"
+             id="books-grid"
+             data-current-page="@Model.Pager.CurrentPage"
+             data-page-size="@Model.Filter.PageSize"
+             data-total-count="@Model.Pager.TotalCount"
+             data-has-more="@(Model.Pager.CurrentPage < Model.Pager.TotalPages)">
             @foreach (var book in Model.Books)
             {
                 <div class="col">
@@ -68,6 +74,18 @@
                 </div>
             }
         </div>
+
+        @* ── Infinite scroll loading indicator ── *@
+        @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
+        {
+            <div id="infinite-scroll-trigger"
+                 class="text-center py-5"
+                 style="margin-top: 2rem;">
+                <div class="spinner-border text-primary d-none" id="loading-spinner" role="status" aria-label="Loading more books">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        }
     }
 </div>
 

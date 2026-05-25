@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System.Diagnostics;
+using System.Text;
 
 namespace Ketabi.Web.Controllers;
 
@@ -219,11 +220,19 @@ public class HomeController : BaseController
             }
         };
 
-        // Return JSON response with HTML partials
+        // Return JSON response with HTML partials and pagination info
         return Json(new
         {
             filterBar = await RenderViewToString("_FilterBar", vm),
             bookGrid = await RenderViewToString("_BookGrid", vm),
+            bookCards = await RenderBookCardsToString(cards),
+            pagination = new
+            {
+                currentPage = page,
+                pageSize = filter.PageSize,
+                totalCount = cards.Count,
+                hasMore = page * filter.PageSize < (vm.Pager.TotalCount > 0 ? vm.Pager.TotalCount : cards.Count)
+            },
             filter = new
             {
                 searchQuery = filter.SearchQuery,
@@ -231,6 +240,17 @@ public class HomeController : BaseController
                 categoryId = filter.CategoryId
             }
         });
+    }
+
+    // Helper method to render book cards to string (for infinite scroll)
+    private async Task<string> RenderBookCardsToString(List<BookCardViewModel> cards)
+    {
+        var output = new StringBuilder();
+        foreach (var card in cards)
+        {
+            output.Append(await RenderViewToString("Shared/_BookCard", card));
+        }
+        return output.ToString();
     }
 
     // Helper method to render a partial view to string

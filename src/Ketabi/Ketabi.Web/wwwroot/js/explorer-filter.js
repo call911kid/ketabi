@@ -1,9 +1,16 @@
 /**
- * Explorer Filter - AJAX-based instant filtering and search
+ * Explorer Filter - AJAX-based instant filtering with Infinite Scroll
+ * Automatically loads books as user scrolls down
  */
+
+let currentPage = 1;
+let isLoadingMore = false;
+let hasMoreBooks = true;
+let intersectionObserver = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   initializeFilterHandlers();
+  initializeInfiniteScroll();
 });
 
 function initializeFilterHandlers() {
@@ -52,6 +59,154 @@ function initializeFilterHandlers() {
   }
 }
 
+function initializeInfiniteScroll() {
+  const trigger = document.getElementById("infinite-scroll-trigger");
+
+  if (!trigger) {
+    return; // No more items to load
+  }
+
+  // Disconnect old observer if exists
+  if (intersectionObserver) {
+    intersectionObserver.disconnect();
+  }
+
+  // Create Intersection Observer to detect when user scrolls to bottom
+  const options = {
+    root: null,
+    rootMargin: "100px",
+    threshold: 0.1,
+  };
+
+  intersectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting && !isLoadingMore && hasMoreBooks) {
+        loadMoreBooks();
+      }
+    });
+  }, options);
+
+  intersectionObserver.observe(trigger);
+}
+
+function loadMoreBooks() {
+  if (isLoadingMore || !hasMoreBooks) {
+    return;
+  }
+
+  isLoadingMore = true;
+  currentPage++;
+
+  // Show loading spinner
+  const spinner = document.getElementById("loading-spinner");
+  if (spinner) {
+    spinner.classList.remove("d-none");
+  }
+
+  // Build filter parameters
+  const url = new URL("/api/books/filter", window.location.origin);
+
+  const searchQuery =
+    document.getElementById("explorer-search-input")?.value || "";
+  const currentUrl = new URL(window.location.href);
+
+  if (searchQuery) {
+    url.searchParams.set("q", searchQuery);
+  }
+
+  const categoryId = currentUrl.searchParams.get("categoryId");
+  const mode = currentUrl.searchParams.get("mode");
+
+  if (categoryId) {
+    url.searchParams.set("categoryId", categoryId);
+  }
+  if (mode) {
+    url.searchParams.set("mode", mode);
+  }
+
+  // Add page parameter
+  url.searchParams.set("page", currentPage);
+
+  // Make AJAX request for next page
+  fetch(url.toString(), {
+    headers: {
+      Accept: "application/json",
+      "X-Requested-With": "XMLHttpRequest",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      // Append new book cards to the grid
+      const booksGrid = document.getElementById("books-grid");
+      if (booksGrid && data.bookCards) {
+        // Create temporary container to parse HTML
+        const temp = document.createElement("div");
+        temp.innerHTML = data.bookCards;
+
+        // Get all book card columns and append them
+        const cols = temp.querySelectorAll(".col");
+        cols.forEach((col) => {
+          const newCol = document.createElement("div");
+          newCol.className = col.className;
+          newCol.innerHTML = col.innerHTML;
+          booksGrid.appendChild(newCol);
+        });
+      }
+
+      // Update pagination state
+      if (data.pagination) {
+        hasMoreBooks = data.pagination.hasMore;
+
+        // Update grid data attributes
+        if (booksGrid) {
+          booksGrid.setAttribute(
+            "data-current-page",
+            data.pagination.currentPage,
+          );
+        }
+
+        // If no more books, remove the trigger element
+        if (!hasMoreBooks) {
+          const trigger = document.getElementById("infinite-scroll-trigger");
+          if (trigger) {
+            trigger.remove();
+          }
+          // Disconnect observer
+          if (intersectionObserver) {
+            intersectionObserver.disconnect();
+          }
+        }
+      }
+
+      // Hide loading spinner
+      if (spinner) {
+        spinner.classList.add("d-none");
+      }
+
+      isLoadingMore = false;
+
+      // Re-initialize observer for next scroll
+      if (hasMoreBooks) {
+        initializeInfiniteScroll();
+      }
+    })
+    .catch((error) => {
+      console.error("Infinite scroll error:", error);
+
+      // Hide loading spinner and reset
+      if (spinner) {
+        spinner.classList.add("d-none");
+      }
+      isLoadingMore = false;
+      currentPage--; // Revert page increment on error
+    });
+}
+
 function debounce(fn, delay) {
   let timeout;
   return function (...args) {
@@ -61,6 +216,11 @@ function debounce(fn, delay) {
 }
 
 function performFilter(customUrl) {
+  // Reset pagination when filter changes
+  currentPage = 1;
+  isLoadingMore = false;
+  hasMoreBooks = true;
+
   // Build filter parameters from current state
   let url;
 
@@ -100,6 +260,9 @@ function performFilter(customUrl) {
     }
   }
 
+  // Add page parameter
+  url.searchParams.set("page", currentPage);
+
   // Show loading state
   showLoadingState();
 
@@ -124,12 +287,21 @@ function performFilter(customUrl) {
         initializeFilterHandlers(); // Re-attach event listeners
       }
 
-      // Update book grid container with the entire grid HTML
+      // Replace book grid with new results
       const gridContainer = document.getElementById("explorer-grid-container");
       if (gridContainer && data.bookGrid) {
         gridContainer.innerHTML = data.bookGrid;
         initializeFilterHandlers(); // Re-attach event listeners for clear search link
       }
+
+      // Update pagination state from response
+      if (data.pagination) {
+        currentPage = data.pagination.currentPage;
+        hasMoreBooks = data.pagination.hasMore;
+      }
+
+      // Initialize infinite scroll for new grid
+      initializeInfiniteScroll();
 
       // Update URL without page refresh
       const newUrl = new URL("/");
