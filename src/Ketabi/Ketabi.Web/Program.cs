@@ -1,4 +1,3 @@
-using System.Text;
 using Ketabi.Application;
 using Ketabi.Application.Common;
 using Ketabi.Application.Interfaces;
@@ -11,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Ketabi.Web
 {
@@ -84,6 +84,11 @@ namespace Ketabi.Web
                                 context.Token = token;
                             }
 
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                                context.Token = accessToken;
+
                             return Task.CompletedTask;
                         }
                     };
@@ -149,6 +154,7 @@ namespace Ketabi.Web
             app.UseAuthorization();
 
             app.MapHub<NotificationHub>("/hubs/notifications");
+            app.MapHub<ChatHub>("/hubs/chat");
 
             app.MapControllerRoute(
                 name: "default",

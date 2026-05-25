@@ -13,6 +13,9 @@ public class ConversationDetailViewModel
 
     public IList<MessageViewModel> Messages { get; set; } = [];
 
+    /// <summary>Underlying request id for this conversation (used to change request status).</summary>
+    public string RequestId { get; set; } = string.Empty;
+
     /// <summary>True when the current user has already confirmed the handoff.</summary>
     public bool CurrentUserConfirmedHandoff { get; set; }
 
@@ -22,9 +25,24 @@ public class ConversationDetailViewModel
     /// <summary>True when the current user has already submitted a review.</summary>
     public bool ReviewAlreadySubmitted { get; set; }
 
+    /// <summary>
+    /// Avatar URL (filename only, e.g. "abc.jpg") for the currently authenticated user.
+    /// Populated by ChatController from the appropriate party slot (owner or requester).
+    /// Used in the handoff bar "You" participant slot.
+    /// </summary>
+    public string CurrentUserAvatarUrl { get; set; } = string.Empty;
+
     // ── Computed helpers (used in views) ────────────────────────────
+
+    /// <summary>
+    /// BUG 2 FIX: Show the handoff bar only when one party has already confirmed
+    /// but the current user has NOT yet confirmed. Excludes Active (no-one confirmed)
+    /// and Completed (both confirmed).
+    /// </summary>
     public bool ShowHandoffBar =>
-        TransactionStatus != TransactionStatus.Completed && !CurrentUserConfirmedHandoff;
+        !CurrentUserConfirmedHandoff &&
+        TransactionStatus != TransactionStatus.Active &&
+        TransactionStatus != TransactionStatus.Completed;
 
     public bool ShowReviewForm =>
         TransactionStatus == TransactionStatus.Completed && !ReviewAlreadySubmitted;

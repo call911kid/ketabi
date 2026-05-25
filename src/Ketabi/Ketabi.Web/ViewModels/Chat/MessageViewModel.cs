@@ -19,4 +19,11 @@ public class MessageViewModel
 
     /// <summary>True when this message starts a new calendar day (drives the date divider).</summary>
     public bool ShowDateDivider { get; set; }
+
+    /// <summary>
+    /// True when this message is the last in a consecutive run from the same sender
+    /// (or is the final message overall). Drives timestamp visibility — avoids showing
+    /// a timestamp after every single bubble when multiple messages are sent in a row.
+    /// </summary>
+    public bool ShowTimestamp { get; set; }
 }

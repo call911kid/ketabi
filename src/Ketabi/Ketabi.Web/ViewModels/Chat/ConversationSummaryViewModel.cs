@@ -18,4 +18,6 @@ public class ConversationSummaryViewModel
 
     /// <summary>True when this conversation is the active/selected one.</summary>
     public bool IsSelected { get; set; }
+
+    public int UnreadCount { get; set; }
 }

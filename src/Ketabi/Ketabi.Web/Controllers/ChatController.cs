@@ -1,119 +1,229 @@
+using Ketabi.Application.DTOs.Chat;
+using Ketabi.Application.Interfaces;
+using Ketabi.Web.ViewModels.Chat;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ketabi.Web.ViewModels.Chat;
+using System.Security.Claims;
 
 namespace Ketabi.Web.Controllers;
 
-/// <summary>
-/// Chat page controller — currently returns mock data only.
-/// Real data wiring will be added in a future sprint.
-/// </summary>
 [Authorize]
 public class ChatController : BaseController
 {
-    // GET /Chat  (no conversation selected)
-    public IActionResult Index() => View(BuildMockViewModel(null));
+    private readonly IConversationService _conversationService;
 
-    // GET /Chat/{id}  (conversation selected)
-    [HttpGet("{id}")]
+    public ChatController(IConversationService conversationService)
+    {
+        _conversationService = conversationService;
+    }
+
+    // GET /Chat
+    public async Task<IActionResult> Index()
+    {
+        var userId = GetCurrentUserId();
+        if (userId == Guid.Empty) return RedirectToAction("Login", "Account");
+
+        // BUG 8: expose current user id for the view / data attribute
+        ViewData["CurrentUserId"] = userId.ToString();
+
+        var result = await _conversationService.GetMyConversationsAsync(userId);
+        if (!result.Success) return View(new ChatIndexViewModel());
+
+        var vm = new ChatIndexViewModel
+        {
+            Conversations = result.Data!.Select(c => MapToSummary(c, userId)).ToList(),
+            ActiveConversation = null
+        };
+
+        return View(vm);
+    }
+
+    // GET /Chat/{id}
+    [HttpGet]
     [Route("Chat/{id}")]
-    public IActionResult Index(string id) => View(BuildMockViewModel(id));
+    public async Task<IActionResult> Index(string id)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == Guid.Empty) return RedirectToAction("Login", "Account");
 
-    // POST /Chat/ConfirmHandoff  (stub — wired in future sprint)
+        // BUG 8: expose current user id for the view / data attribute
+        ViewData["CurrentUserId"] = userId.ToString();
+
+        if (!Guid.TryParse(id, out var convGuid))
+            return RedirectToAction(nameof(Index));
+
+        var listResult = await _conversationService.GetMyConversationsAsync(userId);
+        var detailResult = await _conversationService.GetConversationAsync(convGuid, userId);
+
+        if (!detailResult.Success) return RedirectToAction(nameof(Index));
+
+        var vm = new ChatIndexViewModel
+        {
+            Conversations = listResult.Success
+                ? listResult.Data!.Select(c => MapToSummary(c, userId)).ToList()
+                : new List<ConversationSummaryViewModel>(),
+            ActiveConversation = MapToDetail(detailResult.Data!, userId)
+        };
+
+        // mark selected
+        var selected = vm.Conversations.FirstOrDefault(c => c.ConversationId == id);
+        if (selected != null) selected.IsSelected = true;
+
+        return View(vm);
+    }
+
+    // POST /Chat/Open?requestId={id}
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult ConfirmHandoff(string conversationId)
+    public async Task<IActionResult> Open(Guid requestId)
     {
-        // TODO: wire up service call
-        TempData["FlashSuccess"] = "Handoff confirmed!";
+        var userId = GetCurrentUserId();
+        var result = await _conversationService.OpenConversationAsync(requestId, userId);
+
+        if (!result.Success)
+        {
+            TempData["FlashError"] = result.Errors.FirstOrDefault();
+            return RedirectToAction(nameof(Index));
+        }
+
+        return RedirectToAction(nameof(Index),
+            new { id = result.Data!.ConversationId });
+    }
+
+    // POST /Chat/ConfirmHandoff
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ConfirmHandoff(string conversationId)
+    {
+        var userId = GetCurrentUserId();
+
+        if (!Guid.TryParse(conversationId, out var convGuid))
+            return BadRequest();
+
+        var result = await _conversationService.ConfirmHandoffAsync(
+            new Application.DTOs.Chat.ConfirmHandoffDto { ConversationId = convGuid }, userId);
+
+        if (!result.Success)
+            TempData["FlashError"] = result.Errors.FirstOrDefault();
+        else
+            TempData["FlashSuccess"] = "Handoff confirmed!";
+
         return RedirectToAction(nameof(Index), new { id = conversationId });
     }
 
-    // POST /Chat/SubmitReview  (stub — wired in future sprint)
+    // POST /Chat/SubmitReview
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult SubmitReview(string conversationId, string revieweeId, int rating, string? comment)
     {
-        // TODO: wire up service call
+        // TODO: wire IReviewService
         TempData["FlashSuccess"] = "Review submitted!";
         return RedirectToAction(nameof(Index), new { id = conversationId });
     }
 
-    // ── Mock data factory ───────────────────────────────────────────────────
-    private static ChatIndexViewModel BuildMockViewModel(string? activeId)
+    // Mapping helpers
+    private static ConversationSummaryViewModel MapToSummary(ConversationDto c, Guid callerId)
     {
-        // Two mock conversations matching the UI screenshot
-        var conversations = new List<ConversationSummaryViewModel>
+        var isOwner = callerId == c.OwnerId;
+        var otherUser = new OtherUserViewModel
         {
-            new()
-            {
-                ConversationId       = "conv-1",
-                Book                 = new() { BookId = "b1", Title = "Being and Time",  CoverImageUrl = "/img/mock/being-and-time.jpg" },
-                OtherUser            = new() { UserId = "u1", FullName = "Omar Khalid",  AvatarUrl = "/img/mock/omar.jpg", Location = "Zamalek, Cairo", Rating = 4.8 },
-                TransactionStatus    = TransactionStatus.HandoffConfirmedRequester,
-                LastMessagePreview   = "nice",
-                LastMessageIsMine    = true,
-                LastMessageTimeAgo   = "5h ago",
-                IsSelected           = activeId == "conv-1",
-            },
-            new()
-            {
-                ConversationId       = "conv-2",
-                Book                 = new() { BookId = "b2", Title = "The Alchemist",   CoverImageUrl = "/img/mock/alchemist.jpg" },
-                OtherUser            = new() { UserId = "u2", FullName = "Youssef Nour", AvatarUrl = "/img/mock/youssef.jpg", Location = "Maadi, Cairo",   Rating = 4.5 },
-                TransactionStatus    = TransactionStatus.Active,
-                LastMessagePreview   = "Yes, absolutely! When can you pick it up?",
-                LastMessageIsMine    = true,
-                LastMessageTimeAgo   = "5h ago",
-                IsSelected           = activeId == "conv-2",
-            },
+            UserId = (isOwner ? c.RequesterId : c.OwnerId).ToString(),
+            FullName = isOwner ? c.RequesterName : c.OwnerName,
+            AvatarUrl = isOwner ? c.RequesterAvatar : c.OwnerAvatar
         };
 
-        ConversationDetailViewModel? active = activeId switch
+        return new ConversationSummaryViewModel
         {
-            "conv-1" => BuildConvDetail_Omar(),
-            "conv-2" => BuildConvDetail_Youssef(),
-            _        => null
-        };
-
-        return new ChatIndexViewModel
-        {
-            Conversations      = conversations,
-            ActiveConversation = active,
+            ConversationId = c.ConversationId.ToString(),
+            Book = new BookSummaryViewModel { Title = c.BookTitle, CoverImageUrl = c.BookImageUrl ?? string.Empty },
+            OtherUser = otherUser,
+            TransactionStatus = MapStatus(c),
+            LastMessagePreview = c.LastMessage?.Text ?? string.Empty,
+            LastMessageIsMine = c.LastMessage != null ? (c.LastMessage.SenderId == callerId) : false,
+            LastMessageTimeAgo = c.LastMessage?.TimeAgo ?? string.Empty,
+            UnreadCount = c.UnreadCount
         };
     }
 
-    private static ConversationDetailViewModel BuildConvDetail_Omar() => new()
+    private static ConversationDetailViewModel MapToDetail(ConversationDto c, Guid callerId)
     {
-        ConversationId               = "conv-1",
-        Book                         = new() { BookId = "b1", Title = "Being and Time",  CoverImageUrl = "/img/mock/being-and-time.jpg" },
-        OtherUser                    = new() { UserId = "u1", FullName = "Omar Khalid",  AvatarUrl = "/img/mock/omar.jpg", Location = "Zamalek, Cairo", Rating = 4.8 },
-        TransactionStatus            = TransactionStatus.HandoffConfirmedRequester,
-        RequestType                  = RequestType.Exchange,
-        CurrentUserConfirmedHandoff  = true,
-        OtherUserConfirmedHandoff    = false,
-        ReviewAlreadySubmitted       = false,
-        Messages                     = new List<MessageViewModel>
-        {
-            new() { MessageId="m1", IsMine=false, SenderName="Omar Khalid",  SenderAvatarUrl="/img/mock/omar.jpg",   Text="Perfect! Saturday at 10am works great. Shall we meet at Cilantro in Zamalek? It's halfway for us.", FormattedTime="01:35 PM", DateLabel="Yesterday", ShowDateDivider=true  },
-            new() { MessageId="m2", IsMine=true,  SenderName="Layla Hassan", SenderAvatarUrl="/img/mock/layla.jpg", Text="That sounds wonderful! See you there. I'll have The Alchemist wrapped up nicely 📚",                 FormattedTime="01:40 PM", DateLabel="Yesterday", ShowDateDivider=false },
-            new() { MessageId="m3", IsMine=false, SenderName="Omar Khalid",  SenderAvatarUrl="/img/mock/omar.jpg",   Text="Haha love the enthusiasm! Being and Time will be equally well-packaged. Looking forward to it!",    FormattedTime="01:42 PM", DateLabel="Yesterday", ShowDateDivider=false },
-            new() { MessageId="m4", IsMine=true,  SenderName="Layla Hassan", SenderAvatarUrl="/img/mock/layla.jpg", Text="nice",                                                                                                FormattedTime="05:10 PM", DateLabel="Today",     ShowDateDivider=true  },
-        },
-    };
+        var isOwner = callerId == c.OwnerId;
 
-    private static ConversationDetailViewModel BuildConvDetail_Youssef() => new()
-    {
-        ConversationId     = "conv-2",
-        Book               = new() { BookId = "b2", Title = "The Alchemist", CoverImageUrl = "/img/mock/alchemist.jpg" },
-        OtherUser          = new() { UserId = "u2", FullName = "Youssef Nour", AvatarUrl = "/img/mock/youssef.jpg", Location = "Maadi, Cairo", Rating = 4.5 },
-        TransactionStatus  = TransactionStatus.Active,
-        RequestType        = RequestType.Borrow,
-        BorrowDurationDays = 14,
-        Messages           = new List<MessageViewModel>
+        var otherUser = new OtherUserViewModel
         {
-            new() { MessageId="m5", IsMine=false, SenderName="Youssef Nour", SenderAvatarUrl="/img/mock/youssef.jpg", Text="Hey! Is the book still available?",         FormattedTime="10:00 AM", DateLabel="Today", ShowDateDivider=true  },
-            new() { MessageId="m6", IsMine=true,  SenderName="Layla Hassan", SenderAvatarUrl="/img/mock/layla.jpg",  Text="Yes, absolutely! When can you pick it up?", FormattedTime="10:05 AM", DateLabel="Today", ShowDateDivider=false },
-        },
-    };
+            UserId = (isOwner ? c.RequesterId : c.OwnerId).ToString(),
+            FullName = isOwner ? c.RequesterName : c.OwnerName,
+            AvatarUrl = isOwner ? c.RequesterAvatar : c.OwnerAvatar,
+        };
+
+        // BUG 5 + BUG 7: Build ordered list once to compare adjacent messages
+        var ordered = c.Messages.OrderBy(m => m.CreatedAt).ToList();
+
+        var messages = ordered.Select((m, index) =>
+        {
+            var prev = index > 0 ? ordered[index - 1] : null;
+
+            // BUG 5: ShowDateDivider is true when this message starts a new calendar day
+            var showDivider = prev == null || m.CreatedAt.Date != prev.CreatedAt.Date;
+
+            return new MessageViewModel
+            {
+                MessageId      = m.MessageId.ToString(),
+                IsMine         = m.SenderId == callerId,
+                SenderName     = m.SenderName,
+                SenderAvatarUrl = m.SenderAvatar,
+                Text           = m.Text,
+                FormattedTime  = m.CreatedAt.ToString("hh:mm tt"),
+                DateLabel      = m.CreatedAt.Date == DateTime.UtcNow.Date
+                                    ? "Today"
+                                    : m.CreatedAt.Date == DateTime.UtcNow.Date.AddDays(-1)
+                                        ? "Yesterday"
+                                        : m.CreatedAt.ToString("MMM d"),
+                ShowDateDivider = showDivider,
+                ShowTimestamp   = true   // placeholder; corrected in the post-processing loop below
+            };
+        }).ToList();
+
+        // BUG 7: ShowTimestamp — only show at the last bubble of a consecutive sender run,
+        // or when the next message switches sender, or at the very last message.
+        for (var i = 0; i < messages.Count; i++)
+        {
+            var isLast              = i == messages.Count - 1;
+            var nextIsDifferentSender = !isLast && messages[i + 1].IsMine != messages[i].IsMine;
+            messages[i].ShowTimestamp = isLast || nextIsDifferentSender;
+        }
+
+        var vm = new ConversationDetailViewModel
+        {
+            ConversationId = c.ConversationId.ToString(),
+            Book           = new BookSummaryViewModel { Title = c.BookTitle, CoverImageUrl = c.BookImageUrl ?? string.Empty },
+            OtherUser      = otherUser,
+            TransactionStatus          = MapStatus(c),
+            RequestId = c.RequestId.ToString(),
+            CurrentUserConfirmedHandoff = isOwner ? c.OwnerConfirmedHandoff  : c.RequesterConfirmedHandoff,
+            OtherUserConfirmedHandoff  = isOwner ? c.RequesterConfirmedHandoff : c.OwnerConfirmedHandoff,
+            // BUG 4: current user avatar — pick the correct party slot
+            CurrentUserAvatarUrl = isOwner ? c.OwnerAvatar : c.RequesterAvatar,
+            Messages = messages
+        };
+
+        return vm;
+    }
+
+    private static TransactionStatus MapStatus(ConversationDto c)
+    {
+        if (c.RequesterConfirmedHandoff && c.OwnerConfirmedHandoff)
+            return TransactionStatus.Completed;
+        if (c.RequesterConfirmedHandoff)
+            return TransactionStatus.HandoffConfirmedRequester;
+        if (c.OwnerConfirmedHandoff)
+            return TransactionStatus.HandoffConfirmedOwner;
+        return TransactionStatus.Active;
+    }
+
+    private Guid GetCurrentUserId()
+    {
+        var s = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return Guid.TryParse(s, out var id) ? id : Guid.Empty;
+    }
 }

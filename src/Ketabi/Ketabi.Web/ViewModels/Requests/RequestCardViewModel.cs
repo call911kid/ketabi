@@ -74,4 +74,8 @@ public class RequestCardViewModel
     public string CounterpartyRoleLabel => IsIncoming ? "Requester" : "Owner";
 
     public string CounterpartySectionLabel => IsIncoming ? "From" : "To";
+
+    // Populated when Status == Approved and a Conversation exists
+    public Guid? ConversationId { get; set; }
+    public bool HasConversation => ConversationId.HasValue;
 }

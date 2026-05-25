@@ -15,12 +15,14 @@ public class RequestsController : BaseController
 {
     private readonly IRequestService _requestService;
     private readonly IBookListingService _bookListingService;
+    private readonly IConversationService _conversationService;
     private readonly IMapper _mapper;
 
-    public RequestsController(IRequestService requestService, IBookListingService bookListingService, IMapper mapper)
+    public RequestsController(IRequestService requestService, IBookListingService bookListingService, IConversationService conversationService, IMapper mapper)
     {
         _requestService = requestService;
         _bookListingService = bookListingService;
+        _conversationService = conversationService;
         _mapper = mapper;
     }
 
@@ -44,11 +46,48 @@ public class RequestsController : BaseController
         var outgoingRequests = await _requestService.GetOutgoingRequestsAsync(userId, query);
         var userPendingBooks = await _bookListingService.GetUserPendingBooksAsync(userId);
 
+        // Build initial viewmodels
+        var incomingList = incomingRequests.Items.Select(r => MapToCardViewModel(r, userId)).ToList();
+        var outgoingList = outgoingRequests.Items.Select(r => MapToCardViewModel(r, userId)).ToList();
+
+        // Optimization: fetch all conversations for this user once to avoid N+1.
+        try
+        {
+            var convsResult = await _conversationService.GetMyConversationsAsync(userId);
+            if (convsResult != null && convsResult.Success && convsResult.Data != null)
+            {
+                var convsByRequest = convsResult.Data.Where(c => c.RequestId != Guid.Empty).ToDictionary(c => c.RequestId, c => c);
+
+                // Assign conversation ids to approved requests
+                foreach (var card in incomingList.Concat(outgoingList))
+                {
+                    if (card.Status == Ketabi.Core.Domain.Enums.RequestStatus.Approved)
+                    {
+                        // If conversation exists for the request id, set it
+                        if (convsByRequest.TryGetValue(card.RequestId, out var conv))
+                        {
+                            card.ConversationId = conv.ConversationId;
+                        }
+                        else
+                        {
+                            // If not found, check participant-based retrieval as fallback
+                            // Do not create conversations here.
+                            // Optionally check if user is participant in some conversation related to this request.
+                        }
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Non-fatal: leave conversation ids blank if retrieval fails
+        }
+
         var viewModel = new RequestsIndexViewModel
         {
             ActiveTab = tab,
-            IncomingRequests = incomingRequests.Items.Select(r => MapToCardViewModel(r, userId)).ToList(),
-            OutgoingRequests = outgoingRequests.Items.Select(r => MapToCardViewModel(r, userId)).ToList(),
+            IncomingRequests = incomingList,
+            OutgoingRequests = outgoingList,
             PendingBooks = userPendingBooks.Select(b => MapPendingBookCardViewModel(b)).ToList()
         };
 
@@ -84,6 +123,28 @@ public class RequestsController : BaseController
             };
 
             await _requestService.UpdateRequestStatusAsync(userId, requestId, dto);
+
+            // If request was approved, open (or ensure) a conversation for the request.
+            if (parsedStatus == Ketabi.Core.Domain.Enums.RequestStatus.Approved)
+            {
+                try
+                {
+                    // OpenConversationAsync is idempotent; if it fails we log and continue.
+                    var convResult = await _conversationService.OpenConversationAsync(requestId, userId);
+                    if (convResult != null && !convResult.Success)
+                    {
+                        // Log but do not fail the workflow (status update already succeeded)
+                        // Obtain logger via HttpContext.RequestServices if needed
+                        var logger = HttpContext.RequestServices.GetService<Microsoft.Extensions.Logging.ILogger<RequestsController>>();
+                        logger?.LogWarning("OpenConversationAsync returned failure for request {RequestId}: {Errors}", requestId, string.Join(';', convResult.Errors ?? new List<string>()));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var logger = HttpContext.RequestServices.GetService<Microsoft.Extensions.Logging.ILogger<RequestsController>>();
+                    logger?.LogError(ex, "Failed to open conversation after approving request {RequestId}", requestId);
+                }
+            }
 
             return Json(new { success = true, message = $"Request {parsedStatus.ToString().ToLower()} successfully." });
         }
@@ -137,7 +198,7 @@ public class RequestsController : BaseController
         }
     }
 
-    private RequestCardViewModel MapToCardViewModel(Ketabi.Application.DTOs.Requests.RequestDto dto, Guid currentUserId)
+    private RequestCardViewModel MapToCardViewModel(Ketabi.Application.DTOs.Requests.RequestDto dto, Guid currentUserId, Guid? conversationId = null)
     {
         var isIncoming = dto.OwnerId == currentUserId;
 
@@ -179,6 +240,9 @@ public class RequestsController : BaseController
             CanAcceptOrReject = isIncoming && dto.Status == RequestStatus.Pending,
             CanWithdraw = !isIncoming && dto.Status == RequestStatus.Pending
         };
+
+        // Assign conversation id if supplied by caller (batch lookup)
+        viewModel.ConversationId = conversationId;
 
         if (dto.OfferedListingId.HasValue)
         {
