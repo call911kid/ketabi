@@ -93,7 +93,7 @@ public class ProfileController : BaseController
             vm.ReviewCount = profileDto.Stats?.ReviewCount ?? 0;
             vm.BooksListed = profileDto.Stats?.BooksListed ?? 0;
             vm.ActiveListings = profileDto.Stats?.BooksListed ?? 0;
-            vm.CompletedBorrows = 0;
+            vm.CompletedBorrows = profileDto.Stats?.CompletedTransactions ?? 0;
             vm.CompletedExchanges = 0;
             vm.MemberSince = profileDto.MemberSince ?? string.Empty;
 
@@ -155,7 +155,6 @@ public class ProfileController : BaseController
             }
 
             vm.Books = books;
-            vm.BooksListed = books.Count;
 
             vm.BooksPager = new PagerViewModel
             {

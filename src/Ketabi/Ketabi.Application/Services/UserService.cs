@@ -1,4 +1,4 @@
-﻿using Ketabi.Application.Common;
+using Ketabi.Application.Common;
 using Ketabi.Application.DTOs.Users;
 using Ketabi.Application.Exceptions;
 using Ketabi.Application.Interfaces;
@@ -63,8 +63,8 @@ namespace Ketabi.Application.Services
 
             // Populate stats
             var reviewCount = await _unitOfWork.Reviews.CountReviewsForUserAsync(user.Id);
-            var booksListed = user.Listings?.Count ?? 0;
-            var activeListings = user.Listings?.Count(l => l.IsAvailable) ?? 0;
+            var booksListed = await _unitOfWork.Listings.CountAsync(l => l.UserId == user.Id);
+            var activeListings = await _unitOfWork.Listings.CountAsync(l => l.UserId == user.Id && l.IsAvailable);
             var completedTransactions = await _unitOfWork.Requests.CountCompletedTradesForUserAsync(user.Id);
             var reputation = await _unitOfWork.Reviews.CalculateAverageRatingForUserAsync(user.Id);
 
@@ -73,6 +73,7 @@ namespace Ketabi.Application.Services
                 ReputationScore = reputation,
                 ReviewCount = reviewCount,
                 BooksListed = booksListed,
+                ActiveListings = activeListings,
                 CompletedTransactions = completedTransactions,
                 UnreadNotifications = user.Notifications?.Count(n => !n.IsRead) ?? 0
             };
@@ -99,7 +100,8 @@ namespace Ketabi.Application.Services
             {
                 ReputationScore = user.ReputationScore,
                 ReviewCount = await _unitOfWork.Reviews.CountReviewsForUserAsync(user.Id),
-                BooksListed = user.Listings?.Count ?? 0,
+                BooksListed = await _unitOfWork.Listings.CountAsync(l => l.UserId == user.Id),
+                ActiveListings = await _unitOfWork.Listings.CountAsync(l => l.UserId == user.Id && l.IsAvailable),
                 CompletedTransactions = await _unitOfWork.Requests.CountCompletedTradesForUserAsync(user.Id),
                 UnreadNotifications = user.Notifications?.Count(n => !n.IsRead) ?? 0
             };

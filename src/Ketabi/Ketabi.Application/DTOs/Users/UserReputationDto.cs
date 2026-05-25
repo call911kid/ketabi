@@ -11,6 +11,7 @@ public class UserReputationDto
     public int ReviewCount { get; set; }
     public int BooksListed { get; set; }
     public int CompletedTransactions { get; set; }
+    public int ActiveListings { get; set; }
     public int UnreadNotifications { get; set; }
 }
 
@@ -22,6 +23,7 @@ public sealed class UserStatsDto
     public int ReviewCount { get; set; }
     public int BooksListed { get; set; }
     public int CompletedTransactions { get; set; }
+    public int ActiveListings { get; set; }
     public int UnreadNotifications { get; set; }
 }
 
