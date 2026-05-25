@@ -16,7 +16,7 @@ internal class MessageRepository : GenericRepository<Message>, IMessageRepositor
             .Where(m => m.ConversationId == conversationId)
             .OrderBy(m => m.CreatedAt)
             .Include(m => m.Sender)
-            .ToListAsync()
+            .ToListAsync();
 
     public Task<int> CountUnreadAsync(Guid userId) =>
         _dbSet.CountAsync(m =>

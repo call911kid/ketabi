@@ -7,5 +7,6 @@ public enum ListingCondition
     VeryGood = 2,
     Good = 3,
     Fair = 4,
-    Poor = 5
+    Poor = 5,
+    Warn = 6,
 }
