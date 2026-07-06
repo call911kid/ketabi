@@ -1,4 +1,4 @@
-﻿namespace Ketabi.Application.DTOs.Chat;
+namespace Ketabi.Application.DTOs.Chat;
 
 public class ConversationDto
 {
@@ -18,4 +18,6 @@ public class ConversationDto
     public MessageDto? LastMessage { get; set; }
     public IEnumerable<MessageDto> Messages { get; set; } = new List<MessageDto>();
     public DateTime CreatedAt { get; set; }
+    public string RequestType { get; set; } = string.Empty;
+    public int? BorrowDurationDays { get; set; }
 }

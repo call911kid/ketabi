@@ -42,7 +42,7 @@ namespace Ketabi.Application.Services
                 return ServiceResultDto<ReviewDto>.Fail("You can only review completed requests.");
             // Prevent duplicate reviews by the same reviewer for the same request
             var existingReview = await _unitOfWork.Reviews
-                .FindAsync(r => r.RelatedRequestId == createReviewDto.RelatedRequestId
+                .GetFirstOrDefaultAsync(r => r.RelatedRequestId == createReviewDto.RelatedRequestId
                     && r.ReviewerId == reviewerId);
             if (existingReview is not null)
                 return ServiceResultDto<ReviewDto>.Fail("You have already reviewed this request.");
@@ -93,6 +93,15 @@ namespace Ketabi.Application.Services
                 "Review submitted successfully.");
 
         }
+
+        /// <inheritdoc/>
+        public async Task<bool> HasReviewedAsync(Guid reviewerId, Guid requestId)
+        {
+            var existing = await _unitOfWork.Reviews
+                .GetFirstOrDefaultAsync(r => r.RelatedRequestId == requestId && r.ReviewerId == reviewerId);
+            return existing is not null;
+        }
+
         public async Task<ServiceResultDto<ReviewDto>> GetReviewByIdAsync(Guid reviewId)
         {
             var review = await _unitOfWork.Reviews.GetByIdAsync(reviewId);

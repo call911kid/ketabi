@@ -1,4 +1,4 @@
-﻿using Ketabi.Application.DTOs.Common;
+using Ketabi.Application.DTOs.Common;
 using Ketabi.Application.DTOs.Reviews;
 using System;
 using System.Collections.Generic;
@@ -14,5 +14,8 @@ namespace Ketabi.Application.Interfaces
         Task<ServiceResultDto<ReviewDto>> CreateReviewAsync(Guid reviewerId, CreateReviewDto createReviewDto);
         Task<ServiceResultDto<ReviewDto>> GetReviewByIdAsync(Guid reviewId);
         Task<ServiceResultDto<bool>> DeleteReviewAsync(Guid reviewId , Guid requestingUserId);
+
+        /// <summary>Returns true when <paramref name="reviewerId"/> has already submitted a review for <paramref name="requestId"/>.</summary>
+        Task<bool> HasReviewedAsync(Guid reviewerId, Guid requestId);
     }
 }

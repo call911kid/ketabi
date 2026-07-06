@@ -1,4 +1,5 @@
 using Ketabi.Application.DTOs.Chat;
+using Ketabi.Application.DTOs.Reviews;
 using Ketabi.Application.Interfaces;
 using Ketabi.Web.ViewModels.Chat;
 using Microsoft.AspNetCore.Authorization;
@@ -11,10 +12,12 @@ namespace Ketabi.Web.Controllers;
 public class ChatController : BaseController
 {
     private readonly IConversationService _conversationService;
+    private readonly IReviewService _reviewService;
 
-    public ChatController(IConversationService conversationService)
+    public ChatController(IConversationService conversationService, IReviewService reviewService)
     {
         _conversationService = conversationService;
+        _reviewService = reviewService;
     }
 
     // GET /Chat
@@ -52,17 +55,24 @@ public class ChatController : BaseController
         if (!Guid.TryParse(id, out var convGuid))
             return RedirectToAction(nameof(Index));
 
-        var listResult = await _conversationService.GetMyConversationsAsync(userId);
+        var listResult   = await _conversationService.GetMyConversationsAsync(userId);
         var detailResult = await _conversationService.GetConversationAsync(convGuid, userId);
 
         if (!detailResult.Success) return RedirectToAction(nameof(Index));
+
+        var conv = detailResult.Data!;
+
+        // Check if the current user has already reviewed this request
+        bool reviewAlreadySubmitted = false;
+        if (Guid.TryParse(conv.RequestId.ToString(), out var reqGuid))
+            reviewAlreadySubmitted = await _reviewService.HasReviewedAsync(userId, reqGuid);
 
         var vm = new ChatIndexViewModel
         {
             Conversations = listResult.Success
                 ? listResult.Data!.Select(c => MapToSummary(c, userId)).ToList()
                 : new List<ConversationSummaryViewModel>(),
-            ActiveConversation = MapToDetail(detailResult.Data!, userId)
+            ActiveConversation = MapToDetail(conv, userId, reviewAlreadySubmitted)
         };
 
         // mark selected
@@ -114,10 +124,37 @@ public class ChatController : BaseController
     // POST /Chat/SubmitReview
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult SubmitReview(string conversationId, string revieweeId, int rating, string? comment)
+    public async Task<IActionResult> SubmitReview(
+        string conversationId,
+        string revieweeId,
+        string requestId,
+        int rating,
+        string? comment)
     {
-        // TODO: wire IReviewService
-        TempData["FlashSuccess"] = "Review submitted!";
+        var callerId = GetCurrentUserId();
+
+        if (!Guid.TryParse(revieweeId, out var revieweeGuid) ||
+            !Guid.TryParse(requestId,  out var requestGuid))
+        {
+            TempData["FlashError"] = "Invalid review data.";
+            return RedirectToAction(nameof(Index), new { id = conversationId });
+        }
+
+        var dto = new CreateReviewDto
+        {
+            RevieweeId       = revieweeGuid,
+            RelatedRequestId = requestGuid,
+            Rating           = rating,
+            Comment          = comment
+        };
+
+        var result = await _reviewService.CreateReviewAsync(callerId, dto);
+
+        if (!result.Success)
+            TempData["FlashError"] = result.Errors.FirstOrDefault() ?? "Review could not be submitted.";
+        else
+            TempData["FlashSuccess"] = "Review submitted! Thank you for your feedback.";
+
         return RedirectToAction(nameof(Index), new { id = conversationId });
     }
 
@@ -145,7 +182,7 @@ public class ChatController : BaseController
         };
     }
 
-    private static ConversationDetailViewModel MapToDetail(ConversationDto c, Guid callerId)
+    private static ConversationDetailViewModel MapToDetail(ConversationDto c, Guid callerId, bool reviewAlreadySubmitted = false)
     {
         var isOwner = callerId == c.OwnerId;
 
@@ -168,17 +205,18 @@ public class ChatController : BaseController
 
             return new MessageViewModel
             {
-                MessageId      = m.MessageId.ToString(),
-                IsMine         = m.SenderId == callerId,
-                SenderName     = m.SenderName,
+                MessageId       = m.MessageId.ToString(),
+                SenderId        = m.SenderId.ToString(),
+                IsMine          = m.SenderId == callerId,
+                SenderName      = m.SenderName,
                 SenderAvatarUrl = m.SenderAvatar,
-                Text           = m.Text,
-                FormattedTime  = m.CreatedAt.ToString("hh:mm tt"),
-                DateLabel      = m.CreatedAt.Date == DateTime.UtcNow.Date
-                                    ? "Today"
-                                    : m.CreatedAt.Date == DateTime.UtcNow.Date.AddDays(-1)
-                                        ? "Yesterday"
-                                        : m.CreatedAt.ToString("MMM d"),
+                Text            = m.Text,
+                FormattedTime   = m.CreatedAt.ToString("hh:mm tt"),
+                DateLabel       = m.CreatedAt.Date == DateTime.UtcNow.Date
+                                      ? "Today"
+                                      : m.CreatedAt.Date == DateTime.UtcNow.Date.AddDays(-1)
+                                          ? "Yesterday"
+                                          : m.CreatedAt.ToString("MMM d"),
                 ShowDateDivider = showDivider,
                 ShowTimestamp   = true   // placeholder; corrected in the post-processing loop below
             };
@@ -202,8 +240,10 @@ public class ChatController : BaseController
             RequestId = c.RequestId.ToString(),
             CurrentUserConfirmedHandoff = isOwner ? c.OwnerConfirmedHandoff  : c.RequesterConfirmedHandoff,
             OtherUserConfirmedHandoff  = isOwner ? c.RequesterConfirmedHandoff : c.OwnerConfirmedHandoff,
-            // BUG 4: current user avatar — pick the correct party slot
             CurrentUserAvatarUrl = isOwner ? c.OwnerAvatar : c.RequesterAvatar,
+            ReviewAlreadySubmitted = reviewAlreadySubmitted,
+            RequestType = Enum.TryParse<RequestType>(c.RequestType, true, out var rType) ? rType : RequestType.Exchange,
+            BorrowDurationDays = c.BorrowDurationDays,
             Messages = messages
         };
 

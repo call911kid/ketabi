@@ -3,6 +3,7 @@ namespace Ketabi.Web.ViewModels.Chat;
 public class MessageViewModel
 {
     public string MessageId { get; set; } = string.Empty;
+    public string SenderId { get; set; } = string.Empty;
     public string SenderName { get; set; } = string.Empty;
     public string SenderAvatarUrl { get; set; } = string.Empty;
 

@@ -46,8 +46,8 @@
           Borrow · @Model.BorrowDurationDays d
         </span>
       }
-      <span class="chat-header__meta-sep">·</span>
-      <span class="chat-header__meta-item">with @Model.OtherUser.FullName</span>
+      <span class="chat-header__meta-sep d-none d-lg-inline">·</span>
+      <span class="chat-header__meta-item d-none d-lg-inline-flex">with @Model.OtherUser.FullName</span>
     </div>
   </div>
 
@@ -55,13 +55,20 @@
   <div class="chat-header__spacer"></div>
 
   <!-- Other user info (right side) -->
-  <div class="chat-header__user">
+  <div class="chat-header__user" data-presence-user="@Model.OtherUser.UserId">
     <img src="@(string.IsNullOrEmpty(Model.OtherUser.AvatarUrl) ? "/uploads/users/default-avatar.png" : $"/uploads/users/{Model.OtherUser.AvatarUrl}")"
          alt="@Model.OtherUser.FullName"
          class="chat-header__user-avatar" loading="lazy" />
-    <div class="chat-header__user-info d-none d-sm-block">
+    <div class="chat-header__user-info d-none d-md-block">
       <p class="chat-header__user-name">@Model.OtherUser.FullName</p>
       <div class="chat-header__user-meta">
+        @* Presence indicator (dot + label) — updated by JS via UserPresenceChanged *@
+        <span class="presence-status" id="presence-status">
+
+          <span class="presence-dot presence-dot--offline" id="presence-dot" aria-hidden="true"></span>
+          <span class="presence-label" id="presence-label">Offline</span>
+        </span>
+        <span class="chat-header__user-sep">·</span>
         <i class="bi bi-geo-alt" aria-hidden="true"></i>
         <span>@Model.OtherUser.Location</span>
         @if (!string.IsNullOrEmpty(Model.OtherUser.FormattedRating))

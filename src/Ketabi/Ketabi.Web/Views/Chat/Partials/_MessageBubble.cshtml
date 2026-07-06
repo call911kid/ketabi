@@ -7,7 +7,7 @@
   </div>
 }
 
-<div class="chat-bubble-row @(Model.IsMine ? "chat-bubble-row--mine" : "chat-bubble-row--theirs")">
+<div class="chat-bubble-row @(Model.IsMine ? "chat-bubble-row--mine" : "chat-bubble-row--theirs")" data-sender-id="@Model.SenderId" data-msg-id="@Model.MessageId">
   @if (!Model.IsMine)
   {
     <img src="@(string.IsNullOrEmpty(Model.SenderAvatarUrl) ? "/uploads/users/default-avatar.png" : $"/uploads/users/{Model.SenderAvatarUrl}")"
@@ -21,7 +21,16 @@
     @* BUG 7: Only render timestamp at the last bubble of a consecutive sender run *@
     @if (Model.ShowTimestamp)
     {
-      <span class="chat-bubble-group__time">@Model.FormattedTime</span>
+      <span class="chat-bubble-group__time">
+        @Model.FormattedTime
+        @* Read receipt — only on own messages; JS upgrades sent→read icon *@
+        @if (Model.IsMine)
+        {
+          <span class="read-receipt read-receipt--sent" aria-label="Sent">
+            <i class="bi bi-check2" aria-hidden="true"></i>
+          </span>
+        }
+      </span>
     }
   </div>
 </div>

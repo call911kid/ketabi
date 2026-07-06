@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Ketabi.Application.Common;
 using Ketabi.Application.DTOs.Chat;
 using Ketabi.Core.Domain.Entities;
@@ -50,7 +50,15 @@ public class ChatMappingProfile : Profile
                 s.Messages != null && s.Messages.Any()
                     ? s.Messages.OrderByDescending(m => m.CreatedAt).First()
                     : null))
-            .ForMember(d => d.UnreadCount, o => o.Ignore());
+            .ForMember(d => d.UnreadCount, o => o.Ignore())
+            .ForMember(d => d.RequestType, o => o.MapFrom(s =>
+                s.Request != null
+                    ? s.Request.Type.ToString()
+                    : string.Empty))
+            .ForMember(d => d.BorrowDurationDays, o => o.MapFrom(s =>
+                s.Request != null && s.Request.Listing != null
+                    ? s.Request.Listing.SharingDurationInDays
+                    : null));
     }
 
     private static string GetTimeAgo(DateTime dt)

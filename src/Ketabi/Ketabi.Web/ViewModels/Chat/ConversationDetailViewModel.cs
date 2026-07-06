@@ -35,13 +35,12 @@ public class ConversationDetailViewModel
     // ── Computed helpers (used in views) ────────────────────────────
 
     /// <summary>
-    /// BUG 2 FIX: Show the handoff bar only when one party has already confirmed
-    /// but the current user has NOT yet confirmed. Excludes Active (no-one confirmed)
-    /// and Completed (both confirmed).
+    /// Show the handoff bar when the current user has not yet confirmed and
+    /// the transaction is not fully completed. This allows the first user to
+    /// initiate confirmation during Active state.
     /// </summary>
     public bool ShowHandoffBar =>
         !CurrentUserConfirmedHandoff &&
-        TransactionStatus != TransactionStatus.Active &&
         TransactionStatus != TransactionStatus.Completed;
 
     public bool ShowReviewForm =>

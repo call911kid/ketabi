@@ -53,44 +53,29 @@
         autoGrow();
     }
 
-    // ─── BUG 6 FIX: Handoff bar collapse/expand ────────────────────────────────
-    // Root cause: after collapse sets max-height:0 + overflow:hidden, re-expanding
-    // read scrollHeight which returns 0, so max-height was set to 0px again.
-    // Fix: capture naturalHeight before any collapse so it is always available.
+    // ─── Handoff bar collapse/expand ───────────────────────────────────────────
+    // Uses direct inline-style toggling so it works regardless of CSS cache state.
     function initHandoffToggle() {
         var toggle  = qs('#handoff-toggle');
         var content = qs('#handoff-content');
         if (!toggle || !content) return;
 
-        var naturalHeight = 0;
-
-        // Measure the natural (unconstrained) height before applying any collapse
-        content.style.overflow  = 'visible';
-        content.style.maxHeight = 'none';
-        naturalHeight = content.scrollHeight;
-        content.style.maxHeight  = naturalHeight + 'px';
-        content.style.overflow   = '';
-        content.style.transition = 'max-height 0.3s ease';
-
-        toggle.addEventListener('click', function () {
-            var expanded = toggle.getAttribute('aria-expanded') === 'true';
-            if (expanded) {
-                content.style.maxHeight = '0px';
-                content.style.overflow  = 'hidden';
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            var isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+            if (isExpanded) {
+                // Collapse
+                content.style.display = 'none';
                 toggle.setAttribute('aria-expanded', 'false');
             } else {
-                // Re-measure in case DOM changed (e.g. confirmation badge added);
-                // fall back to the captured naturalHeight if scrollHeight is still 0.
-                content.style.overflow  = 'visible';
-                naturalHeight = content.scrollHeight || naturalHeight;
-                content.style.maxHeight = naturalHeight + 'px';
-                setTimeout(function () {
-                    content.style.overflow = '';
-                }, 310);
+                // Expand
+                content.style.display = 'block';
                 toggle.setAttribute('aria-expanded', 'true');
             }
         });
     }
+
+
 
     // Sidebar search
     function initSidebarSearch() {
@@ -187,8 +172,38 @@
         });
 
         // Event: messages read
-        connection.on('MessagesRead', function () {
-            // TODO: update read receipt UI
+        connection.on('MessagesRead', function (conversationId, readerUserId) {
+            // The other user read our messages — upgrade all OUR sent receipts to read.
+            // Our own messages have data-sender-id === currentUserId.
+            qsa('[data-sender-id="' + currentUserId + '"]', feed).forEach(function (row) {
+                var receipt = row.querySelector('.read-receipt');
+                if (receipt && !receipt.classList.contains('read-receipt--read')) {
+                    // Swap icon: single tick → double tick
+                    receipt.innerHTML = '<i class="bi bi-check2-all" aria-hidden="true"></i>';
+                    receipt.classList.remove('read-receipt--sent');
+                    receipt.classList.add('read-receipt--read');
+                    receipt.setAttribute('aria-label', 'Read');
+                }
+            });
+        });
+
+        // Event: other user presence changed
+        connection.on('UserPresenceChanged', function (userId, isOnline) {
+            var dot   = qs('#presence-dot');
+            var label = qs('#presence-label');
+            if (!dot || !label) return;
+
+            if (isOnline) {
+                dot.classList.remove('presence-dot--offline');
+                dot.classList.add('presence-dot--online');
+                label.textContent = 'Online';
+                label.classList.add('presence-label--online');
+            } else {
+                dot.classList.remove('presence-dot--online');
+                dot.classList.add('presence-dot--offline');
+                label.textContent = 'Offline';
+                label.classList.remove('presence-label--online');
+            }
         });
 
         // Event: handoff confirmed
@@ -206,6 +221,8 @@
             try {
                 await connection.start();
                 await connection.invoke('JoinConversation', conversationId);
+                // Announce presence as online after joining
+                await connection.invoke('UserPresence', conversationId, true).catch(console.error);
             } catch (err) {
                 console.error('SignalR connection error:', err);
                 setTimeout(start, 3000);
@@ -213,9 +230,17 @@
         }
         start();
 
-        // Reconnection: re-join group
+        // Reconnection: re-join group + re-announce presence
         connection.onreconnected(function () {
             connection.invoke('JoinConversation', conversationId).catch(console.error);
+            connection.invoke('UserPresence', conversationId, true).catch(console.error);
+        });
+
+        // Announce offline when tab/window is about to close
+        window.addEventListener('beforeunload', function () {
+            if (connection.state === signalR.HubConnectionState.Connected) {
+                connection.invoke('UserPresence', conversationId, false).catch(console.error);
+            }
         });
 
         // Send message
@@ -276,8 +301,11 @@
             var time   = new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
             var row = document.createElement('div');
-            row.className    = 'chat-bubble-row ' + (isMine ? 'chat-bubble-row--mine' : 'chat-bubble-row--theirs');
-            row.dataset.msgId = msg.messageId;
+            row.className     = 'chat-bubble-row ' +
+                                (isMine ? 'chat-bubble-row--mine' : 'chat-bubble-row--theirs') +
+                                ' chat-bubble-row--new';  // triggers slideInMessage animation
+            row.dataset.msgId    = msg.messageId || msg.MessageId || '';
+            row.dataset.senderId = String(msg.senderId || msg.senderID || msg.sender || '');
 
             if (!isMine) {
                 var avatar = document.createElement('img');
@@ -339,6 +367,19 @@
             // BUG 7: dynamically appended messages always show their timestamp
             // (grouping applies only to server-rendered history)
 
+            // Add sent read-receipt for own messages (single tick; upgraded to
+            // double tick when MessagesRead fires from the other participant).
+            if (isMine) {
+                var receipt = document.createElement('span');
+                receipt.className = 'read-receipt read-receipt--sent';
+                receipt.setAttribute('aria-label', 'Sent');
+                var icon = document.createElement('i');
+                icon.className = 'bi bi-check2';
+                icon.setAttribute('aria-hidden', 'true');
+                receipt.appendChild(icon);
+                timeEl.appendChild(receipt);
+            }
+
             group.appendChild(bubble);
             group.appendChild(timeEl);
             row.appendChild(group);
@@ -360,6 +401,17 @@
             indicator.id     = 'typing-indicator';
             indicator.className = 'chat-bubble-row chat-bubble-row--theirs';
 
+            // Clone other user avatar from the header to align typing indicator bubble perfectly
+            var otherAvatarEl = qs('.chat-header__user-avatar');
+            if (otherAvatarEl) {
+                var avatar = document.createElement('img');
+                avatar.src = otherAvatarEl.src;
+                avatar.alt = otherAvatarEl.alt || 'Typing';
+                avatar.className = 'chat-bubble-row__avatar';
+                avatar.loading = 'lazy';
+                indicator.appendChild(avatar);
+            }
+
             var group  = document.createElement('div');
             group.className = 'chat-bubble-group';
 
@@ -380,6 +432,7 @@
 
             typingTimer = setTimeout(removeTypingIndicator, 3000);
         }
+
 
         function removeTypingIndicator() {
             clearTimeout(typingTimer);

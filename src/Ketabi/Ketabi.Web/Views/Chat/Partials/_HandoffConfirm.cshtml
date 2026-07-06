@@ -3,69 +3,90 @@
 <div class="handoff-bar" id="handoff-bar">
 
   <!-- Collapsible toggle header -->
-  <button class="handoff-bar__toggle"
+  <button type="button"
+          class="handoff-bar__toggle"
           id="handoff-toggle"
           aria-expanded="true"
           aria-controls="handoff-content">
-    <span class="handoff-bar__toggle-label">Confirm Physical Handoff</span>
-    <i class="bi bi-chevron-down handoff-bar__chevron" aria-hidden="true"></i>
+    <span class="handoff-bar__toggle-label">
+      <i class="bi bi-shield-check" aria-hidden="true" style="color: var(--color-indigo); margin-right: 6px;"></i>
+      Confirm Physical Handoff
+    </span>
+    <div class="handoff-bar__toggle-right">
+      <span class="handoff-bar__mini-status">
+        @if (Model.CurrentUserConfirmedHandoff)
+        {
+          <span style="color: var(--color-success); font-size: 0.8rem;"><i class="bi bi-check-circle-fill"></i> You confirmed</span>
+        }
+        else
+        {
+          <span style="color: var(--color-text-muted); font-size: 0.8rem;">Action Required</span>
+        }
+      </span>
+      <i class="bi bi-chevron-down handoff-bar__chevron" aria-hidden="true"></i>
+    </div>
   </button>
 
   <!-- Collapsible body -->
   <div class="handoff-bar__body" id="handoff-content">
+    <div class="handoff-bar__grid">
+      
+      <!-- Left side: Avatars & Status -->
+      <div class="handoff-bar__left">
+        <div class="handoff-bar__avatars-group">
+          <!-- Current User -->
+          <div class="handoff-bar__avatar-item">
+            <div class="handoff-bar__img-container">
+              <img src="@(string.IsNullOrEmpty(Model.CurrentUserAvatarUrl) ? "/uploads/users/default-avatar.png" : $"/uploads/users/{Model.CurrentUserAvatarUrl}")"
+                   alt="You"
+                   class="handoff-bar__avatar-img"
+                   style="width:36px;height:36px;border-radius:50%;object-fit:cover;display:block;flex-shrink:0;" />
+              @if (Model.CurrentUserConfirmedHandoff)
+              {
+                <span class="handoff-bar__badge-success"><i class="bi bi-check"></i></span>
+              }
+            </div>
+            <span class="handoff-bar__name-label @(Model.CurrentUserConfirmedHandoff ? "confirmed" : "")">You</span>
+          </div>
 
-    <!-- Participant confirmation status -->
-    <div class="handoff-bar__participants">
-      <!-- BUG 4: "You" slot — use CurrentUserAvatarUrl (the authenticated user's own avatar) -->
-      <div class="handoff-bar__participant">
-        <div class="handoff-bar__participant-img-wrap">
-          <img src="@(string.IsNullOrEmpty(Model.CurrentUserAvatarUrl) ? "/uploads/users/default-avatar.png" : $"/uploads/users/{Model.CurrentUserAvatarUrl}")"
-               alt="You"
-               class="handoff-bar__participant-img" />
-          @if (Model.CurrentUserConfirmedHandoff)
-          {
-            <span class="handoff-bar__confirmed-badge" aria-label="Confirmed">
-              <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
-            </span>
-          }
+          <!-- Connection arrows -->
+          <div class="handoff-bar__connection-arrow">
+            <i class="bi bi-arrow-left-right"></i>
+          </div>
+
+          <!-- Other User -->
+          <div class="handoff-bar__avatar-item">
+            <div class="handoff-bar__img-container">
+              <img src="@(string.IsNullOrEmpty(Model.OtherUser.AvatarUrl) ? "/uploads/users/default-avatar.png" : $"/uploads/users/{Model.OtherUser.AvatarUrl}")"
+                   alt="@Model.OtherUser.FullName"
+                   class="handoff-bar__avatar-img"
+                   style="width:36px;height:36px;border-radius:50%;object-fit:cover;display:block;flex-shrink:0;" />
+              @if (Model.OtherUserConfirmedHandoff)
+              {
+                <span class="handoff-bar__badge-success"><i class="bi bi-check"></i></span>
+              }
+            </div>
+            <span class="handoff-bar__name-label @(Model.OtherUserConfirmedHandoff ? "confirmed" : "")">@Model.OtherUser.FullName.Split(' ')[0]</span>
+          </div>
         </div>
-        <span class="handoff-bar__participant-name @(Model.CurrentUserConfirmedHandoff ? "handoff-bar__participant-name--confirmed" : "")">
-          You @(Model.CurrentUserConfirmedHandoff ? "✓" : "")
-        </span>
       </div>
-      <!-- BUG 4: Other user slot — use OtherUser.AvatarUrl with /uploads/users/ prefix and fallback -->
-      <div class="handoff-bar__participant">
-        <div class="handoff-bar__participant-img-wrap">
-          <img src="@(string.IsNullOrEmpty(Model.OtherUser.AvatarUrl) ? "/uploads/users/default-avatar.png" : $"/uploads/users/{Model.OtherUser.AvatarUrl}")"
-               alt="@Model.OtherUser.FullName"
-               class="handoff-bar__participant-img" />
-          @if (Model.OtherUserConfirmedHandoff)
-          {
-            <span class="handoff-bar__confirmed-badge" aria-label="Confirmed">
-              <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
-            </span>
-          }
-        </div>
-        <span class="handoff-bar__participant-name @(Model.OtherUserConfirmedHandoff ? "handoff-bar__participant-name--confirmed" : "")">
-          @Model.OtherUser.FullName.Split(' ')[0] @(Model.OtherUserConfirmedHandoff ? "✓" : "")
-        </span>
+
+      <!-- Right side: Confirm Action -->
+      <div class="handoff-bar__right">
+        <form asp-controller="Chat" asp-action="ConfirmHandoff" method="post" style="width: 100%;">
+          <input type="hidden" name="conversationId" value="@Model.ConversationId" />
+          @Html.AntiForgeryToken()
+          <button type="submit" class="handoff-bar__btn-confirm">
+            <i class="bi bi-check-circle" aria-hidden="true"></i>
+            I Confirm the Handoff
+          </button>
+        </form>
       </div>
-      <span class="handoff-bar__both-label">Both must confirm</span>
+
     </div>
-
-    <!-- Confirm button (POST to future endpoint) -->
-    <form asp-controller="Chat" asp-action="ConfirmHandoff" method="post">
-      <input type="hidden" name="conversationId" value="@Model.ConversationId" />
-      @Html.AntiForgeryToken()
-      <button type="submit" class="handoff-bar__confirm-btn">
-        <i class="bi bi-check-circle" aria-hidden="true"></i>
-        I Confirm the Handoff
-      </button>
-    </form>
-
-    <p class="handoff-bar__hint">
-      Tap after the book has physically changed hands.
-      Once both parties confirm, you'll each be invited to leave a review.
+    
+    <p class="handoff-bar__hint-text">
+      Tap only after the book has physically changed hands. Once both parties confirm, you can leave a review.
     </p>
 
   </div>

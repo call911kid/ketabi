@@ -42,6 +42,7 @@
       @Html.AntiForgeryToken()
       <input type="hidden" name="conversationId" value="@Model.ConversationId" />
       <input type="hidden" name="revieweeId"     value="@Model.OtherUser.UserId" />
+      <input type="hidden" name="requestId"      value="@Model.RequestId" />
       <input type="hidden" name="rating"         id="rating-hidden-input" value="0" />
 
       <textarea name="comment"

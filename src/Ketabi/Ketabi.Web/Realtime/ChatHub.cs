@@ -1,4 +1,4 @@
-﻿using Ketabi.Application.DTOs.Chat;
+using Ketabi.Application.DTOs.Chat;
 using Ketabi.Application.DTOs.Notifications;
 using Ketabi.Application.Interfaces;
 using Ketabi.Core.Domain.Enums;
@@ -115,6 +115,28 @@ public sealed class ChatHub : Hub
 
         await Clients.OthersInGroup(conversationId)
                      .SendAsync("UserTyping", conversationId, userId.ToString());
+    }
+
+    // User presence — broadcast online/offline status to the other participant
+    public async Task UserPresence(string conversationId, bool isOnline)
+    {
+        if (!TryGetUserId(out var userId)) return;
+
+        if (!Guid.TryParse(conversationId, out var convGuid)) return;
+
+        // Verify caller is actually in this conversation before broadcasting
+        var isParticipant = await _conversationService
+            .IsParticipantAsync(convGuid, userId);
+
+        if (!isParticipant) return;
+
+        var userName = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+
+        await Clients.OthersInGroup(conversationId)
+                     .SendAsync("UserPresenceChanged", userId.ToString(), isOnline);
+
+        _logger.LogDebug("User {UserId} presence: {Status} in conversation {ConvId}",
+            userId, isOnline ? "online" : "offline", convGuid);
     }
 
     // Confirm handoff

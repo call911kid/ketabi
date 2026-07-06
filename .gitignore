@@ -38,3 +38,6 @@ Properties/PublishProfiles/
 *.pubxml.user
 *.pubxml.userosmac
 *.Publish.xml
+
+
+CHAT_FEATURE_ANALYSIS.md
